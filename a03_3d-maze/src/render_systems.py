@@ -1,6 +1,7 @@
 from OpenGL import GL as gl
 import glm
 import glfw
+import pygame
 
 # pylint: disable=import-error
 from esper import Processor
@@ -69,5 +70,5 @@ class StandardRenderSystem(Processor):
 class FinishFrameSystem(Processor):
 
     def process(self):
-        pass
+        pygame.display.flip()
         

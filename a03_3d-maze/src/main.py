@@ -1,75 +1,95 @@
-import contextlib, sys, ctypes
-from OpenGL import GL as gl
+import pygame
 import esper
-import glfw
-import glm
+from OpenGL import GL as gl
+
 
 from vertex_buffer_array import StandardShaderVertexArray
-from application import Application
 import render_systems as rsys
 import physic_systems as psys
 import components as com
 
+RESOLUTION = 720, 480
+FPS = 60
+
 def main_loop(window, world):
-    while (
-        glfw.get_key(window, glfw.KEY_ESCAPE) != glfw.PRESS and
-        not glfw.window_should_close(window)
-    ):
-        world.process()
-        glfw.swap_buffers(app.window)
-        glfw.poll_events()
+    pass
 
 class World(esper.World):
     def __init__(self):
         super().__init__()
 
-if __name__ == '__main__':
-    app = Application()
-    world = World()
+        # Systems
+        self.add_processor(psys.MovementSystem(), priority=2000)
+        self.add_processor(rsys.PrepareFrameSystem(), priority=1010)
+        self.add_processor(rsys.TranslationMatricesSystem(), priority=1009)
+        self.add_processor(rsys.StandardRenderSystem(), priority=1008)
+        self.add_processor(rsys.FinishFrameSystem(), priority=1007)
 
-    # Systems
-    world.add_processor(psys.MovementSystem(), priority=2000)
-    world.add_processor(rsys.PrepareFrameSystem(), priority=1010)
-    world.add_processor(rsys.TranslationMatricesSystem(), priority=1009)
-    world.add_processor(rsys.StandardRenderSystem(), priority=1008)
-    world.add_processor(rsys.FinishFrameSystem(), priority=1007)
+        self._populate()
     
-    # Crappy mixed entity, OOP is a thing... well actually an object...
-    vba = StandardShaderVertexArray(3)
-    vba.load_position_data([-1, -1, 0, 1, -1, 0, 0,  1, 0])
-    vba.load_color_data([
-        1.0, 0.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 0.0, 1.0])
+    def _populate(self):
+        # Crappy mixed entity, OOP is a thing... well actually an object...
+        # WTF. I'm always amazed by the comments I leave in my code. ~xFrednet 2020.09.23
+        vba2 = StandardShaderVertexArray(6)
+        vba2.load_position_data([
+            -0.1,  0.1, 0.1,
+            -0.1, -0.1, 0.1,
+            0.1, -0.1, 0.1,
+            -0.1,  0.1, 0.1,
+            0.1, -0.1, 0.1,
+            0.1,  0.1, 0.1])
+        vba2.load_color_data([
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0])
 
-    vba2 = StandardShaderVertexArray(6)
-    vba2.load_position_data([
-        -0.1,  0.1, 0.1,
-        -0.1, -0.1, 0.1,
-         0.1, -0.1, 0.1,
-        -0.1,  0.1, 0.1,
-         0.1, -0.1, 0.1,
-         0.1,  0.1, 0.1])
-    vba2.load_color_data([
-        1.0, 0.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 0.0, 1.0,
-        1.0, 0.0, 0.0,
-        0.0, 0.0, 1.0,
-        0.0, 1.0, 0.0])
+        entity = self.create_entity()
+        self.add_component(entity, vba2)
+        self.add_component(entity, com.Position())
+        self.add_component(entity, com.Velocity(0.001, 0.001))
+        self.add_component(entity, com.Scale())
+        self.add_component(entity, com.TransformationMatrix())
 
-    # entity = world.create_entity()
-    # world.add_component(entity, vba)
+def game_loop(world):
+    clock = pygame.time.Clock()
+    last_millis = pygame.time.get_ticks()
 
-    entity = world.create_entity()
-    world.add_component(entity, vba2)
-    world.add_component(entity, com.Position())
-    world.add_component(entity, com.Velocity(0.001, 0.001))
-    world.add_component(entity, com.Scale())
-    world.add_component(entity, com.TransformationMatrix())
+    while True:
+        # Delta timing. See https://en.wikipedia.org/wiki/Delta_timing
+        # Trust me, this gets important in larger games
+        # Pygame implementation stolen from: https://stackoverflow.com/questions/24039804/pygame-current-time-millis-and-delta-time
+        millis = pygame.time.get_ticks()
+        delta = (millis - last_millis) / 1000.0
+        last_millis = millis
+        
+        # Get events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.locals.K_ESCAPE:
+                    return
 
-    main_loop(app.window, world)
+        # Update
+        world.process()
 
-    del vba
-    del vba2
+        clock.tick(FPS)
+
+def main():
+    pygame.init()
+    pygame.display.init()
+    pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF|pygame.OPENGL)
+    pygame.display.set_caption("Le 3D maze of time")
+
+    world = World()
+    
+    game_loop(world)
+
     del world
+
+if __name__ == '__main__':
+    main()
+    pygame.quit()
