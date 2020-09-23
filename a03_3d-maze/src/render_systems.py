@@ -69,6 +69,5 @@ class StandardRenderSystem(Processor):
 class FinishFrameSystem(Processor):
 
     def process(self):
-        glfw.swap_buffers(self.world.get_resource(Application).window)
-        glfw.poll_events()
+        pass
         

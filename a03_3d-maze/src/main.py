@@ -1,6 +1,6 @@
 import contextlib, sys, ctypes
 from OpenGL import GL as gl
-import esper as ecs
+import esper
 import glfw
 import glm
 
@@ -16,13 +16,16 @@ def main_loop(window, world):
         not glfw.window_should_close(window)
     ):
         world.process()
+        glfw.swap_buffers(app.window)
+        glfw.poll_events()
+
+class World(esper.World):
+    def __init__(self):
+        super().__init__()
 
 if __name__ == '__main__':
     app = Application()
-    world = ecs.World()
-
-    # Resource
-    world.add_resource(app)
+    world = World()
 
     # Systems
     world.add_processor(psys.MovementSystem(), priority=2000)
@@ -65,7 +68,7 @@ if __name__ == '__main__':
     world.add_component(entity, com.Scale())
     world.add_component(entity, com.TransformationMatrix())
 
-    main_loop(world.get_resource(Application).window, world)
+    main_loop(app.window, world)
 
     del vba
     del vba2
