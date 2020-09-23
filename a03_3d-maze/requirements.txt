@@ -1,0 +1,4 @@
+pygame
+PyGLM
+PyOpenGL
+esper

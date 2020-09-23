@@ -1,12 +1,12 @@
 from OpenGL import GL as gl
 import glm
 import glfw
+import pygame
 
 # pylint: disable=import-error
 from esper import Processor
 from shader_program import StandardShaderProgram 
 from vertex_buffer_array import StandardShaderVertexArray
-from application import Application
 import components as com
 
 class PrepareFrameSystem(Processor):
@@ -41,6 +41,9 @@ class StandardRenderSystem(Processor):
 
     def __init__(self):
         self.__shader = StandardShaderProgram()
+    
+    def cleanup(self):
+        self.__shader.cleanup()
 
     def process(self):
         # Ugly hacks, because hacker man!!
@@ -69,6 +72,5 @@ class StandardRenderSystem(Processor):
 class FinishFrameSystem(Processor):
 
     def process(self):
-        glfw.swap_buffers(self.world.get_resource(Application).window)
-        glfw.poll_events()
+        pygame.display.flip()
         
