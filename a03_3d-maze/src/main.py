@@ -26,6 +26,11 @@ class World(esper.World):
         self.add_processor(rsys.FinishFrameSystem(), priority=1007)
 
         self._populate()
+
+    def __del__(self):
+        for id, (vertex) in self.get_component(StandardShaderVertexArray):
+            self.remove_component(id, vertex)
+            del vertex
     
     def _populate(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...

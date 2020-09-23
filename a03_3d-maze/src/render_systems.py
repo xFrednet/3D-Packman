@@ -7,7 +7,6 @@ import pygame
 from esper import Processor
 from shader_program import StandardShaderProgram 
 from vertex_buffer_array import StandardShaderVertexArray
-from application import Application
 import components as com
 
 class PrepareFrameSystem(Processor):
