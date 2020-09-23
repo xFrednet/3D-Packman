@@ -41,6 +41,9 @@ class StandardRenderSystem(Processor):
 
     def __init__(self):
         self.__shader = StandardShaderProgram()
+    
+    def cleanup(self):
+        self.__shader.cleanup()
 
     def process(self):
         # Ugly hacks, because hacker man!!

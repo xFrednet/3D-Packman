@@ -3,13 +3,14 @@ from OpenGL import GL as gl
 
 from shader_program import StandardShaderProgram
 
+
 class VertexBufferArray:
     def __init__(self, vertex_count):
         self.vertex_array_id = gl.glGenVertexArrays(1)
         self.vertex_count = vertex_count
         self.__vertex_buffer = []
     
-    def __del__(self):
+    def cleanup(self):
         for vb in self.__vertex_buffer:
             gl.glDeleteBuffers(1, [vb])
 
@@ -47,6 +48,7 @@ class VertexBufferArray:
             gl.GLfloat, 
             gl.GL_FLOAT,
             ctypes.sizeof(ctypes.c_float))
+
 
 class StandardShaderVertexArray(VertexBufferArray):
     

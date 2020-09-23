@@ -6,7 +6,7 @@ class ShaderProgram:
         self.program_id = gl.glCreateProgram()
         self.shader_ids = []
 
-    def __del__(self):
+    def cleanup(self):
         for shader_id in self.shader_ids:
             gl.glDetachShader(self.program_id, shader_id)
             gl.glDeleteShader(shader_id)
@@ -94,15 +94,11 @@ class StandardShaderProgram(ShaderProgram):
         self.transformation_matrix_location = self._load_uniform_location(StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
         print("StandardShaderProgram created")
 
-    def __del__(self):
-        print("StandardShaderProgram deleted")
-
     # The vertex data has the following layout:
     # [
     #   x_0, y_0, z_0,
     #   x_1, y_1, z_1,
     #   x_n, y_n, z_n]
-    
 
     def start(self):
         ShaderProgram.start(self)

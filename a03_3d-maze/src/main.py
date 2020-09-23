@@ -11,12 +11,11 @@ import components as com
 RESOLUTION = 720, 480
 FPS = 60
 
-def main_loop(window, world):
-    pass
-
 class World(esper.World):
     def __init__(self):
         super().__init__()
+
+        self.thingy = None
 
         # Systems
         self.add_processor(psys.MovementSystem(), priority=2000)
@@ -27,10 +26,24 @@ class World(esper.World):
 
         self._populate()
 
-    def __del__(self):
-        for id, (vertex) in self.get_component(StandardShaderVertexArray):
-            self.remove_component(id, vertex)
-            del vertex
+    def cleanup(self):
+        """
+        cleanup... cleanup so what's the story behind this cleanup method why wouldn't I just use `__del__`?
+        Well let me tell you the stupidest thing I've found in Python so far... Do you think that
+        `del object` calls `object.__del__`? Well you would be kind of right because it does... but not right away.
+        YES yes trust me. It queues the `__del__` call. This is usually fine but not here do you want to guess why?
+        Well the `__del__` of the VBOs get called after the destruction of PyOpenGL. Now HOW, tell me HOW should I
+        destruct a VBO if the OpenGL bindings are unavailable????
+
+        Now calm down and be happy that you've solved this bug after 4 total hours of debugging...... 
+        ~ xFrednet 
+        """
+        for _entity, vbo in self.get_component(StandardShaderVertexArray):
+            vbo.cleanup()
+
+        self.get_processor(rsys.StandardRenderSystem).cleanup()
+
+        print("World: Cleanup complete")
     
     def _populate(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...
@@ -57,6 +70,7 @@ class World(esper.World):
         self.add_component(entity, com.Velocity(0.001, 0.001))
         self.add_component(entity, com.Scale())
         self.add_component(entity, com.TransformationMatrix())
+
 
 def game_loop(world):
     clock = pygame.time.Clock()
@@ -93,7 +107,7 @@ def main():
     
     game_loop(world)
 
-    del world
+    world.cleanup()
 
 if __name__ == '__main__':
     main()
