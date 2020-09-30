@@ -30,7 +30,7 @@ class BuildTranformationMatrixSystem(Processor):
                 com.Scale,
                 com.Rotation):
             mat = glm.mat4x4(1.0)
-            mat = glm.translate(mat, glm.vec3(position.value.x, position.value.y, 0.0))
+            mat = glm.translate(mat, position.value)
             mat = glm.rotate(mat, rotation.value.x, glm.vec3(1, 0, 0))
             mat = glm.rotate(mat, rotation.value.y, glm.vec3(0, 1, 0))
             mat = glm.rotate(mat, rotation.value.z, glm.vec3(0, 0, 1))

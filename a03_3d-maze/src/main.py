@@ -1,5 +1,6 @@
 import pygame
 import esper
+import glm
 from OpenGL import GL as gl
 
 from shader_program import StandardShaderProgram 
@@ -12,11 +13,12 @@ RESOLUTION = 720, 480
 FPS = 60
 
 class World(esper.World):
-    def __init__(self):
+    def __init__(self, resolution):
         super().__init__()
 
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
+        self.resolution = resolution
 
         #
         # Physics
@@ -37,6 +39,8 @@ class World(esper.World):
         self.add_processor(rsys.FinishFrameSystem(), priority=1007)
 
         self._populate()
+
+        self.update_resolution(resolution)
 
     def cleanup(self):
         """
@@ -79,11 +83,16 @@ class World(esper.World):
         entity = self.create_entity()
         self.add_component(entity, vba2)
         self.add_component(entity, com.Velocity(0.05, 0.05))
+
         self.add_component(entity, com.Position())
         self.add_component(entity, com.Scale())
         self.add_component(entity, com.Rotation())
         self.add_component(entity, com.TransformationMatrix())
 
+    def update_resolution(self, resolution):
+        self.resolution = resolution
+
+        self.standard_shader.update_view_matrix(resolution)
 
 def game_loop(world):
     clock = pygame.time.Clock()
@@ -116,7 +125,7 @@ def main():
     pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF|pygame.OPENGL)
     pygame.display.set_caption("Le 3D maze of time")
 
-    world = World()
+    world = World(glm.vec2(RESOLUTION))
     
     game_loop(world)
 

@@ -1,5 +1,6 @@
 import sys, ctypes
 import glm
+import math
 from OpenGL import GL as gl
 
 class ShaderProgram:
@@ -99,3 +100,24 @@ class StandardShaderProgram(ShaderProgram):
     
     def set_projection_matrix(self, matrix):
         gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+    
+    def update_view_matrix(self, resolution, fov=(math.pi / 2), n=0.5, f=25.0):
+        aspect = resolution.x / resolution.y
+        
+        top = n * math.tan(fov / 2)
+        bottom = -top
+        right = top * aspect
+        left = -right
+
+        mat = glm.mat4(0.0)
+        mat[0][0] = (2 * n) / (right - left)
+        mat[1][1] = (2 * n) / (top - bottom)
+        mat[2][0] = (left + right) / (right - left)
+        mat[2][1] = (top + bottom) / (top - bottom)
+        mat[2][2] = (-(f + n)) / (f - n)
+        mat[2][3] = -1
+        mat[3][2] = (-(2 * f * n)) / (f - n)
+
+        self.start()
+        self.set_projection_matrix(mat)
+        self.stop()
