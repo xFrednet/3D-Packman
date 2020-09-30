@@ -14,6 +14,11 @@ class PrepareFrameSystem(Processor):
         gl.glClearColor(1.0, 0, 1.0, 0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
+        self.world.standard_shader.start()
+        self.world.standard_shader.set_view_matrix(glm.mat4(1.0))
+        self.world.standard_shader.set_projection_matrix(glm.mat4(1.0))
+        self.world.standard_shader.stop()
+
 class TranslationMatricesSystem(Processor):
     def process(self):
         for _id, (translation, position, scale) in self.world.get_components(com.TransformationMatrix, com.Position, com.Scale):
@@ -40,7 +45,7 @@ class StandardRenderSystem(Processor):
             gl.glEnableVertexAttribArray(shader.COLOR_ATTR)
             
             # Draw the beautiful
-            shader.set_transformation_matrix(translation)
+            shader.set_transformation_matrix(translation.value)
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
             
             # Unbind the thingies
