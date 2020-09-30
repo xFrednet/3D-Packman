@@ -25,3 +25,16 @@ class Rotation:
 class TransformationMatrix:
     def __init__(self):
         self.value = glm.mat4x4(1.0)
+
+#
+# Camera
+#
+class CameraOrientation:
+    def __init__(self):
+        self.yaw = 0.0    # turning <- ->
+        self.pitch = 0.0  # up and down
+        self.role = 0.0   # leaning -\|/-
+        
+class ViewMatrix:
+    def __init__(self):
+        self.value = glm.mat4x4(1.0)

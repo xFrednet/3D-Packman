@@ -19,18 +19,21 @@ class World(esper.World):
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
         self.resolution = resolution
+        self.camera_id = 0
 
         #
         # Physics
         #
+        self.add_processor(psys.CameraControlSystem(), priority=2100)
         self.add_processor(psys.MovementSystem(), priority=2000)
         
         #
         # Rendering
         #
         # Prepare
-        self.add_processor(rsys.PrepareFrameSystem(), priority=1010)
+        self.add_processor(rsys.BuildViewMatrixSystem(), priority=1010)
         self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1009)
+        self.add_processor(rsys.PrepareFrameSystem(), priority=1008)
 
         # Draw
         self.add_processor(rsys.StandardRenderSystem(), priority=1008)
@@ -83,11 +86,18 @@ class World(esper.World):
         entity = self.create_entity()
         self.add_component(entity, vba2)
         self.add_component(entity, com.Velocity(0.05, 0.05))
-
         self.add_component(entity, com.Position())
         self.add_component(entity, com.Scale())
         self.add_component(entity, com.Rotation())
         self.add_component(entity, com.TransformationMatrix())
+        
+        camera = self.create_entity()
+        self.add_component(camera, com.Position(x=1.0, y=1.0))
+        self.add_component(camera, com.Velocity(0.0, 0.0))
+        self.add_component(camera, com.CameraOrientation())
+        self.add_component(camera, com.ViewMatrix())
+        self.camera_id = camera
+        
 
     def update_resolution(self, resolution):
         self.resolution = resolution

@@ -17,9 +17,10 @@ class PrepareFrameSystem(Processor):
         gl.glClearColor(1.0, 0, 1.0, 0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
+        matrix = self.world.component_for_entity(self.world.camera_id, com.ViewMatrix).value
         self.world.standard_shader.start()
-        self.world.standard_shader.set_view_matrix(glm.mat4(1.0))
-        self.world.standard_shader.set_projection_matrix(glm.mat4(1.0))
+        self.world.standard_shader.set_view_matrix(matrix)
+#        self.world.standard_shader.set_projection_matrix(glm.mat4(1.0))
         self.world.standard_shader.stop()
 
 class BuildTranformationMatrixSystem(Processor):
@@ -36,6 +37,19 @@ class BuildTranformationMatrixSystem(Processor):
             mat = glm.rotate(mat, rotation.value.z, glm.vec3(0, 0, 1))
             mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
 
+            mat_target.value = mat
+
+class BuildViewMatrixSystem(Processor):
+    def process(self):
+        for _id, (mat_target, position, orientation) in self.world.get_components(
+                com.ViewMatrix,
+                com.Position,
+                com.CameraOrientation):
+            mat = glm.mat4x4(1.0)
+            mat = glm.rotate(mat, orientation.pitch, glm.vec3(1, 0, 0))
+            mat = glm.rotate(mat, orientation.yaw  , glm.vec3(0, 1, 0))
+            mat = glm.rotate(mat, orientation.role , glm.vec3(0, 0, 1))
+            mat = glm.translate(mat, position.value * -1)
             mat_target.value = mat
 
 #
