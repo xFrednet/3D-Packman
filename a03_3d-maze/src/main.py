@@ -2,7 +2,7 @@ import pygame
 import esper
 from OpenGL import GL as gl
 
-
+from shader_program import StandardShaderProgram 
 from vertex_buffer_array import StandardShaderVertexArray
 import render_systems as rsys
 import physic_systems as psys
@@ -15,7 +15,7 @@ class World(esper.World):
     def __init__(self):
         super().__init__()
 
-        self.thingy = None
+        self.standard_shader = StandardShaderProgram()
 
         # Systems
         self.add_processor(psys.MovementSystem(), priority=2000)
@@ -41,7 +41,7 @@ class World(esper.World):
         for _entity, vbo in self.get_component(StandardShaderVertexArray):
             vbo.cleanup()
 
-        self.get_processor(rsys.StandardRenderSystem).cleanup()
+        self.standard_shader.cleanup()
 
         print("World: Cleanup complete")
     

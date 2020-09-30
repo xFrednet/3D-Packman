@@ -1,4 +1,5 @@
 import sys, ctypes
+import glm
 from OpenGL import GL as gl
 
 class ShaderProgram:
@@ -56,6 +57,8 @@ class StandardShaderProgram(ShaderProgram):
     COLOR_ATTR = 1
 
     TRANSFORMATION_MATRIX_NAME = 'transformationMatrix'
+    VIEW_MATRIX_NAME = 'viewMatrix'
+    PROJECTION_MATRIX_NAME = 'projectionMatrix'
 
     def __init__(self):
         ShaderProgram.__init__(self)
@@ -72,6 +75,8 @@ class StandardShaderProgram(ShaderProgram):
         self._compile_shaders(shaders)
 
         self.transformation_matrix_location = self._load_uniform_location(StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
+        self.view_matrix_location = self._load_uniform_location(StandardShaderProgram.VIEW_MATRIX_NAME)
+        self.projection_matrix_location = self._load_uniform_location(StandardShaderProgram.PROJECTION_MATRIX_NAME)
         print("StandardShaderProgram created")
 
     # The vertex data has the following layout:
@@ -86,3 +91,11 @@ class StandardShaderProgram(ShaderProgram):
     def stop(self):
         ShaderProgram.stop(self)
     
+    def set_transformation_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.transformation_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix.value))
+
+    def set_view_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.view_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix.value))
+    
+    def set_projection_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix.value))
