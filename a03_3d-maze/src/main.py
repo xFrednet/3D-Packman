@@ -1,4 +1,5 @@
 import pygame
+import pygame.locals
 import esper
 from OpenGL import GL as gl
 
