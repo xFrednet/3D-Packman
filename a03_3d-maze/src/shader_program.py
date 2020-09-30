@@ -57,39 +57,19 @@ class StandardShaderProgram(ShaderProgram):
 
     TRANSFORMATION_MATRIX_NAME = 'transformationMatrix'
 
-    SHADERS = {
-        gl.GL_VERTEX_SHADER: '''\
-            #version 330 core
-            
-            layout(location = 0) in vec3 position;
-            layout(location = 1) in vec3 color;
-
-            out vec3 vb_color;
-
-            uniform mat4 transformationMatrix;
-
-            void main(){
-                vb_color = color;
-                gl_Position = transformationMatrix * vec4(position, 1.0);
-                gl_Position.w = 1.0;
-            }
-            ''',
-        gl.GL_FRAGMENT_SHADER: '''\
-            #version 330 core
-            
-            in vec3 vb_color;
-
-            out vec3 color;
-            
-            void main(){
-                color = vec3((vb_color.x + 1) / 2, (vb_color.y + 1) / 2, (vb_color.z + 1) / 2);
-            }
-            '''
-        }
-
     def __init__(self):
         ShaderProgram.__init__(self)
-        self._compile_shaders(StandardShaderProgram.SHADERS)
+
+        vertex_file = open(sys.path[0] + "/simple3D.vert")
+        fragment_file = open(sys.path[0] + "/simple3D.frag")
+        shaders = {
+            gl.GL_VERTEX_SHADER: vertex_file.read(),
+            gl.GL_FRAGMENT_SHADER: fragment_file.read()
+        }
+        vertex_file.close()
+        fragment_file.close()
+
+        self._compile_shaders(shaders)
 
         self.transformation_matrix_location = self._load_uniform_location(StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
         print("StandardShaderProgram created")
