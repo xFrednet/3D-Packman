@@ -8,6 +8,9 @@ from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 import components as com
 
+#
+# Prepare frame
+#
 class PrepareFrameSystem(Processor):
     
     def process(self):
@@ -19,14 +22,25 @@ class PrepareFrameSystem(Processor):
         self.world.standard_shader.set_projection_matrix(glm.mat4(1.0))
         self.world.standard_shader.stop()
 
-class TranslationMatricesSystem(Processor):
+class BuildTranformationMatrixSystem(Processor):
     def process(self):
-        for _id, (translation, position, scale) in self.world.get_components(com.TransformationMatrix, com.Position, com.Scale):
+        for _id, (mat_target, position, scale, rotation) in self.world.get_components(
+                com.TransformationMatrix,
+                com.Position,
+                com.Scale,
+                com.Rotation):
             mat = glm.mat4x4(1.0)
             mat = glm.translate(mat, glm.vec3(position.value.x, position.value.y, 0.0))
+            mat = glm.rotate(mat, rotation.value.x, glm.vec3(1, 0, 0))
+            mat = glm.rotate(mat, rotation.value.y, glm.vec3(0, 1, 0))
+            mat = glm.rotate(mat, rotation.value.z, glm.vec3(0, 0, 1))
             mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
-            translation.value = mat
 
+            mat_target.value = mat
+
+#
+# Draw frame
+#
 class StandardRenderSystem(Processor):
 
     VERTEX_POS_INDEX = 0
@@ -53,8 +67,11 @@ class StandardRenderSystem(Processor):
             gl.glDisableVertexAttribArray(shader.COLOR_ATTR)
             gl.glBindVertexArray(0)
 
-        gl.glUseProgram(0)
+        shader.stop()
 
+#
+# Complete frame
+#
 class FinishFrameSystem(Processor):
 
     def process(self):

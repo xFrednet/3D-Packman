@@ -16,12 +16,24 @@ class World(esper.World):
         super().__init__()
 
         self.standard_shader = StandardShaderProgram()
+        self.delta = 0.0
 
-        # Systems
+        #
+        # Physics
+        #
         self.add_processor(psys.MovementSystem(), priority=2000)
+        
+        #
+        # Rendering
+        #
+        # Prepare
         self.add_processor(rsys.PrepareFrameSystem(), priority=1010)
-        self.add_processor(rsys.TranslationMatricesSystem(), priority=1009)
+        self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1009)
+
+        # Draw
         self.add_processor(rsys.StandardRenderSystem(), priority=1008)
+        
+        #finish
         self.add_processor(rsys.FinishFrameSystem(), priority=1007)
 
         self._populate()
@@ -50,12 +62,12 @@ class World(esper.World):
         # WTF. I'm always amazed by the comments I leave in my code. ~xFrednet 2020.09.23
         vba2 = StandardShaderVertexArray(6)
         vba2.load_position_data([
-            -0.1,  0.1, 0.1,
-            -0.1, -0.1, 0.1,
-            0.1, -0.1, 0.1,
-            -0.1,  0.1, 0.1,
-            0.1, -0.1, 0.1,
-            0.1,  0.1, 0.1])
+            -0.1,  0.1, 0.0,
+            -0.1, -0.1, 0.0,
+             0.1, -0.1, 0.0,
+            -0.1,  0.1, 0.0,
+             0.1, -0.1, 0.0,
+             0.1,  0.1, 0.0])
         vba2.load_color_data([
             1.0, 0.0, 0.0,
             0.0, 1.0, 0.0,
@@ -66,9 +78,10 @@ class World(esper.World):
 
         entity = self.create_entity()
         self.add_component(entity, vba2)
+        self.add_component(entity, com.Velocity(0.05, 0.05))
         self.add_component(entity, com.Position())
-        self.add_component(entity, com.Velocity(0.001, 0.001))
         self.add_component(entity, com.Scale())
+        self.add_component(entity, com.Rotation())
         self.add_component(entity, com.TransformationMatrix())
 
 
@@ -81,7 +94,7 @@ def game_loop(world):
         # Trust me, this gets important in larger games
         # Pygame implementation stolen from: https://stackoverflow.com/questions/24039804/pygame-current-time-millis-and-delta-time
         millis = pygame.time.get_ticks()
-        delta = (millis - last_millis) / 1000.0
+        world.delta = (millis - last_millis) / 1000.0
         last_millis = millis
         
         # Get events
