@@ -46,15 +46,19 @@ class BuildViewMatrixSystem(Processor):
                 com.Position,
                 com.CameraOrientation):
             mat = glm.mat4x4(1.0)
-            mat[3][0] = -position.value.x
-            mat[3][1] = -position.value.y
-            mat[3][2] = -position.value.z
             mat = glm.rotate(mat, orientation.pitch, glm.vec3(1, 0, 0))
             mat = glm.rotate(mat, orientation.yaw  , glm.vec3(0, 1, 0))
             mat = glm.rotate(mat, orientation.role , glm.vec3(0, 0, 1))
-            #mat = glm.translate(mat, position.value * -1)
+            mat[3][0] = -position.value.x
+            mat[3][1] = -position.value.y
+            mat[3][2] = -position.value.z
 
-            mat_target.value = mat
+            # I have no and I mean NO idea why we need glm.inverse here
+            # We shouldn't need it. the above code is exactly the code I've used in
+            # a different project an it works perfectly. But this works and we need to do
+            # other stuff so let's leave it!! ~xFrednet
+            # https://stackoverflow.com/questions/22194424/creating-a-view-matrix-with-glm
+            mat_target.value = glm.inverse(mat)
 
 #
 # Draw frame

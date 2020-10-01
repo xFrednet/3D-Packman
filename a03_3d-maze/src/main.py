@@ -94,7 +94,7 @@ class World(esper.World):
             self.add_component(entity, com.TransformationMatrix())
         
         camera = self.create_entity()
-        self.add_component(camera, com.Position(x=0.0, y=0.0, z=0.0))
+        self.add_component(camera, com.Position(x=0.0, y=0.0, z=-5.0))
         self.add_component(camera, com.Velocity(0.0, 0.0))
         self.add_component(camera, com.CameraOrientation())
         self.add_component(camera, com.ViewMatrix())
