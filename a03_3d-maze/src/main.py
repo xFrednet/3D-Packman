@@ -2,6 +2,7 @@ import pygame
 import esper
 import glm
 from OpenGL import GL as gl
+import random
 
 from shader_program import StandardShaderProgram 
 from vertex_buffer_array import StandardShaderVertexArray
@@ -83,16 +84,17 @@ class World(esper.World):
             0.0, 0.0, 1.0,
             0.0, 1.0, 0.0])
 
-        entity = self.create_entity()
-        self.add_component(entity, vba2)
-        self.add_component(entity, com.Velocity(0.05, 0.05))
-        self.add_component(entity, com.Position())
-        self.add_component(entity, com.Scale())
-        self.add_component(entity, com.Rotation())
-        self.add_component(entity, com.TransformationMatrix())
+        for i in range(0, 10):
+            entity = self.create_entity()
+            self.add_component(entity, vba2)
+            self.add_component(entity, com.Velocity(x=0.0, y=0.0))
+            self.add_component(entity, com.Position(x=random.uniform(-1.0, 1.0), y=random.uniform(-1.0, 1.0), z=random.uniform(-1.0, 1.0)))
+            self.add_component(entity, com.Scale())
+            self.add_component(entity, com.Rotation(x=random.uniform(-1.0, 1.0), y=random.uniform(-1.0, 1.0), z=random.uniform(-1.0, 1.0)))
+            self.add_component(entity, com.TransformationMatrix())
         
         camera = self.create_entity()
-        self.add_component(camera, com.Position(x=1.0, y=1.0))
+        self.add_component(camera, com.Position(x=0.0, y=0.0, z=0.0))
         self.add_component(camera, com.Velocity(0.0, 0.0))
         self.add_component(camera, com.CameraOrientation())
         self.add_component(camera, com.ViewMatrix())
@@ -102,7 +104,7 @@ class World(esper.World):
     def update_resolution(self, resolution):
         self.resolution = resolution
 
-        self.standard_shader.update_view_matrix(resolution)
+        self.standard_shader.update_projection_matrix(resolution)
 
 def game_loop(world):
     clock = pygame.time.Clock()

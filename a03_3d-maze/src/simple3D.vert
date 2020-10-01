@@ -12,7 +12,5 @@ uniform mat4 projectionMatrix;
 void main(){
     vb_color = color;
     vec4 position = transformationMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * viewMatrix * position;
-
-    gl_Position.w = 1.0;
+    gl_Position = projectionMatrix * (viewMatrix * position);
 }

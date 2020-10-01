@@ -46,10 +46,14 @@ class BuildViewMatrixSystem(Processor):
                 com.Position,
                 com.CameraOrientation):
             mat = glm.mat4x4(1.0)
+            mat[3][0] = -position.value.x
+            mat[3][1] = -position.value.y
+            mat[3][2] = -position.value.z
             mat = glm.rotate(mat, orientation.pitch, glm.vec3(1, 0, 0))
             mat = glm.rotate(mat, orientation.yaw  , glm.vec3(0, 1, 0))
             mat = glm.rotate(mat, orientation.role , glm.vec3(0, 0, 1))
-            mat = glm.translate(mat, position.value * -1)
+            #mat = glm.translate(mat, position.value * -1)
+
             mat_target.value = mat
 
 #
