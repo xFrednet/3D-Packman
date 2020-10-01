@@ -118,8 +118,6 @@ class StandardShaderProgram(ShaderProgram):
         mat[2][3] = -1
         mat[3][2] = (-(2 * f * n)) / (f - n)
 
-        print(mat)
-
         self.start()
         self.set_projection_matrix(mat)
         self.stop()

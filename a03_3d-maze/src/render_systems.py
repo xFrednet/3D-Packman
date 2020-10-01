@@ -49,6 +49,14 @@ class BuildViewMatrixSystem(Processor):
             mat = glm.rotate(mat, orientation.pitch, glm.vec3(1, 0, 0))
             mat = glm.rotate(mat, orientation.yaw  , glm.vec3(0, 1, 0))
             mat = glm.rotate(mat, orientation.role , glm.vec3(0, 0, 1))
+
+            # u = glm.vec3(mat[0][0], mat[0][1], mat[0][2])
+            # v = glm.vec3(mat[1][0], mat[1][1], mat[1][2])
+            # n = glm.vec3(mat[2][0], mat[2][1], mat[2][2])
+            # mat[3][0] = -(glm.dot(position.value, u))
+            # mat[3][1] = -(glm.dot(position.value, v))
+            # mat[3][2] = -(glm.dot(position.value, n))
+
             mat[3][0] = -position.value.x
             mat[3][1] = -position.value.y
             mat[3][2] = -position.value.z
