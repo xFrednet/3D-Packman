@@ -25,6 +25,31 @@ class CameraControlSystem(esper.Processor):
     def process(self):
         keys = pygame.key.get_pressed()
         for _id, (orientation, position) in self.world.get_components(com.CameraOrientation, com.Position):
+            
+            speed = 10.0 * self.world.delta
+            direction = glm.vec3()
+
+            # Position
+            if keys[pygame.locals.K_w]:
+                direction.z += 1
+            if keys[pygame.locals.K_s]:
+                direction.z -= 1
+            if keys[pygame.locals.K_a]:
+                direction.x += 1
+            if keys[pygame.locals.K_d]:
+                direction.x -= 1
+            
+            direction *= speed
+            
+            # forward backwards
+            position.value.x += direction.z * math.sin(orientation.yaw);
+            position.value.z += direction.z * math.cos(orientation.yaw);
+
+            # left right
+            position.value.x += direction.x * math.cos(-orientation.yaw);
+            position.value.z += direction.x * math.sin(-orientation.yaw);
+
+            
             pitch_change = 0.0
             if keys[pygame.locals.K_UP]:
                 pitch_change += 0.1
@@ -44,13 +69,3 @@ class CameraControlSystem(esper.Processor):
                 orientation.role -= 0.1
             if keys[pygame.locals.K_PAGEDOWN]:
                 orientation.role += 0.1
-
-            # Position
-            if keys[pygame.locals.K_w]:
-                position.value.z -= 0.1
-            if keys[pygame.locals.K_s]:
-                position.value.z += 0.1
-            if keys[pygame.locals.K_a]:
-                position.value.x -= 0.1
-            if keys[pygame.locals.K_d]:
-                position.value.x += 0.1
