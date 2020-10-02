@@ -88,6 +88,17 @@ class World(esper.World):
         self.add_component(floor, com.TransformationMatrix())
         self.add_component(floor, com.ObjectMaterial(color=glm.vec3(0.8, 0.8, 0.8)))
 
+        cube = self.create_entity()
+        rect = com.Rectangle(5.0, 3.0, 1.0)
+        self.add_component(cube, rect)
+        self.add_component(cube, com.Position(0, 0, 2))
+        
+        self.add_component(cube, StandardShaderVertexArray.from_rectangle(rect))
+        self.add_component(cube, com.Scale())
+        self.add_component(cube, com.Rotation())
+        self.add_component(cube, com.TransformationMatrix())
+        self.add_component(cube, com.ObjectMaterial(color=glm.vec3(0.3, 0.3, 0.3)))
+
         for i in range(0, 10):
             entity = self.create_entity()
             self.add_component(entity, vba2)
