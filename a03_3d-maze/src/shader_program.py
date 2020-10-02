@@ -3,6 +3,7 @@ import glm
 import math
 from OpenGL import GL as gl
 
+
 class ShaderProgram:
     def __init__(self):
         self.program_id = gl.glCreateProgram()
@@ -52,8 +53,8 @@ class ShaderProgram:
     def stop(self):
         gl.glUseProgram(0)
 
+
 class StandardShaderProgram(ShaderProgram):
-    
     POSITION_ATTR = 0
     COLOR_ATTR = 1
 
@@ -75,7 +76,8 @@ class StandardShaderProgram(ShaderProgram):
 
         self._compile_shaders(shaders)
 
-        self.transformation_matrix_location = self._load_uniform_location(StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
+        self.transformation_matrix_location = self._load_uniform_location(
+            StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
         self.view_matrix_location = self._load_uniform_location(StandardShaderProgram.VIEW_MATRIX_NAME)
         self.projection_matrix_location = self._load_uniform_location(StandardShaderProgram.PROJECTION_MATRIX_NAME)
         print("StandardShaderProgram created")
@@ -88,22 +90,22 @@ class StandardShaderProgram(ShaderProgram):
 
     def start(self):
         ShaderProgram.start(self)
-    
+
     def stop(self):
         ShaderProgram.stop(self)
-    
+
     def set_transformation_matrix(self, matrix):
         gl.glUniformMatrix4fv(self.transformation_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
 
     def set_view_matrix(self, matrix):
         gl.glUniformMatrix4fv(self.view_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
-    
+
     def set_projection_matrix(self, matrix):
         gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
-    
+
     def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.5, f=50.0):
         aspect = resolution.x / resolution.y
-        
+
         top = n * math.tan(fov / 2)
         bottom = -top
         right = top * aspect
