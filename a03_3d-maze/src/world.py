@@ -78,13 +78,6 @@ class World(esper.World):
             -0.1, 0.1, 0.0,
             0.1, -0.1, 0.0,
             0.1, 0.1, 0.0])
-        vba2.load_color_data([
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-            1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0,
-            0.0, 1.0, 0.0])
 
         floor = self.create_entity()
         self.add_component(floor, vba2)

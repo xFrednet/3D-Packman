@@ -94,15 +94,14 @@ class StandardRenderSystem(Processor):
             # Bind buffers
             gl.glBindVertexArray(vba.vertex_array_id)
             gl.glEnableVertexAttribArray(shader.POSITION_ATTR)
-            gl.glEnableVertexAttribArray(shader.COLOR_ATTR)
 
             # Draw the beautiful
             shader.set_transformation_matrix(translation.value)
+            shader.set_object_color(glm.vec3(0.0, 1.0, 0.0))
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
 
             # Unbind the thingies
             gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
-            gl.glDisableVertexAttribArray(shader.COLOR_ATTR)
             gl.glBindVertexArray(0)
 
         shader.stop()

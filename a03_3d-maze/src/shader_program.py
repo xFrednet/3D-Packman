@@ -62,6 +62,8 @@ class StandardShaderProgram(ShaderProgram):
     VIEW_MATRIX_NAME = 'viewMatrix'
     PROJECTION_MATRIX_NAME = 'projectionMatrix'
 
+    OBJECT_COLOR = 'object_color'
+
     def __init__(self):
         ShaderProgram.__init__(self)
 
@@ -80,6 +82,7 @@ class StandardShaderProgram(ShaderProgram):
             StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
         self.view_matrix_location = self._load_uniform_location(StandardShaderProgram.VIEW_MATRIX_NAME)
         self.projection_matrix_location = self._load_uniform_location(StandardShaderProgram.PROJECTION_MATRIX_NAME)
+        self.object_color_location = self._load_uniform_location(StandardShaderProgram.OBJECT_COLOR)
         print("StandardShaderProgram created")
 
     # The vertex data has the following layout:
@@ -102,6 +105,9 @@ class StandardShaderProgram(ShaderProgram):
 
     def set_projection_matrix(self, matrix):
         gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+    
+    def set_object_color(self, color):
+        gl.glUniform3fv(self.object_color_location, 1, glm.value_ptr(color))
 
     def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.5, f=50.0):
         aspect = resolution.x / resolution.y
@@ -122,4 +128,5 @@ class StandardShaderProgram(ShaderProgram):
 
         self.start()
         self.set_projection_matrix(mat)
+        self.set_object_color(glm.vec3(1.0, 1.0, 1.0))
         self.stop()

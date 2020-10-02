@@ -58,5 +58,3 @@ class StandardShaderVertexArray(VertexBufferArray):
     def load_position_data(self, data):
         self._load_vertex_buffer_f(StandardShaderProgram.POSITION_ATTR, data, 3)
 
-    def load_color_data(self, data):
-        self._load_vertex_buffer_f(StandardShaderProgram.COLOR_ATTR, data, 3)
