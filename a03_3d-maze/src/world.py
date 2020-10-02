@@ -50,6 +50,7 @@ class World(esper.World):
         self.add_processor(psys.VelocityToEntityAxis(), priority=2100)
         self.add_processor(psys.MovementSystem(), priority=2099)
         self.add_processor(psys.CameraControlSystem(), priority=2098)
+        self.add_processor(psys.ResetSystem(), priority=2097)
 
         #
         # Rendering
@@ -111,6 +112,7 @@ class World(esper.World):
         self.add_component(camera, com.CameraOrientation())
         self.add_component(camera, com.ArrowKeyRotationControlComponent())
         self.add_component(camera, com.ViewMatrix())
+        self.add_component(camera, com.Home(z=5.0))
         self.camera_id = camera
 
     def update_resolution(self, resolution):

@@ -21,7 +21,10 @@ class ResetSystem(esper.Processor):
         for _id, (home, position, rotation) in self.world.get_components(com.Home, com.Position, com.Rotation):
             # Home reset
             if keys[pygame.locals.K_h]:
-                pass
+                position.value = home.position
+                rotation.yaw = home.orientation.x
+                rotation.pitch = home.orientation.y
+                rotation.role = home.orientation.z
 
 
 class MovementSystem(esper.Processor):

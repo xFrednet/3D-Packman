@@ -41,7 +41,7 @@ class Scale:
 class Home:
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.position = glm.vec3(x, y, z)
-        self.orientation = (0.0, 0.0, 0.0)
+        self.orientation = glm.vec3(x, y, z)
 
 
 class Rotation:
