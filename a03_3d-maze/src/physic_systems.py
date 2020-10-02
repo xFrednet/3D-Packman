@@ -64,8 +64,3 @@ class CameraControlSystem(esper.Processor):
                 orientation.yaw -= 0.1
             if keys[pygame.locals.K_RIGHT]:
                 orientation.yaw += 0.1
-
-            if keys[pygame.locals.K_PAGEUP]:
-                orientation.role -= 0.1
-            if keys[pygame.locals.K_PAGEDOWN]:
-                orientation.role += 0.1
