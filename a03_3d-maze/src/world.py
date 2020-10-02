@@ -12,32 +12,13 @@ class World(esper.World):
     def __init__(self, resolution):
         super().__init__()
 
+        self.resolution = resolution
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
-        self.resolution = resolution
         self.camera_id = 0
 
-        #
-        # Physics
-        #
-        self.add_processor(psys.CameraControlSystem(), priority=2100)
-        self.add_processor(psys.MovementSystem(), priority=2000)
-        
-        #
-        # Rendering
-        #
-        # Prepare
-        self.add_processor(rsys.BuildViewMatrixSystem(), priority=1010)
-        self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1009)
-        self.add_processor(rsys.PrepareFrameSystem(), priority=1008)
-
-        # Draw
-        self.add_processor(rsys.StandardRenderSystem(), priority=1008)
-        
-        #finish
-        self.add_processor(rsys.FinishFrameSystem(), priority=1007)
-
-        self._populate()
+        self._setup_systems()
+        self._setup_entities()
 
         self.update_resolution(resolution)
 
@@ -60,7 +41,28 @@ class World(esper.World):
 
         print("World: Cleanup complete")
     
-    def _populate(self):
+    def _setup_systems(self):
+        #
+        # Physics
+        #
+        self.add_processor(psys.CameraControlSystem(), priority=2100)
+        self.add_processor(psys.MovementSystem(), priority=2000)
+        
+        #
+        # Rendering
+        #
+        # Prepare
+        self.add_processor(rsys.BuildViewMatrixSystem(), priority=1010)
+        self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1009)
+        self.add_processor(rsys.PrepareFrameSystem(), priority=1008)
+
+        # Draw
+        self.add_processor(rsys.StandardRenderSystem(), priority=1008)
+        
+        #finish
+        self.add_processor(rsys.FinishFrameSystem(), priority=1007)
+
+    def _setup_entities(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...
         # WTF. I'm always amazed by the comments I leave in my code. ~xFrednet 2020.09.23
         vba2 = StandardShaderVertexArray(6)
