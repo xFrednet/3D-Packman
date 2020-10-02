@@ -33,12 +33,26 @@ class BuildTranformationMatrixSystem(Processor):
                 com.Rotation):
             mat = glm.mat4x4(1.0)
             mat = glm.translate(mat, position.value)
-            mat = glm.rotate(mat, rotation.value.x, glm.vec3(1, 0, 0))
-            mat = glm.rotate(mat, rotation.value.y, glm.vec3(0, 1, 0))
-            mat = glm.rotate(mat, rotation.value.z, glm.vec3(0, 0, 1))
+            mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
+            mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
+            mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
             mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
 
             mat_target.value = mat
+
+class RotationToOrientation(Processor):
+    def process(self):
+        for _id, (position, orientation, rotation) in self.world.get_components(
+                com.Position,
+                com.CameraOrientation,
+                com.Rotation):
+            
+            height = math.sin(rotation.pitch)
+            orientation.look_at = position.value + glm.vec3(
+                math.sin(rotation.yaw) * (1.0 - abs(height)),
+                math.cos(rotation.yaw) * (1.0 - abs(height)),
+                height
+            )
 
 class BuildViewMatrixSystem(Processor):
     def process(self):
@@ -46,17 +60,10 @@ class BuildViewMatrixSystem(Processor):
                 com.ViewMatrix,
                 com.Position,
                 com.CameraOrientation):
-            
-            height = math.sin(orientation.pitch)
-            dir_vec = glm.vec3(
-                math.sin(orientation.yaw) * (1.0 - abs(height)),
-                math.cos(orientation.yaw) * (1.0 - abs(height)),
-                height
-            )
 
             mat_target.value = glm.lookAt(
                 position.value,
-                position.value + glm.vec3(dir_vec.x, dir_vec.y, dir_vec.z),
+                orientation.look_at,
                 orientation.up)
 
             # - I have no and I mean NO idea why we need glm.inverse here

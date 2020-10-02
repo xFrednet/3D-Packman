@@ -45,13 +45,16 @@ class World(esper.World):
         #
         # Physics
         #
-        self.add_processor(psys.CameraControlSystem(), priority=2100)
-        self.add_processor(psys.MovementSystem(), priority=2000)
+        self.add_processor(psys.WasdControlSystem(), priority=2101)
+        self.add_processor(psys.VelocityToEntityAxis(), priority=2100)
+        self.add_processor(psys.MovementSystem(), priority=2099)
+        self.add_processor(psys.CameraControlSystem(), priority=2098)
         
         #
         # Rendering
         #
         # Prepare
+        self.add_processor(rsys.RotationToOrientation(), priority=1011)
         self.add_processor(rsys.BuildViewMatrixSystem(), priority=1010)
         self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1009)
         self.add_processor(rsys.PrepareFrameSystem(), priority=1008)
@@ -94,14 +97,16 @@ class World(esper.World):
             self.add_component(entity, com.Velocity(x=0.0, y=0.0))
             self.add_component(entity, com.Position(x=random.uniform(-1.0, 1.0), y=random.uniform(-1.0, 1.0), z=random.uniform(-1.0, 1.0)))
             self.add_component(entity, com.Scale())
-            self.add_component(entity, com.Rotation(x=random.uniform(-3.14, 3.14), y=random.uniform(-3.14, 3.14), z=random.uniform(-3.14, 3.14)))
+            self.add_component(entity, com.Rotation(random.uniform(-3.14, 3.14), random.uniform(-3.14, 3.14), random.uniform(-3.14, 3.14)))
             self.add_component(entity, com.TransformationMatrix())
-        
         
         camera = self.create_entity()
         self.add_component(camera, com.Position(x=0.0, y=0.0, z=5.0))
-        self.add_component(camera, com.Velocity(0.0, 0.0))
+        self.add_component(camera, com.Velocity(along_world_axis=False))
+        self.add_component(camera, com.Rotation())
+        self.add_component(camera, com.WasdControlComponent(speed=10))
         self.add_component(camera, com.CameraOrientation())
+        self.add_component(camera, com.ArrowKeyRotationControlComponent())
         self.add_component(camera, com.ViewMatrix())
         self.camera_id = camera
         
