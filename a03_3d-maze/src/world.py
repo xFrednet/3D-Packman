@@ -1,6 +1,7 @@
 import esper
 import random
 import math
+import glm
 
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
@@ -79,13 +80,6 @@ class World(esper.World):
             -0.1, 0.1, 0.0,
             0.1, -0.1, 0.0,
             0.1, 0.1, 0.0])
-        vba2.load_color_data([
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-            1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0,
-            0.0, 1.0, 0.0])
 
         floor = self.create_entity()
         self.add_component(floor, vba2)
@@ -93,6 +87,18 @@ class World(esper.World):
         self.add_component(floor, com.Scale(100))
         self.add_component(floor, com.Rotation())
         self.add_component(floor, com.TransformationMatrix())
+        self.add_component(floor, com.ObjectMaterial(color=glm.vec3(0.8, 0.8, 0.8)))
+
+        cube = self.create_entity()
+        rect = com.Rectangle(5.0, 3.0, 1.0)
+        self.add_component(cube, rect)
+        self.add_component(cube, com.Position(0, 0, 2))
+        
+        self.add_component(cube, StandardShaderVertexArray.from_rectangle(rect))
+        self.add_component(cube, com.Scale())
+        self.add_component(cube, com.Rotation())
+        self.add_component(cube, com.TransformationMatrix())
+        self.add_component(cube, com.ObjectMaterial(color=glm.vec3(0.3, 0.3, 0.3)))
 
         for i in range(0, 10):
             entity = self.create_entity()
@@ -104,6 +110,10 @@ class World(esper.World):
             self.add_component(entity, com.Rotation(random.uniform(-3.14, 3.14), random.uniform(-3.14, 3.14),
                                                     random.uniform(-3.14, 3.14)))
             self.add_component(entity, com.TransformationMatrix())
+            self.add_component(entity, com.ObjectMaterial(color=glm.vec3(
+                random.uniform(0.0, 1.0),
+                random.uniform(0.0, 1.0),
+                random.uniform(0.0, 1.0))))
 
         camera = self.create_entity()
         self.add_component(camera, com.Position(x=0.0, y=0.0, z=5.0))
