@@ -6,6 +6,7 @@ from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 import render_systems as rsys
 import physic_systems as psys
+from maze import _setup_maze
 import components as com
 
 
@@ -20,7 +21,7 @@ class World(esper.World):
 
         self._setup_systems()
         self._setup_entities()
-
+        _setup_maze(self)
         self.update_resolution(resolution)
 
     def cleanup(self):
