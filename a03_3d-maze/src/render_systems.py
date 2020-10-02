@@ -2,73 +2,112 @@ from OpenGL import GL as gl
 import glm
 import glfw
 import pygame
-
-# pylint: disable=import-error
 from esper import Processor
-from shader_program import StandardShaderProgram 
+import math
+
+from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 import components as com
 
+#
+# Prepare frame
+#
 class PrepareFrameSystem(Processor):
     
     def process(self):
         gl.glClearColor(1.0, 0, 1.0, 0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
-class TranslationMatricesSystem(Processor):
+        matrix = self.world.component_for_entity(self.world.camera_id, com.ViewMatrix).value
+        self.world.standard_shader.start()
+        self.world.standard_shader.set_view_matrix(matrix)
+#        self.world.standard_shader.set_projection_matrix(glm.mat4(1.0))
+        self.world.standard_shader.stop()
+
+class BuildTranformationMatrixSystem(Processor):
     def process(self):
-        for _id, (translation, position, scale) in self.world.get_components(com.TransformationMatrix, com.Position, com.Scale):
+        for _id, (mat_target, position, scale, rotation) in self.world.get_components(
+                com.TransformationMatrix,
+                com.Position,
+                com.Scale,
+                com.Rotation):
             mat = glm.mat4x4(1.0)
-            mat = glm.translate(mat, glm.vec3(position.value.x, position.value.y, 0.0))
+            mat = glm.translate(mat, position.value)
+            mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
+            mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
+            mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
             mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
-            translation.value = mat
 
-            # glm::mat4x4 matrix(
-            #     glm::vec4(1, 0, 0, 0),
-            #     glm::vec4(0, 1, 0, 0),
-            #     glm::vec4(0, 0, 1, 0),
-            #     glm::vec4(0, 0, 0, 1));
-            # matrix = glm::translate(matrix, position);
-            # matrix = glm::rotate(matrix, (float)(rotation.x / 180.0 * PI), glm::vec3(1, 0, 0));
-            # matrix = glm::rotate(matrix, (float)(rotation.y / 180.0 * PI), glm::vec3(0, 1, 0));
-            # matrix = glm::rotate(matrix, (float)(rotation.z / 180.0 * PI), glm::vec3(0, 0, 1));
-            # matrix = glm::scale(matrix, glm::vec3(scale, scale, scale));
-            # return matrix;
+            mat_target.value = mat
 
+class RotationToOrientation(Processor):
+    def process(self):
+        for _id, (position, orientation, rotation) in self.world.get_components(
+                com.Position,
+                com.CameraOrientation,
+                com.Rotation):
+            
+            height = math.sin(rotation.pitch)
+            orientation.look_at = position.value + glm.vec3(
+                math.sin(rotation.yaw) * (1.0 - abs(height)),
+                math.cos(rotation.yaw) * (1.0 - abs(height)),
+                height
+            )
+
+class BuildViewMatrixSystem(Processor):
+    def process(self):
+        for _id, (mat_target, position, orientation) in self.world.get_components(
+                com.ViewMatrix,
+                com.Position,
+                com.CameraOrientation):
+
+            mat_target.value = glm.lookAt(
+                position.value,
+                orientation.look_at,
+                orientation.up)
+
+            # - I have no and I mean NO idea why we need glm.inverse here
+            #   We shouldn't need it. the above code is exactly the code I've used in
+            #   a different project an it works perfectly. But this works and we need to do
+            #   other stuff so let's leave it!! ~xFrednet
+            # - https://stackoverflow.com/questions/22194424/creating-a-view-matrix-with-glm
+            # - I got it working holy fuck, HOLY FUCK I'm so happy right now (and tired)
+            #   I'm going to leave this here in the memory of the wasted time RIP
+
+#
+# Draw frame
+#
 class StandardRenderSystem(Processor):
 
     VERTEX_POS_INDEX = 0
-
-    def __init__(self):
-        self.__shader = StandardShaderProgram()
-    
-    def cleanup(self):
-        self.__shader.cleanup()
 
     def process(self):
         # Ugly hacks, because hacker man!!
         # You should delete this command before you hand in the assignment
         # nawww ~xFrednet
-        gl.glUseProgram(self.__shader.program_id)
-        transformation_matrix_location = self.__shader.transformation_matrix_location
+        shader : StandardShaderProgram = self.world.standard_shader
+        shader.start()
 
         for _id, (vba, translation) in self.world.get_components(StandardShaderVertexArray, com.TransformationMatrix):
             # Bind buffers
             gl.glBindVertexArray(vba.vertex_array_id)
-            gl.glEnableVertexAttribArray(StandardShaderProgram.POSITION_ATTR)
-            gl.glEnableVertexAttribArray(StandardShaderProgram.COLOR_ATTR)
+            gl.glEnableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glEnableVertexAttribArray(shader.COLOR_ATTR)
             
             # Draw the beautiful
-            gl.glUniformMatrix4fv(transformation_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(translation.value))
+            shader.set_transformation_matrix(translation.value)
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
             
             # Unbind the thingies
-            gl.glDisableVertexAttribArray(StandardShaderProgram.POSITION_ATTR)
-            gl.glDisableVertexAttribArray(StandardShaderProgram.COLOR_ATTR)
+            gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glDisableVertexAttribArray(shader.COLOR_ATTR)
             gl.glBindVertexArray(0)
 
-        gl.glUseProgram(0)
+        shader.stop()
 
+#
+# Complete frame
+#
 class FinishFrameSystem(Processor):
 
     def process(self):

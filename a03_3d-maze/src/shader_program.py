@@ -1,4 +1,6 @@
 import sys, ctypes
+import glm
+import math
 from OpenGL import GL as gl
 
 class ShaderProgram:
@@ -56,42 +58,26 @@ class StandardShaderProgram(ShaderProgram):
     COLOR_ATTR = 1
 
     TRANSFORMATION_MATRIX_NAME = 'transformationMatrix'
-
-    SHADERS = {
-        gl.GL_VERTEX_SHADER: '''\
-            #version 330 core
-            
-            layout(location = 0) in vec3 position;
-            layout(location = 1) in vec3 color;
-
-            out vec3 vb_color;
-
-            uniform mat4 transformationMatrix;
-
-            void main(){
-                vb_color = color;
-                gl_Position = transformationMatrix * vec4(position, 1.0);
-                gl_Position.w = 1.0;
-            }
-            ''',
-        gl.GL_FRAGMENT_SHADER: '''\
-            #version 330 core
-            
-            in vec3 vb_color;
-
-            out vec3 color;
-            
-            void main(){
-                color = vec3((vb_color.x + 1) / 2, (vb_color.y + 1) / 2, (vb_color.z + 1) / 2);
-            }
-            '''
-        }
+    VIEW_MATRIX_NAME = 'viewMatrix'
+    PROJECTION_MATRIX_NAME = 'projectionMatrix'
 
     def __init__(self):
         ShaderProgram.__init__(self)
-        self._compile_shaders(StandardShaderProgram.SHADERS)
+
+        vertex_file = open(sys.path[0] + "/simple3D.vert")
+        fragment_file = open(sys.path[0] + "/simple3D.frag")
+        shaders = {
+            gl.GL_VERTEX_SHADER: vertex_file.read(),
+            gl.GL_FRAGMENT_SHADER: fragment_file.read()
+        }
+        vertex_file.close()
+        fragment_file.close()
+
+        self._compile_shaders(shaders)
 
         self.transformation_matrix_location = self._load_uniform_location(StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
+        self.view_matrix_location = self._load_uniform_location(StandardShaderProgram.VIEW_MATRIX_NAME)
+        self.projection_matrix_location = self._load_uniform_location(StandardShaderProgram.PROJECTION_MATRIX_NAME)
         print("StandardShaderProgram created")
 
     # The vertex data has the following layout:
@@ -106,3 +92,32 @@ class StandardShaderProgram(ShaderProgram):
     def stop(self):
         ShaderProgram.stop(self)
     
+    def set_transformation_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.transformation_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+
+    def set_view_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.view_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+    
+    def set_projection_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+    
+    def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.5, f=50.0):
+        aspect = resolution.x / resolution.y
+        
+        top = n * math.tan(fov / 2)
+        bottom = -top
+        right = top * aspect
+        left = -right
+
+        mat = glm.mat4(0.0)
+        mat[0][0] = (2 * n) / (right - left)
+        mat[1][1] = (2 * n) / (top - bottom)
+        mat[2][0] = (left + right) / (right - left)
+        mat[2][1] = (top + bottom) / (top - bottom)
+        mat[2][2] = (-(f + n)) / (f - n)
+        mat[2][3] = -1
+        mat[3][2] = (-(2 * f * n)) / (f - n)
+
+        self.start()
+        self.set_projection_matrix(mat)
+        self.stop()
