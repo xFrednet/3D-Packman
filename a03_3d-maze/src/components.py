@@ -56,6 +56,11 @@ class TransformationMatrix:
         self.value = glm.mat4x4(1.0)
 
 
+class CollisionComponent:
+    def __init__(self):
+        self.is_colliding_y = False
+        self.is_colliding_x = False
+
 #
 # Camera
 #
@@ -105,6 +110,7 @@ class Rectangle:
 
     def max_z(self):
         return self.height / 2
+
 
 class Circle:
     def __init__(self, center_x, center_y, radius):

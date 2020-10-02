@@ -109,7 +109,7 @@ class StandardShaderProgram(ShaderProgram):
     def set_object_color(self, color):
         gl.glUniform3fv(self.object_color_location, 1, glm.value_ptr(color))
 
-    def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.5, f=50.0):
+    def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.25, f=50.0):
         aspect = resolution.x / resolution.y
 
         top = n * math.tan(fov / 2)
