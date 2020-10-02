@@ -50,8 +50,8 @@ class World(esper.World):
         #
         self.add_processor(psys.WasdControlSystem(), priority=2110)
         self.add_processor(psys.VelocityToEntityAxis(), priority=2100)
-        self.add_processor(psys.CollisionSystem(), priority=2091)
-        self.add_processor(psys.MovementSystem(), priority=2090)
+        self.add_processor(psys.CollisionSystem(), priority=2090)
+        self.add_processor(psys.MovementSystem(), priority=2080)
         self.add_processor(psys.CameraControlSystem(), priority=2070)
         self.add_processor(psys.ResetSystem(), priority=2060)
 

@@ -92,15 +92,17 @@ class CollisionSystem(esper.Processor):
                 hero_min_y_old = hero_position.value.y + hero_rectangle.min_y()
                 hero_max_y_old = hero_position.value.y + hero_rectangle.max_y()
 
-                if (hero_min_x_old > villan_max_x and hero_min_x <= villan_max_x):
-                    hero_collision.is_colliding_x = True
-                elif (hero_max_x_old < villan_min_x and hero_max_x >= villan_min_x):
-                    hero_collision.is_colliding_x = True
+                if (hero_max_y_old > villan_min_y and hero_min_y_old <= villan_max_y):
+                    if (hero_min_x_old > villan_max_x and hero_min_x <= villan_max_x):
+                        hero_collision.is_colliding_x = True
+                    elif (hero_max_x_old < villan_min_x and hero_max_x >= villan_min_x):
+                        hero_collision.is_colliding_x = True
                 
-                if (hero_min_y_old > villan_max_y and hero_min_y <= villan_max_y):
-                    hero_collision.is_colliding_y = True
-                elif (hero_max_y_old < villan_min_y and hero_max_y >= villan_min_y):
-                    hero_collision.is_colliding_y = True
+                if (hero_max_x_old > villan_min_x and hero_min_x_old <= villan_max_x):
+                    if (hero_min_y_old > villan_max_y and hero_min_y <= villan_max_y):
+                        hero_collision.is_colliding_y = True
+                    elif (hero_max_y_old < villan_min_y and hero_max_y >= villan_min_y):
+                        hero_collision.is_colliding_y = True
 
                 if (hero_collision.is_colliding_x and hero_collision.is_colliding_y):
                     return
