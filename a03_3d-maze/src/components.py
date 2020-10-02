@@ -73,21 +73,48 @@ class ViewMatrix:
 # Shape
 #
 class Rectangle:
-    """This should not be rotated.
+    """
+    This should not be rotated or scaled. Top view:
+    
      width (x axis)
     #######
-    #  1  # length (y axis)
+    #  1  # depth (y axis)
     #######
     
     1 is the height (z axis)
     """
-    def __init__(self, center_x, center_y, width, length, height):
-        self.position = glm.vec2(center_x, center_y)
+    def __init__(self, width, depth, height):
         self.width = width
-        self.length = length
+        self.depth = depth
         self.height = height
+    
+    def min_x(self):
+        return -self.width / 2
+    
+    def max_x(self):
+        return self.width / 2
+
+    def min_y(self):
+        return -self.depth / 2
+    
+    def max_y(self):
+        return self.depth / 2
+
+    def min_z(self):
+        return -self.height / 2
+
+    def max_z(self):
+        return self.height / 2
 
 class Circle:
     def __init__(self, center_x, center_y, radius):
         self.position = glm.vec2(center_x, center_y)
         self.radius = radius
+
+
+#
+# Graphics
+#
+class ObjectMaterial:
+    def __init__(self, color):
+        self.color = color
