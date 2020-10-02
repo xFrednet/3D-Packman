@@ -91,3 +91,11 @@ class Circle:
     def __init__(self, center_x, center_y, radius):
         self.position = glm.vec2(center_x, center_y)
         self.radius = radius
+
+
+#
+# Graphics
+#
+class ObjectMaterial:
+    def __init__(self, color):
+        self.color = color

@@ -90,14 +90,17 @@ class StandardRenderSystem(Processor):
         shader: StandardShaderProgram = self.world.standard_shader
         shader.start()
 
-        for _id, (vba, translation) in self.world.get_components(StandardShaderVertexArray, com.TransformationMatrix):
+        for _id, (vba, translation, material) in self.world.get_components(
+                StandardShaderVertexArray, 
+                com.TransformationMatrix, 
+                com.ObjectMaterial):
             # Bind buffers
             gl.glBindVertexArray(vba.vertex_array_id)
             gl.glEnableVertexAttribArray(shader.POSITION_ATTR)
 
             # Draw the beautiful
             shader.set_transformation_matrix(translation.value)
-            shader.set_object_color(glm.vec3(0.0, 1.0, 0.0))
+            shader.set_object_color(material.color)
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
 
             # Unbind the thingies

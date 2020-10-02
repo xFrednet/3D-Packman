@@ -1,6 +1,7 @@
 import esper
 import random
 import math
+import glm
 
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
@@ -85,6 +86,7 @@ class World(esper.World):
         self.add_component(floor, com.Scale(100))
         self.add_component(floor, com.Rotation())
         self.add_component(floor, com.TransformationMatrix())
+        self.add_component(floor, com.ObjectMaterial(color=glm.vec3(0.8, 0.8, 0.8)))
 
         for i in range(0, 10):
             entity = self.create_entity()
@@ -96,6 +98,10 @@ class World(esper.World):
             self.add_component(entity, com.Rotation(random.uniform(-3.14, 3.14), random.uniform(-3.14, 3.14),
                                                     random.uniform(-3.14, 3.14)))
             self.add_component(entity, com.TransformationMatrix())
+            self.add_component(entity, com.ObjectMaterial(color=glm.vec3(
+                random.uniform(0.0, 1.0),
+                random.uniform(0.0, 1.0),
+                random.uniform(0.0, 1.0))))
 
         camera = self.create_entity()
         self.add_component(camera, com.Position(x=0.0, y=0.0, z=5.0))
