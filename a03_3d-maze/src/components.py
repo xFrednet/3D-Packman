@@ -68,3 +68,26 @@ class CameraOrientation:
 class ViewMatrix:
     def __init__(self):
         self.value = glm.mat4x4(1.0)
+
+#
+# Shape
+#
+class Rectangle:
+    """This should not be rotated.
+     width (x axis)
+    #######
+    #  1  # length (y axis)
+    #######
+    
+    1 is the height (z axis)
+    """
+    def __init__(self, center_x, center_y, width, length, height):
+        self.position = glm.vec2(center_x, center_y)
+        self.width = width
+        self.length = length
+        self.height = height
+
+class Circle:
+    def __init__(self, center_x, center_y, radius):
+        self.position = glm.vec2(center_x, center_y)
+        self.radius = radius
