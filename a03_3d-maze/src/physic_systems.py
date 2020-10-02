@@ -31,23 +31,23 @@ class CameraControlSystem(esper.Processor):
 
             # Position
             if keys[pygame.locals.K_w]:
-                direction.z += 1
+                direction.y += 1
             if keys[pygame.locals.K_s]:
-                direction.z -= 1
+                direction.y -= 1
             if keys[pygame.locals.K_a]:
-                direction.x += 1
-            if keys[pygame.locals.K_d]:
                 direction.x -= 1
+            if keys[pygame.locals.K_d]:
+                direction.x += 1
             
             direction *= speed
             
             # forward backwards
-            position.value.x += direction.z * math.sin(orientation.yaw);
-            position.value.z += direction.z * math.cos(orientation.yaw);
+            position.value.x += direction.y * math.sin(orientation.yaw);
+            position.value.y += direction.y * math.cos(orientation.yaw);
 
             # left right
             position.value.x += direction.x * math.cos(-orientation.yaw);
-            position.value.z += direction.x * math.sin(-orientation.yaw);
+            position.value.y += direction.x * math.sin(-orientation.yaw);
 
             
             pitch_change = 0.0
@@ -57,8 +57,8 @@ class CameraControlSystem(esper.Processor):
                 pitch_change -= 0.1
             orientation.pitch = clamp(
                 orientation.pitch + pitch_change,
-                math.pi / -2,
-                math.pi / 2)
+                (math.pi - 0.2) / -2,
+                (math.pi - 0.2) / 2)
 
             if keys[pygame.locals.K_LEFT]:
                 orientation.yaw -= 0.1

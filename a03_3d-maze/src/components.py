@@ -34,6 +34,7 @@ class CameraOrientation:
         self.yaw = 0.0    # turning <- ->
         self.pitch = 0.0  # up and down
         self.role = 0.0   # leaning -\|/-
+        self.up = glm.vec3(0.0, 0.0, 1.0)
         
 class ViewMatrix:
     def __init__(self):

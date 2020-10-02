@@ -87,9 +87,9 @@ class World(esper.World):
 
         floor = self.create_entity()
         self.add_component(floor, vba2)
-        self.add_component(floor, com.Position(0, -2, 0))
+        self.add_component(floor, com.Position(0, 0, -2))
         self.add_component(floor, com.Scale(100))
-        self.add_component(floor, com.Rotation(math.pi / 2))
+        self.add_component(floor, com.Rotation())
         self.add_component(floor, com.TransformationMatrix())
 
         for i in range(0, 10):
@@ -98,7 +98,7 @@ class World(esper.World):
             self.add_component(entity, com.Velocity(x=0.0, y=0.0))
             self.add_component(entity, com.Position(x=random.uniform(-1.0, 1.0), y=random.uniform(-1.0, 1.0), z=random.uniform(-1.0, 1.0)))
             self.add_component(entity, com.Scale())
-            self.add_component(entity, com.Rotation(x=random.uniform(-1.0, 1.0), y=random.uniform(-1.0, 1.0), z=random.uniform(-1.0, 1.0)))
+            self.add_component(entity, com.Rotation(x=random.uniform(-3.14, 3.14), y=random.uniform(-3.14, 3.14), z=random.uniform(-3.14, 3.14)))
             self.add_component(entity, com.TransformationMatrix())
         
         

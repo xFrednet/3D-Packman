@@ -3,6 +3,7 @@ import glm
 import glfw
 import pygame
 from esper import Processor
+import math
 
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
@@ -45,28 +46,26 @@ class BuildViewMatrixSystem(Processor):
                 com.ViewMatrix,
                 com.Position,
                 com.CameraOrientation):
-            mat = glm.mat4x4(1.0)
-            mat = glm.rotate(mat, orientation.pitch, glm.vec3(1, 0, 0))
-            mat = glm.rotate(mat, orientation.yaw  , glm.vec3(0, 1, 0))
-            mat = glm.rotate(mat, orientation.role , glm.vec3(0, 0, 1))
+            
+            height = math.sin(orientation.pitch)
+            dir_vec = glm.vec3(
+                math.sin(orientation.yaw) * (1.0 - abs(height)),
+                math.cos(orientation.yaw) * (1.0 - abs(height)),
+                height
+            )
 
-            # u = glm.vec3(mat[0][0], mat[0][1], mat[0][2])
-            # v = glm.vec3(mat[1][0], mat[1][1], mat[1][2])
-            # n = glm.vec3(mat[2][0], mat[2][1], mat[2][2])
-            # mat[3][0] = -(glm.dot(position.value, u))
-            # mat[3][1] = -(glm.dot(position.value, v))
-            # mat[3][2] = -(glm.dot(position.value, n))
+            mat_target.value = glm.lookAt(
+                position.value,
+                position.value + glm.vec3(dir_vec.x, dir_vec.y, dir_vec.z),
+                orientation.up)
 
-            mat[3][0] = -position.value.x
-            mat[3][1] = -position.value.y
-            mat[3][2] = -position.value.z
-
-            # I have no and I mean NO idea why we need glm.inverse here
-            # We shouldn't need it. the above code is exactly the code I've used in
-            # a different project an it works perfectly. But this works and we need to do
-            # other stuff so let's leave it!! ~xFrednet
-            # https://stackoverflow.com/questions/22194424/creating-a-view-matrix-with-glm
-            mat_target.value = glm.inverse(mat)
+            # - I have no and I mean NO idea why we need glm.inverse here
+            #   We shouldn't need it. the above code is exactly the code I've used in
+            #   a different project an it works perfectly. But this works and we need to do
+            #   other stuff so let's leave it!! ~xFrednet
+            # - https://stackoverflow.com/questions/22194424/creating-a-view-matrix-with-glm
+            # - I got it working holy fuck, HOLY FUCK I'm so happy right now (and tired)
+            #   I'm going to leave this here in the memory of the wasted time RIP
 
 #
 # Draw frame
