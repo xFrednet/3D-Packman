@@ -3,15 +3,33 @@ Python implementation of a maze generation algorithm:
 https://en.wikipedia.org/wiki/Maze_generation_algorithm
 """
 from random import randint
+import esper
+import math
+import glm
+from vertex_buffer_array import StandardShaderVertexArray
+import components as com
 
 
 def _setup_maze(world):
     maze = Maze()
     m = maze.generate_maze()
+    for i in range(len(m)):
+        for j in range(len(m)):
+            if m[i][j]:
+                cube = world.create_entity()
+                rect = com.Rectangle(1.0, 1.0, 1.0)
+                world.add_component(cube, rect)
+                world.add_component(cube, com.Position(i, j, 2))
+
+                world.add_component(cube, StandardShaderVertexArray.from_rectangle(rect))
+                world.add_component(cube, com.Scale())
+                world.add_component(cube, com.Rotation())
+                world.add_component(cube, com.TransformationMatrix())
+                world.add_component(cube, com.ObjectMaterial(color=glm.vec3(0.3, 0.3, 0.3)))
 
 
 class Maze:
-    def __init__(self, w=7, h=7, complexity=.75, density=.75):
+    def __init__(self, w=10, h=10, complexity=.75, density=.75):
         self.width = w
         self.height = h
         self.complexity = complexity

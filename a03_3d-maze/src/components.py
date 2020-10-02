@@ -69,6 +69,7 @@ class ViewMatrix:
     def __init__(self):
         self.value = glm.mat4x4(1.0)
 
+
 #
 # Shape
 #
@@ -83,20 +84,21 @@ class Rectangle:
     
     1 is the height (z axis)
     """
+
     def __init__(self, width, depth, height):
         self.width = width
         self.depth = depth
         self.height = height
-    
+
     def min_x(self):
         return -self.width / 2
-    
+
     def max_x(self):
         return self.width / 2
 
     def min_y(self):
         return -self.depth / 2
-    
+
     def max_y(self):
         return self.depth / 2
 
@@ -105,6 +107,7 @@ class Rectangle:
 
     def max_z(self):
         return self.height / 2
+
 
 class Circle:
     def __init__(self, center_x, center_y, radius):
