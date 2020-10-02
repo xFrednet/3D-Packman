@@ -59,7 +59,8 @@ class World(esper.World):
         # Rendering
         #
         # Prepare
-        self.add_processor(rsys.RotationToOrientation(), priority=1011)
+        self.add_processor(rsys.FreeCamOrientation(), priority=1011)
+        self.add_processor(rsys.ThirdPersonCameraSystem(), priority=1011)
         self.add_processor(rsys.BuildViewMatrixSystem(), priority=1010)
         self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1009)
         self.add_processor(rsys.PrepareFrameSystem(), priority=1008)
@@ -90,18 +91,37 @@ class World(esper.World):
         self.add_component(floor, com.TransformationMatrix())
         self.add_component(floor, com.ObjectMaterial(color=glm.vec3(0.8, 0.8, 0.8)))
 
-        camera = self.create_entity()
-        self.add_component(camera, com.Position(x=0.0, y=20.0, z=5.0))
-        self.add_component(camera, com.Velocity(along_world_axis=False))
-        self.add_component(camera, com.Rotation())
-        self.add_component(camera, com.WasdControlComponent(speed=10))
-        self.add_component(camera, com.CameraOrientation())
-        self.add_component(camera, com.ArrowKeyRotationControlComponent())
-        self.add_component(camera, com.ViewMatrix())
-        self.add_component(camera, com.Home(z=5.0))
-        self.add_component(camera, com.CollisionComponent())
-        self.add_component(camera, com.Rectangle(1, 1, 1))
-        self.camera_id = camera
+        player_rect = com.Rectangle(1, 1, 1)
+        self.player_object = self.create_entity(
+                StandardShaderVertexArray.from_rectangle(player_rect),
+                com.Position(x=0.0, y=20.0, z=4.0),
+                com.Scale(),
+                com.Rotation(yaw=3.1),
+                com.TransformationMatrix(),
+                com.ObjectMaterial(color=glm.vec3(1.0, 0.0, 0.0)),
+                com.Velocity(along_world_axis=False),
+                com.WasdControlComponent(speed=10),
+                player_rect,
+                com.CollisionComponent(),
+                com.ArrowKeyRotationControlComponent()
+            )
+        self.camera_id = self.create_entity(
+                com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
+                com.CameraOrientation(),
+                com.ViewMatrix(),
+                com.Position()
+            )
+#        self.camera_id = self.create_entity(
+#                com.Position(x=0.0, y=20.0, z=5.0),
+#                com.Velocity(along_world_axis=False),
+#                com.FreeCamera(),
+#                com.Rotation(),
+#                com.WasdControlComponent(speed=10),
+#                com.CameraOrientation(),
+#                com.ArrowKeyRotationControlComponent(),
+#                com.ViewMatrix(),
+#                com.Home(z=5.0),
+#                com.Rectangle(1, 1, 1))
 
     def update_resolution(self, resolution):
         self.resolution = resolution
