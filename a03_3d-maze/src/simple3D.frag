@@ -1,7 +1,9 @@
 #version 330 core
 #define MAX_LIGHT_COUNT 4
 
-in vec3 vb_color;
+in vec3 to_light[MAX_LIGHT_COUNT];
+in vec3 to_camera;
+in vec3 surface_normal;
 
 out vec3 color;
 
@@ -13,12 +15,26 @@ out vec3 color;
 uniform vec3 u_color;
 uniform vec3 u_diffuse;
 uniform vec3 u_specular;
-uniform int  u_shininess;
+uniform uint u_shininess;
 
 uniform vec3 u_light_color[MAX_LIGHT_COUNT];
 uniform uint u_light_count;
 uniform vec3 u_global_ambient;
 
-void main(){
-    color = u_color * u_global_ambient;
+void main() {
+    
+    color = vec3(0.0, 0.0, 0.0);
+
+    for (int index = 0; index < MAX_LIGHT_COUNT; index++) {
+        vec3 s = normalize(to_light[index]);
+        float lambert = max(dot(surface_normal, s), 0);
+        color += u_diffuse * u_light_color[index] * lambert;
+
+        vec3 h = normalize(to_camera + to_light[index]);
+        float phong = max(dot(surface_normal, h), 0);
+        color += u_specular * u_light_color[index] * pow(phong, u_shininess);
+    }
+
+    //color = surface_normal;
+    color += u_diffuse * u_global_ambient;
 }

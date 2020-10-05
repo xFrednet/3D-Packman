@@ -28,6 +28,10 @@ class UpdateLightSetup(Processor):
             if (light_count >= MAX_LIGHT_COUNT):
                 break
         
+        for index in range(light_count, MAX_LIGHT_COUNT):
+            light_setup.lights.append(com.Light(glm.vec3(), glm.vec3()))
+
+        
         light_setup.light_count = light_count
         self.world.light_setup = light_setup
 
@@ -139,6 +143,7 @@ class StandardRenderSystem(Processor):
             # Bind buffers
             gl.glBindVertexArray(vba.vertex_array_id)
             gl.glEnableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glEnableVertexAttribArray(shader.NORMAL_ATTR)
 
             # Draw the beautiful
             shader.set_transformation_matrix(translation.value)
@@ -147,6 +152,7 @@ class StandardRenderSystem(Processor):
 
             # Unbind the thingies
             gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glDisableVertexAttribArray(shader.NORMAL_ATTR)
             gl.glBindVertexArray(0)
 
         shader.stop()

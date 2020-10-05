@@ -145,8 +145,8 @@ class StandardShaderProgram(ShaderProgram):
         gl.glUniform3fv(self.vs_camera_position, 1, glm.value_ptr(light_setup.camera_position))
         for index in range(light_setup.light_count):
             gl.glUniform3fv(
-                self.vs_light_position,
-                index,
+                self.vs_light_position + index,
+                1,
                 glm.value_ptr(light_setup.lights[index].position))
 
         # Fragment shader
@@ -155,8 +155,8 @@ class StandardShaderProgram(ShaderProgram):
         for index in range(light_setup.light_count):
             gl.glUniform3fv(
                 self.ps_light_color,
-                index,
-                glm.value_ptr(light_setup.lights[index].color))
+                1,
+                glm.value_ptr(light_setup.lights[0].color))
 
     def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.25, f=50.0):
         aspect = resolution.x / resolution.y
