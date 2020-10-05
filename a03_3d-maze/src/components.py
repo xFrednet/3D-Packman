@@ -56,6 +56,11 @@ class TransformationMatrix:
         self.value = glm.mat4x4(1.0)
 
 
+class CollisionComponent:
+    def __init__(self):
+        self.is_colliding_y = False
+        self.is_colliding_x = False
+
 #
 # Camera
 #
@@ -64,6 +69,14 @@ class CameraOrientation:
         self.look_at = glm.vec3(0.0, 1.0, 0.0)
         self.up = glm.vec3(0.0, 0.0, 1.0)
 
+class FreeCamera:
+    pass
+
+class ThirdPersonCamera:
+    def __init__(self, target, distance=1.0, pitch=0.0):
+        self.target = target
+        self.distance = distance
+        self.pitch = pitch
 
 class ViewMatrix:
     def __init__(self):

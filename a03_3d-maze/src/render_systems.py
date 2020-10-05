@@ -35,24 +35,46 @@ class BuildTranformationMatrixSystem(Processor):
                 com.Rotation):
             mat = glm.mat4x4(1.0)
             mat = glm.translate(mat, position.value)
-            mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
-            mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
-            mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
+            # No rotation for you
+            # mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
+            # mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
+            #mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
             mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
 
             mat_target.value = mat
 
-
-class RotationToOrientation(Processor):
+class ThirdPersonCameraSystem(Processor):
     def process(self):
-        for _id, (position, orientation, rotation) in self.world.get_components(
+        for _id, (position, orientation, third_person_cam) in self.world.get_components(
                 com.Position,
                 com.CameraOrientation,
-                com.Rotation):
+                com.ThirdPersonCamera):
+            orientation.look_at = self.world.component_for_entity(third_person_cam.target, com.Position).value
+
+            yaw = self.world.component_for_entity(third_person_cam.target, com.Rotation).yaw
+            pitch = third_person_cam.pitch
+            
+            dir_height = math.sin(pitch)
+            dir_vec = glm.vec3(
+                math.sin(yaw) * (1.0 - abs(dir_height)),
+                math.cos(yaw) * (1.0 - abs(dir_height)),
+                dir_height
+            )
+
+            target_pos = self.world.component_for_entity(third_person_cam.target, com.Position).value
+            position.value = target_pos + ((dir_vec * -1) * third_person_cam.distance)
+
+class FreeCamOrientation(Processor):
+    def process(self):
+        for _id, (position, orientation, rotation, _free_cam) in self.world.get_components(
+                com.Position,
+                com.CameraOrientation,
+                com.Rotation,
+                com.FreeCamera):
             height = math.sin(rotation.pitch)
             orientation.look_at = position.value + glm.vec3(
-                math.sin(rotation.yaw) * (1.0 - abs(height)),
-                math.cos(rotation.yaw) * (1.0 - abs(height)),
+                math.sin(-rotation.yaw) * (1.0 - abs(height)),
+                math.cos(-rotation.yaw) * (1.0 - abs(height)),
                 height
             )
 
