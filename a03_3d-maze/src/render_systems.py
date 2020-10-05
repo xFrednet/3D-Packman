@@ -22,7 +22,7 @@ class PrepareFrameSystem(Processor):
         matrix = self.world.component_for_entity(self.world.camera_id, com.ViewMatrix).value
         self.world.standard_shader.start()
         self.world.standard_shader.set_view_matrix(matrix)
-        #        self.world.standard_shader.set_projection_matrix(glm.mat4(1.0))
+        self.world.standard_shader.load_light_setup(self.world.light_setup)
         self.world.standard_shader.stop()
 
 
@@ -122,7 +122,7 @@ class StandardRenderSystem(Processor):
 
             # Draw the beautiful
             shader.set_transformation_matrix(translation.value)
-            shader.set_object_color(material.color)
+            shader.set_object_material(material)
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
 
             # Unbind the thingies

@@ -19,6 +19,7 @@ class World(esper.World):
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
         self.camera_id = 0
+        self.light_setup = com.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
 
         self._setup_systems()
         self._setup_entities()

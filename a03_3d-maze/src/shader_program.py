@@ -64,6 +64,16 @@ class StandardShaderProgram(ShaderProgram):
 
     OBJECT_COLOR = 'object_color'
 
+    FS_COLOR_NAME = 'u_color'
+    FS_DIFFUSE_NAME = 'u_diffuse'
+    FS_SPECULAR_NAME = 'u_specular'
+    FS_SHININESS_NAME = 'u_shininess'
+
+    FS_LIGHT_COLOR_NAME = 'u_light_color'
+    FS_LIGHT_COUNT_NAME = 'u_light_count'
+    FS_GLOBAL_AMBIENT_NAME = 'u_global_ambient'
+
+
     def __init__(self):
         ShaderProgram.__init__(self)
 
@@ -83,6 +93,19 @@ class StandardShaderProgram(ShaderProgram):
         self.view_matrix_location = self._load_uniform_location(StandardShaderProgram.VIEW_MATRIX_NAME)
         self.projection_matrix_location = self._load_uniform_location(StandardShaderProgram.PROJECTION_MATRIX_NAME)
         self.object_color_location = self._load_uniform_location(StandardShaderProgram.OBJECT_COLOR)
+
+        # This is not beautiful but I've tried. DirectX can actually just load entire
+        # structs. This makes stuff like this simple and clean as it only requires one 
+        # loading command but who cares it's not like we can rewrite OpenGl now :) ~ xFrednet 2020.10.05
+        self.ps_color = self._load_uniform_location(StandardShaderProgram.FS_COLOR_NAME)
+        self.ps_diffuse = self._load_uniform_location(StandardShaderProgram.FS_DIFFUSE_NAME)
+        self.ps_specular = self._load_uniform_location(StandardShaderProgram.FS_SPECULAR_NAME)
+        self.ps_shininess = self._load_uniform_location(StandardShaderProgram.FS_SHININESS_NAME)
+
+        self.ps_light_color = self._load_uniform_location(StandardShaderProgram.FS_LIGHT_COLOR_NAME)
+        self.ps_light_count = self._load_uniform_location(StandardShaderProgram.FS_LIGHT_COUNT_NAME)
+        self.ps_global_ambient = self._load_uniform_location(StandardShaderProgram.FS_GLOBAL_AMBIENT_NAME)
+
         print("StandardShaderProgram created")
 
     # The vertex data has the following layout:
@@ -108,6 +131,25 @@ class StandardShaderProgram(ShaderProgram):
     
     def set_object_color(self, color):
         gl.glUniform3fv(self.object_color_location, 1, glm.value_ptr(color))
+
+    def set_object_material(self, material):
+        gl.glUniform3fv(self.ps_color, 1, glm.value_ptr(material.color))
+        gl.glUniform3fv(self.ps_diffuse, 1, glm.value_ptr(material.diffuse))
+        gl.glUniform3fv(self.ps_specular, 1, glm.value_ptr(material.specular))
+        gl.glUniform1ui(self.ps_shininess, material.shininess)
+
+    def load_light_setup(self, light_setup):
+        # lights
+        # global_ambient
+        # camera_position
+        # light_count
+        gl.glUniform1ui(self.ps_light_count, light_setup.light_count)
+        gl.glUniform3fv(self.ps_global_ambient, 1, glm.value_ptr(light_setup.global_ambient))
+        for index in range(light_setup.light_count):
+            gl.glUniform3fv(
+                self.ps_light_color,
+                index,
+                glm.value_ptr(light_setup.lights[index].color))
 
     def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.25, f=50.0):
         aspect = resolution.x / resolution.y
