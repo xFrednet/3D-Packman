@@ -13,7 +13,6 @@ import components as com
 #
 # Prepare frame
 #
-<<<<<<< HEAD
 class UpdateLightSetup(Processor):
     def process(self):
         MAX_LIGHT_COUNT = 4
@@ -33,8 +32,6 @@ class UpdateLightSetup(Processor):
         self.world.light_setup = light_setup
 
 
-=======
->>>>>>> f9a8ba4a0c67d90192ee15b86a8b5cedefc5be59
 class PrepareFrameSystem(Processor):
     def process(self):
         gl.glEnable(gl.GL_DEPTH_TEST)

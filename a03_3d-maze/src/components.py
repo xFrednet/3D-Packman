@@ -136,7 +136,6 @@ class Circle:
 # Graphics
 #
 class ObjectMaterial:
-<<<<<<< HEAD
     def __init__(self,
             color,
             diffuse=glm.vec3(0, 0, 0),
@@ -158,7 +157,3 @@ class LightSetup:
         self.global_ambient = global_ambient
         self.camera_position = glm.vec3()
         self.light_count = 0
-=======
-    def __init__(self, color):
-        self.color = color
->>>>>>> f9a8ba4a0c67d90192ee15b86a8b5cedefc5be59
