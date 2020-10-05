@@ -14,8 +14,8 @@ import components as com
 # Prepare frame
 #
 class PrepareFrameSystem(Processor):
-
     def process(self):
+        gl.glEnable(gl.GL_DEPTH_TEST)
         gl.glClearColor(1.0, 0, 1.0, 0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
@@ -38,10 +38,11 @@ class BuildTranformationMatrixSystem(Processor):
             # No rotation for you
             # mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
             # mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
-            #mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
+            # mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
             mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
 
             mat_target.value = mat
+
 
 class ThirdPersonCameraSystem(Processor):
     def process(self):
@@ -53,7 +54,7 @@ class ThirdPersonCameraSystem(Processor):
 
             yaw = self.world.component_for_entity(third_person_cam.target, com.Rotation).yaw
             pitch = third_person_cam.pitch
-            
+
             dir_height = math.sin(pitch)
             dir_vec = glm.vec3(
                 math.sin(yaw) * (1.0 - abs(dir_height)),
@@ -63,6 +64,7 @@ class ThirdPersonCameraSystem(Processor):
 
             target_pos = self.world.component_for_entity(third_person_cam.target, com.Position).value
             position.value = target_pos + ((dir_vec * -1) * third_person_cam.distance)
+
 
 class FreeCamOrientation(Processor):
     def process(self):
@@ -113,8 +115,8 @@ class StandardRenderSystem(Processor):
         shader.start()
 
         for _id, (vba, translation, material) in self.world.get_components(
-                StandardShaderVertexArray, 
-                com.TransformationMatrix, 
+                StandardShaderVertexArray,
+                com.TransformationMatrix,
                 com.ObjectMaterial):
             # Bind buffers
             gl.glBindVertexArray(vba.vertex_array_id)
