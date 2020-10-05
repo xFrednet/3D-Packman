@@ -13,6 +13,29 @@ import components as com
 #
 # Prepare frame
 #
+class UpdateLightSetup(Processor):
+    def process(self):
+        MAX_LIGHT_COUNT = 4
+
+        light_setup: com.LightSetup = self.world.light_setup
+        light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Position).value
+        
+        light_count = 0
+        light_setup.lights.clear()
+        for _id, light in self.world.get_component(com.Light):
+            light_setup.lights.append(light)
+            light_count += 1
+            if (light_count >= MAX_LIGHT_COUNT):
+                break
+        
+        for index in range(light_count, MAX_LIGHT_COUNT):
+            light_setup.lights.append(com.Light(glm.vec3(), glm.vec3()))
+
+        
+        light_setup.light_count = light_count
+        self.world.light_setup = light_setup
+
+
 class PrepareFrameSystem(Processor):
     def process(self):
         gl.glEnable(gl.GL_DEPTH_TEST)
@@ -22,7 +45,7 @@ class PrepareFrameSystem(Processor):
         matrix = self.world.component_for_entity(self.world.camera_id, com.ViewMatrix).value
         self.world.standard_shader.start()
         self.world.standard_shader.set_view_matrix(matrix)
-        #        self.world.standard_shader.set_projection_matrix(glm.mat4(1.0))
+        self.world.standard_shader.load_light_setup(self.world.light_setup)
         self.world.standard_shader.stop()
 
 
@@ -80,7 +103,6 @@ class FreeCamOrientation(Processor):
                 height
             )
 
-
 class BuildViewMatrixSystem(Processor):
     def process(self):
         for _id, (mat_target, position, orientation) in self.world.get_components(
@@ -121,14 +143,16 @@ class StandardRenderSystem(Processor):
             # Bind buffers
             gl.glBindVertexArray(vba.vertex_array_id)
             gl.glEnableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glEnableVertexAttribArray(shader.NORMAL_ATTR)
 
             # Draw the beautiful
             shader.set_transformation_matrix(translation.value)
-            shader.set_object_color(material.color)
+            shader.set_object_material(material)
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
 
             # Unbind the thingies
             gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glDisableVertexAttribArray(shader.NORMAL_ATTR)
             gl.glBindVertexArray(0)
 
         shader.stop()

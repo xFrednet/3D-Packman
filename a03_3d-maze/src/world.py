@@ -19,6 +19,7 @@ class World(esper.World):
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
         self.camera_id = 0
+        self.light_setup = com.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
 
         self._setup_systems()
         self._setup_entities()
@@ -59,17 +60,18 @@ class World(esper.World):
         # Rendering
         #
         # Prepare
-        self.add_processor(rsys.FreeCamOrientation(), priority=1011)
-        self.add_processor(rsys.ThirdPersonCameraSystem(), priority=1011)
-        self.add_processor(rsys.BuildViewMatrixSystem(), priority=1010)
-        self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1009)
-        self.add_processor(rsys.PrepareFrameSystem(), priority=1008)
+        self.add_processor(rsys.FreeCamOrientation(), priority=1050)
+        self.add_processor(rsys.ThirdPersonCameraSystem(), priority=1050)
+        self.add_processor(rsys.UpdateLightSetup(), priority=1040)
+        self.add_processor(rsys.BuildViewMatrixSystem(), priority=1040)
+        self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1040)
+        self.add_processor(rsys.PrepareFrameSystem(), priority=1030)
 
         # Draw
-        self.add_processor(rsys.StandardRenderSystem(), priority=1008)
+        self.add_processor(rsys.StandardRenderSystem(), priority=1010)
 
         # finish
-        self.add_processor(rsys.FinishFrameSystem(), priority=1007)
+        self.add_processor(rsys.FinishFrameSystem(), priority=1000)
 
     def _setup_entities(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...
@@ -81,7 +83,16 @@ class World(esper.World):
             0.1, -0.1, 0.0,
             -0.1, 0.1, 0.0,
             0.1, -0.1, 0.0,
-            0.1, 0.1, 0.0])
+            0.1, 0.1, 0.0
+        ])
+        vba2.load_normal_data([
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0,
+        ])
 
         floor = self.create_entity()
         self.add_component(floor, vba2)
@@ -89,7 +100,9 @@ class World(esper.World):
         self.add_component(floor, com.Scale(100))
         self.add_component(floor, com.Rotation())
         self.add_component(floor, com.TransformationMatrix())
-        self.add_component(floor, com.ObjectMaterial(color=glm.vec3(0.8, 0.8, 0.8)))
+        self.add_component(floor, com.ObjectMaterial(
+            color=glm.vec3(0.8, 0.8, 0.8),
+            diffuse=glm.vec3(0.8, 0.8, 0.8)))
 
         player_rect = com.Rectangle(1, 1, 1)
         self.player_object = self.create_entity(
@@ -98,7 +111,9 @@ class World(esper.World):
                 com.Scale(),
                 com.Rotation(yaw=3.1),
                 com.TransformationMatrix(),
-                com.ObjectMaterial(color=glm.vec3(1.0, 0.0, 0.0)),
+                com.ObjectMaterial(
+                    color=glm.vec3(1.0, 0.0, 0.0),
+                    diffuse=glm.vec3(1.0, 0.0, 0.0)),
                 com.Velocity(along_world_axis=False),
                 com.WasdControlComponent(speed=10),
                 player_rect,
@@ -111,6 +126,15 @@ class World(esper.World):
                 com.ViewMatrix(),
                 com.Position()
             )
+        
+        self.create_entity(
+            com.Light(
+                position=glm.vec3(0.0, 0.0, 10.0),
+                color=glm.vec3(1.0, 1.0, 1.0)))
+        self.create_entity(
+            com.Light(
+                position=glm.vec3(10.0, 10.0, 10.0),
+                color=glm.vec3(1.0, 8.0, 6.0)))
 #        self.camera_id = self.create_entity(
 #                com.Position(x=0.0, y=20.0, z=5.0),
 #                com.Velocity(along_world_axis=False),

@@ -136,5 +136,24 @@ class Circle:
 # Graphics
 #
 class ObjectMaterial:
-    def __init__(self, color):
+    def __init__(self,
+            color,
+            diffuse=glm.vec3(0, 0, 0),
+            specular=glm.vec3(0, 0, 0),
+            shininess=5):
         self.color = color
+        self.diffuse = diffuse
+        self.specular = specular
+        self.shininess = shininess
+
+class Light:
+    def __init__(self, position, color):
+        self.position = position
+        self.color = color
+
+class LightSetup:
+    def __init__(self, global_ambient):
+        self.lights = []
+        self.global_ambient = global_ambient
+        self.camera_position = glm.vec3()
+        self.light_count = 0
