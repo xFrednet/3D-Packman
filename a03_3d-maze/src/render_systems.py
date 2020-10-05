@@ -13,8 +13,26 @@ import components as com
 #
 # Prepare frame
 #
-class PrepareFrameSystem(Processor):
+class UpdateLightSetup(Processor):
+    def process(self):
+        MAX_LIGHT_COUNT = 4
 
+        light_setup: com.LightSetup = self.world.light_setup
+        light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Position).value
+        
+        light_count = 0
+        light_setup.lights.clear()
+        for _id, light in self.world.get_component(com.Light):
+            light_setup.lights.append(light)
+            light_count += 1
+            if (light_count >= MAX_LIGHT_COUNT):
+                break
+        
+        light_setup.light_count = light_count
+        self.world.light_setup = light_setup
+
+
+class PrepareFrameSystem(Processor):
     def process(self):
         gl.glClearColor(1.0, 0, 1.0, 0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
@@ -77,7 +95,6 @@ class FreeCamOrientation(Processor):
                 math.cos(-rotation.yaw) * (1.0 - abs(height)),
                 height
             )
-
 
 class BuildViewMatrixSystem(Processor):
     def process(self):
