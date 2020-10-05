@@ -62,6 +62,10 @@ class StandardShaderProgram(ShaderProgram):
     VIEW_MATRIX_NAME = 'viewMatrix'
     PROJECTION_MATRIX_NAME = 'projectionMatrix'
 
+    VS_LIGHT_POSITION_NAME = 'u_light_position'
+    VS_LIGHT_COUNT_NAME = 'u_light_count'
+    VS_CAMERA_POSITION_NAME = 'u_camera_position'
+
     FS_COLOR_NAME = 'u_color'
     FS_DIFFUSE_NAME = 'u_diffuse'
     FS_SPECULAR_NAME = 'u_specular'
@@ -70,7 +74,6 @@ class StandardShaderProgram(ShaderProgram):
     FS_LIGHT_COLOR_NAME = 'u_light_color'
     FS_LIGHT_COUNT_NAME = 'u_light_count'
     FS_GLOBAL_AMBIENT_NAME = 'u_global_ambient'
-
 
     def __init__(self):
         ShaderProgram.__init__(self)
@@ -94,6 +97,10 @@ class StandardShaderProgram(ShaderProgram):
         # This is not beautiful but I've tried. DirectX can actually just load entire
         # structs. This makes stuff like this simple and clean as it only requires one 
         # loading command but who cares it's not like we can rewrite OpenGl now :) ~ xFrednet 2020.10.05
+        self.vs_light_position = self._load_uniform_location(StandardShaderProgram.VS_LIGHT_POSITION_NAME)
+        self.vs_light_count = self._load_uniform_location(StandardShaderProgram.VS_LIGHT_COUNT_NAME)
+        self.vs_camera_position = self._load_uniform_location(StandardShaderProgram.VS_CAMERA_POSITION_NAME)
+        
         self.ps_color = self._load_uniform_location(StandardShaderProgram.FS_COLOR_NAME)
         self.ps_diffuse = self._load_uniform_location(StandardShaderProgram.FS_DIFFUSE_NAME)
         self.ps_specular = self._load_uniform_location(StandardShaderProgram.FS_SPECULAR_NAME)
@@ -133,10 +140,16 @@ class StandardShaderProgram(ShaderProgram):
         gl.glUniform1ui(self.ps_shininess, material.shininess)
 
     def load_light_setup(self, light_setup):
-        # lights
-        # global_ambient
-        # camera_position
-        # light_count
+        # Vertex Shader
+        gl.glUniform1ui(self.vs_light_count, light_setup.light_count)
+        gl.glUniform3fv(self.vs_camera_position, 1, glm.value_ptr(light_setup.camera_position))
+        for index in range(light_setup.light_count):
+            gl.glUniform3fv(
+                self.vs_light_position,
+                index,
+                glm.value_ptr(light_setup.lights[index].position))
+
+        # Fragment shader
         gl.glUniform1ui(self.ps_light_count, light_setup.light_count)
         gl.glUniform3fv(self.ps_global_ambient, 1, glm.value_ptr(light_setup.global_ambient))
         for index in range(light_setup.light_count):
