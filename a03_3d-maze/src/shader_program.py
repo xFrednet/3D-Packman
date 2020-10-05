@@ -56,7 +56,7 @@ class ShaderProgram:
 
 class StandardShaderProgram(ShaderProgram):
     POSITION_ATTR = 0
-    COLOR_ATTR = 1
+    NORMAL_ATTR = 1
 
     TRANSFORMATION_MATRIX_NAME = 'transformationMatrix'
     VIEW_MATRIX_NAME = 'viewMatrix'
