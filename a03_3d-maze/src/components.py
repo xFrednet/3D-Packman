@@ -61,6 +61,7 @@ class CollisionComponent:
         self.is_colliding_y = False
         self.is_colliding_x = False
 
+
 #
 # Camera
 #
@@ -69,8 +70,10 @@ class CameraOrientation:
         self.look_at = glm.vec3(0.0, 1.0, 0.0)
         self.up = glm.vec3(0.0, 0.0, 1.0)
 
+
 class FreeCamera:
     pass
+
 
 class ThirdPersonCamera:
     def __init__(self, target, distance=1.0, pitch=0.0):
@@ -78,9 +81,11 @@ class ThirdPersonCamera:
         self.distance = distance
         self.pitch = pitch
 
+
 class ViewMatrix:
     def __init__(self):
         self.value = glm.mat4x4(1.0)
+
 
 #
 # Shape
@@ -96,20 +101,21 @@ class Rectangle:
     
     1 is the height (z axis)
     """
+
     def __init__(self, width, depth, height):
         self.width = width
         self.depth = depth
         self.height = height
-    
+
     def min_x(self):
         return -self.width / 2
-    
+
     def max_x(self):
         return self.width / 2
 
     def min_y(self):
         return -self.depth / 2
-    
+
     def max_y(self):
         return self.depth / 2
 
@@ -130,6 +136,7 @@ class Circle:
 # Graphics
 #
 class ObjectMaterial:
+<<<<<<< HEAD
     def __init__(self,
             color,
             diffuse=glm.vec3(0, 0, 0),
@@ -151,3 +158,7 @@ class LightSetup:
         self.global_ambient = global_ambient
         self.camera_position = glm.vec3()
         self.light_count = 0
+=======
+    def __init__(self, color):
+        self.color = color
+>>>>>>> f9a8ba4a0c67d90192ee15b86a8b5cedefc5be59
