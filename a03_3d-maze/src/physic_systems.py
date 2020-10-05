@@ -48,6 +48,7 @@ class CollisionSystem(esper.Processor):
     Welcome to the world of cheats and lairs. We are only doing collision
     detection on the x and y direction. 
     """
+
     def process(self):
         for hero_id, (hero_position, hero_velocity, hero_rectangle, hero_collision) in self.world.get_components(
                 com.Position,
@@ -67,11 +68,11 @@ class CollisionSystem(esper.Processor):
             for villan_id, (villan_position, villan_rectangle) in self.world.get_components(
                     com.Position,
                     com.Rectangle):
-                
+
                 # Don't hit your self
                 if (villan_id == hero_id):
                     continue
-                
+
                 # Positions
                 villan_min_x = villan_position.value.x + villan_rectangle.min_x()
                 villan_max_x = villan_position.value.x + villan_rectangle.max_x()
@@ -85,32 +86,33 @@ class CollisionSystem(esper.Processor):
                 if (hero_max_y < villan_min_y or
                         hero_min_y >= villan_max_y):
                     continue
-                
+
                 # Find side
                 hero_min_x_old = hero_position.value.x + hero_rectangle.min_x()
                 hero_max_x_old = hero_position.value.x + hero_rectangle.max_x()
                 hero_min_y_old = hero_position.value.y + hero_rectangle.min_y()
                 hero_max_y_old = hero_position.value.y + hero_rectangle.max_y()
 
-                if (hero_max_y_old > villan_min_y and hero_min_y_old <= villan_max_y):
-                    if (hero_min_x_old > villan_max_x and hero_min_x <= villan_max_x):
+                if hero_max_y_old > villan_min_y and hero_min_y_old <= villan_max_y:
+                    if hero_min_x_old > villan_max_x and hero_min_x <= villan_max_x:
                         hero_collision.is_colliding_x = True
-                    elif (hero_max_x_old < villan_min_x and hero_max_x >= villan_min_x):
+                    elif hero_max_x_old < villan_min_x and hero_max_x >= villan_min_x:
                         hero_collision.is_colliding_x = True
-                
-                if (hero_max_x_old > villan_min_x and hero_min_x_old <= villan_max_x):
-                    if (hero_min_y_old > villan_max_y and hero_min_y <= villan_max_y):
+
+                if hero_max_x_old > villan_min_x and hero_min_x_old <= villan_max_x:
+                    if hero_min_y_old > villan_max_y and hero_min_y <= villan_max_y:
                         hero_collision.is_colliding_y = True
-                    elif (hero_max_y_old < villan_min_y and hero_max_y >= villan_min_y):
+                    elif hero_max_y_old < villan_min_y and hero_max_y >= villan_min_y:
                         hero_collision.is_colliding_y = True
 
-                if (hero_collision.is_colliding_x and hero_collision.is_colliding_y):
+                if hero_collision.is_colliding_x and hero_collision.is_colliding_y:
                     return
+
 
 class VelocityToEntityAxis(esper.Processor):
     def process(self):
         for _id, (velocity, rotation) in self.world.get_components(com.Velocity, com.Rotation):
-            if (velocity.along_world_axis):
+            if velocity.along_world_axis:
                 continue
 
             new_v = glm.vec3()
@@ -153,7 +155,7 @@ class WasdControlSystem(esper.Processor):
                 velocity.value = glm.normalize(direction) * control.speed
             else:
                 velocity.value = glm.vec3()
-            
+
             if keys[pygame.locals.K_SPACE]:
                 velocity.value.z += control.speed
             if keys[pygame.locals.K_LSHIFT]:

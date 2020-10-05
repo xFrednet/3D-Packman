@@ -10,15 +10,16 @@ import components as com
 
 # TODO:
 # fix Le Maze to be able to create a better maze
-# depth-testing
+# depth-testing - Done
 # lightning
+# minimap
 
 
-def unit(i, j, world, h, cl=1.0, cw=1.0):
+def unites(i, j, world, w, h):
     cube = world.create_entity()
-    rect = com.Rectangle(cl, cw, h)
+    rect = com.Rectangle(w, h, 0.1)
     world.add_component(cube, rect)
-    world.add_component(cube, com.Position(i + cl, j + cw, 2.0))
+    world.add_component(cube, com.Position(i + w / 2, j + h / 2, 2.0))
     world.add_component(cube, StandardShaderVertexArray.from_rectangle(rect))
     world.add_component(cube, com.Scale())
     world.add_component(cube, com.Rotation())
@@ -29,19 +30,30 @@ def unit(i, j, world, h, cl=1.0, cw=1.0):
 def _setup_maze(world):
     maze = Maze()
     m = maze.generate_maze()
-    print(len(m))
-    print(len(m[1]))
-    for i in range(len(m)):
+    scale = 3  # scales the empty space of the maze
+    y = 0
+    for i in range(len(m[0])):
+        x = 0
+        h = 0
+        if i % 2 == 0:
+            h = 1
+        else:
+            h = 3
         for j in range(len(m[0])):
+            w = 0
+            if j % 2 == 0:
+                w = 1
+            else:
+                w = scale
             if m[i][j]:
-                if i % 2 == 0:
-                    unit(i, j, world, maze.height, 1.0)
-                if i % 2 == 1:
-                    unit(i, j, world, maze.height, 1.0, 1.0)
+                unites(x, y, world, w, h)
+            x += w
+        y += h
 
 
 class Maze:
-    def __init__(self, w=10, l=20, h=1.0, complexity=.75, density=.75):
+    def __init__(self, w=6, l=6, h=0.1, complexity=.75, density=.75):
+        # min values for w and l are 6
         self.width = w
         self.length = l
         self.height = h
