@@ -15,16 +15,18 @@ import components as com
 # minimap
 
 
-def unites(i, j, world, w, h):
+def unites(i, j, world, w, h, depth):
     cube = world.create_entity()
-    rect = com.Rectangle(w, h, 0.1)
+    rect = com.Rectangle(w, h, depth)
     world.add_component(cube, rect)
     world.add_component(cube, com.Position(i + w / 2, j + h / 2, 2.0))
     world.add_component(cube, StandardShaderVertexArray.from_rectangle(rect))
     world.add_component(cube, com.Scale())
     world.add_component(cube, com.Rotation())
     world.add_component(cube, com.TransformationMatrix())
-    world.add_component(cube, com.ObjectMaterial(color=glm.vec3(0.3, 0.3, 0.3)))
+    world.add_component(cube, com.ObjectMaterial(
+        color=glm.vec3(0.3, 0.3, 0.3),
+        diffuse=glm.vec3(0.4, 0.4, 0.4)))
 
 
 def _setup_maze(world):
@@ -46,13 +48,13 @@ def _setup_maze(world):
             else:
                 w = scale
             if m[i][j]:
-                unites(x, y, world, w, h)
+                unites(x, y, world, w, h, maze.height)
             x += w
         y += h
 
 
 class Maze:
-    def __init__(self, w=6, l=6, h=0.1, complexity=.75, density=.75):
+    def __init__(self, w=10, l=10, h=2.0, complexity=.75, density=.75):
         # min values for w and l are 6
         self.width = w
         self.length = l

@@ -82,8 +82,8 @@ class StandardShaderVertexArray(VertexBufferArray):
         side_normals = [
             [0.0, 0.0, -1.0], # Bottom
             [0.0, 0.0, 1.0], # Top
-            [0.0, 1.0, 0.0], # Front
-            [0.0, -1.0, 0.0], # Back
+            [0.0, -1.0, 0.0], # Front
+            [0.0, 1.0, 0.0], # Back
             [-1.0, 0.0, 0.0], # Left
             [1.0, 0.0, 0.0] # Right
         ]
@@ -93,7 +93,7 @@ class StandardShaderVertexArray(VertexBufferArray):
             [0, 2, 1, 1, 2, 3], # Bottom
             [4, 6, 5, 5, 6, 7], # Top
             [2, 3, 7, 6, 2, 7], # Front
-            [0, 4, 5, 1, 5, 4], # Back
+            [5, 4, 0, 5, 0, 1], # Back
             [6, 4, 0, 2, 0, 6], # Left
             [7, 5, 3, 5, 3, 1] # Right
         ]

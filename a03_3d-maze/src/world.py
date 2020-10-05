@@ -131,6 +131,10 @@ class World(esper.World):
             com.Light(
                 position=glm.vec3(0.0, 0.0, 10.0),
                 color=glm.vec3(1.0, 1.0, 1.0)))
+        self.create_entity(
+            com.Light(
+                position=glm.vec3(10.0, 10.0, 10.0),
+                color=glm.vec3(1.0, 8.0, 6.0)))
 #        self.camera_id = self.create_entity(
 #                com.Position(x=0.0, y=20.0, z=5.0),
 #                com.Velocity(along_world_axis=False),
