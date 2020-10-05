@@ -62,8 +62,6 @@ class StandardShaderProgram(ShaderProgram):
     VIEW_MATRIX_NAME = 'viewMatrix'
     PROJECTION_MATRIX_NAME = 'projectionMatrix'
 
-    OBJECT_COLOR = 'object_color'
-
     FS_COLOR_NAME = 'u_color'
     FS_DIFFUSE_NAME = 'u_diffuse'
     FS_SPECULAR_NAME = 'u_specular'
@@ -92,7 +90,6 @@ class StandardShaderProgram(ShaderProgram):
             StandardShaderProgram.TRANSFORMATION_MATRIX_NAME)
         self.view_matrix_location = self._load_uniform_location(StandardShaderProgram.VIEW_MATRIX_NAME)
         self.projection_matrix_location = self._load_uniform_location(StandardShaderProgram.PROJECTION_MATRIX_NAME)
-        self.object_color_location = self._load_uniform_location(StandardShaderProgram.OBJECT_COLOR)
 
         # This is not beautiful but I've tried. DirectX can actually just load entire
         # structs. This makes stuff like this simple and clean as it only requires one 
@@ -129,9 +126,6 @@ class StandardShaderProgram(ShaderProgram):
     def set_projection_matrix(self, matrix):
         gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
     
-    def set_object_color(self, color):
-        gl.glUniform3fv(self.object_color_location, 1, glm.value_ptr(color))
-
     def set_object_material(self, material):
         gl.glUniform3fv(self.ps_color, 1, glm.value_ptr(material.color))
         gl.glUniform3fv(self.ps_diffuse, 1, glm.value_ptr(material.diffuse))
@@ -170,5 +164,4 @@ class StandardShaderProgram(ShaderProgram):
 
         self.start()
         self.set_projection_matrix(mat)
-        self.set_object_color(glm.vec3(1.0, 1.0, 1.0))
         self.stop()
