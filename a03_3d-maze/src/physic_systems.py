@@ -1,10 +1,11 @@
-import glm
-import esper
-import pygame
-import pygame.locals
 import math
 
 import components_3d as com
+import esper
+import glm
+import pygame
+import pygame.locals
+
 
 def add_physics_systems_to_world(world):
     world.add_processor(GameControlSystem())
@@ -13,6 +14,7 @@ def add_physics_systems_to_world(world):
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
     world.add_processor(CameraControlSystem())
+
 
 def clamp(value, m_min, m_max):
     if value <= m_min:
@@ -102,7 +104,6 @@ class CollisionSystem(esper.Processor):
                 if (hero_max_z < villan_min_z or
                         hero_min_z >= villan_max_z):
                     continue
-                
 
                 # Find side
                 hero_min_x_old = hero_position.value.x + hero_rectangle.min_x()

@@ -1,7 +1,96 @@
-import sys, ctypes
-import glm
 import math
+import sys
+
+import glm
 from OpenGL import GL as gl
+
+
+class ShaderProgram2D:
+    def __init__(self):
+        self.program_id = gl.glCreateProgram()
+        self.shaders = []
+        # transformation matrix
+        # projection matrix
+
+    def _compile_shaders(self, shaders):
+        pass
+
+    def _load_uniform_location(self, mat_name):
+        return gl.glGetUniformLocation(self.program_id, mat_name)
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def clean_up(self):
+        pass
+
+
+class StandardShaderProgram2D(ShaderProgram2D):
+    POSITION_ATTR = 0
+    NORMAL_ATTR = 1
+
+    TRANSFORMATION_MATRIX_NAME = 'transformationMatrix'
+    VIEW_MATRIX_NAME = 'viewMatrix'
+    PROJECTION_MATRIX_NAME = 'projectionMatrix'
+
+    def __init__(self):
+        ShaderProgram2D.__init__(self)
+        vertex_file = open(sys.path[0] + "/simple2D.vert")
+        fragment_file = open(sys.path[0] + "/simple2D.frag")
+        shaders = {
+            gl.GL_VERTEX_SHADER: vertex_file.read(),
+            gl.GL_FRAGMENT_SHADER: fragment_file.read()
+        }
+        vertex_file.close()
+        fragment_file.close()
+
+        self._compile_shaders(shaders)
+
+        self.transformation_matrix_location = self._load_uniform_location(
+            StandardShaderProgram2D.TRANSFORMATION_MATRIX_NAME)
+        self.view_matrix_location = self._load_uniform_location(StandardShaderProgram2D.VIEW_MATRIX_NAME)
+        self.projection_matrix_location = self._load_uniform_location(StandardShaderProgram2D.PROJECTION_MATRIX_NAME)
+
+        print("StandardShaderProgram2D created")
+
+    def start(self):
+        ShaderProgram2D.start(self)
+
+    def stop(self):
+        ShaderProgram2D.stop(self)
+
+    def set_transformation_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.transformation_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+
+    def set_view_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.view_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+
+    def set_projection_matrix(self, matrix):
+        gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
+
+    def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.25, f=50.0):
+        aspect = resolution.x / resolution.y
+
+        top = n * math.tan(fov / 2)
+        bottom = -top
+        right = top * aspect
+        left = -right
+
+        mat = glm.mat4(0.0)
+        mat[0][0] = (2 * n) / (right - left)
+        mat[1][1] = (2 * n) / (top - bottom)
+        mat[2][0] = (left + right) / (right - left)
+        mat[2][1] = (top + bottom) / (top - bottom)
+        mat[2][2] = (-(f + n)) / (f - n)
+        mat[2][3] = -1
+        mat[3][2] = (-(2 * f * n)) / (f - n)
+
+        self.start()
+        self.set_projection_matrix(mat)
+        self.stop()
 
 
 class ShaderProgram:
@@ -100,7 +189,7 @@ class StandardShaderProgram(ShaderProgram):
         self.vs_light_position = self._load_uniform_location(StandardShaderProgram.VS_LIGHT_POSITION_NAME)
         self.vs_light_count = self._load_uniform_location(StandardShaderProgram.VS_LIGHT_COUNT_NAME)
         self.vs_camera_position = self._load_uniform_location(StandardShaderProgram.VS_CAMERA_POSITION_NAME)
-        
+
         self.ps_diffuse = self._load_uniform_location(StandardShaderProgram.FS_DIFFUSE_NAME)
         self.ps_specular = self._load_uniform_location(StandardShaderProgram.FS_SPECULAR_NAME)
         self.ps_shininess = self._load_uniform_location(StandardShaderProgram.FS_SHININESS_NAME)
@@ -132,7 +221,7 @@ class StandardShaderProgram(ShaderProgram):
 
     def set_projection_matrix(self, matrix):
         gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
-    
+
     def set_object_material(self, material):
         gl.glUniform3fv(self.ps_diffuse, 1, glm.value_ptr(material.diffuse))
         gl.glUniform3fv(self.ps_specular, 1, glm.value_ptr(material.specular))
