@@ -9,9 +9,6 @@ import components_3d as com
 
 
 # TODO:
-# fix Le Maze to be able to create a better maze
-# depth-testing - Done
-# lightning
 # minimap
 
 
@@ -32,6 +29,7 @@ def _setup_maze(world):
     m = maze.generate_maze()
     scale = 3  # scales the empty space of the maze
     y = 0
+    m[1][1] = False
     for i in range(len(m[0])):
         x = 0
         h = 0
@@ -49,6 +47,7 @@ def _setup_maze(world):
                 unites(x, y, world, w, h, maze.height)
             x += w
         y += h
+    return m
 
 
 class Maze:

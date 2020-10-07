@@ -25,7 +25,8 @@ class World(esper.World):
 
         self._setup_systems()
         self._setup_entities()
-        _setup_maze(self)
+        self.maze = _setup_maze(self)
+        print(self.maze)
         self.update_resolution(resolution)
 
     def cleanup(self):
@@ -92,18 +93,20 @@ class World(esper.World):
 
         player_rect = com.Rectangle(1, 1, 1)
         self.player_object = self.create_entity(
-                StandardShaderVertexArray.from_rectangle(player_rect),
-                com.Position(x=0.0, y=20.0, z=4.0),
-                com.Scale(),
-                com.Rotation(yaw=3.1),
-                com.TransformationMatrix(),
-                com.ObjectMaterial(diffuse=glm.vec3(1.0, 0.0, 0.0)),
-                com.Velocity(along_world_axis=False),
-                com.WasdControlComponent(speed=10),
-                player_rect,
-                com.CollisionComponent(),
-                com.ArrowKeyRotationControlComponent()
-            )
+              StandardShaderVertexArray.from_rectangle(player_rect),
+              com.Position(x=0.0, y=20.0, z=4.0),
+              com.Scale(),
+              com.Rotation(yaw=3.1),
+              com.TransformationMatrix(),
+              com.ObjectMaterial(diffuse=glm.vec3(1.0, 0.0, 0.0)),
+              com.Velocity(along_world_axis=False),
+              com.WasdControlComponent(speed=10),
+              com.Home(x=2.0, y=2.0, z=2.0),
+              player_rect,
+              com.CollisionComponent(),
+              com.ArrowKeyRotationControlComponent()
+          )
+
         self.camera_id = self.create_entity(
                 com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
                 com.CameraOrientation(),
@@ -131,7 +134,7 @@ class World(esper.World):
 #                com.Home(z=5.0),
 #                com.Rectangle(1, 1, 1))
 
+
     def update_resolution(self, resolution):
         self.resolution = resolution
-
         self.standard_shader.update_projection_matrix(resolution)
