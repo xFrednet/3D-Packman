@@ -23,12 +23,23 @@ Model and scene specific data is stored in [OpenGL uniform](https://www.khronos.
 The vertex shader calculates the vector S in our lighting calculations. It is a `vec3` value called `to_light` in our shaders. 
 
 ### Fragment shader
-The pixel shader calculates the lighting with the formula we had in lecture 8. An addition we added was the attenuation of the light. 
+The pixel shader calculates the lighting with the formula we had in lecture 8. We added attenuation to our lighting system. The formal definition of attenuation is as follows:
+> In physics, attenuation or, in some contexts, extinction is the gradual loss of flux intensity through a medium.
 
+(Stolen from [wikipedia](https://en.wikipedia.org/wiki/Attenuation))
 
+This basically just means that a light has less effect on objects or in our case pixels if the further away they are from the light source. This enables us to have lights that don't have an infinite effect.
 
-### Lighting formula
+The attenuation can be set for every light or better say modified. The light has three attenuation factors: x, y, z. These factors are than used in the fragment shader in combination with the distance between the light and the actual pixel. The formula for the total light calculation can be seen here (With some awesome latex magic to make it look cool):
+
 ![Awesome lighting formula](res/fs_lighting_formula.png)
+
+The calculation of the attenuation factor gives us a relatively wide range to play with the lighting effect while also not being to performance intensive. This following examples shows three example graphs for the attenuation:
+
+![Attenuation graphs](res/attenuation_graphs.png)
+* **Red**: attenuation = (x=0, y=0, z=1). This gives us an infinite light.
+* **Green**: attenuation = (x=1, y=0, z=1).
+* **Blue**: attenuation = (x=3, y=)
 
 ### Q&A about this layout
 * Why do we calculate lambert, phong and other values in the pixel shader?
