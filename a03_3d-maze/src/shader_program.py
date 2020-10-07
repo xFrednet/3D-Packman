@@ -72,6 +72,7 @@ class StandardShaderProgram(ShaderProgram):
     FS_SHININESS_NAME = 'u_shininess'
 
     FS_LIGHT_COLOR_NAME = 'u_light_color'
+    FS_LIGHT_ATTENUATION_NAME = 'u_light_attenuation'
     FS_LIGHT_COUNT_NAME = 'u_light_count'
     FS_GLOBAL_AMBIENT_NAME = 'u_global_ambient'
 
@@ -107,6 +108,7 @@ class StandardShaderProgram(ShaderProgram):
         self.ps_shininess = self._load_uniform_location(StandardShaderProgram.FS_SHININESS_NAME)
 
         self.ps_light_color = self._load_uniform_location(StandardShaderProgram.FS_LIGHT_COLOR_NAME)
+        self.ps_light_attenuation = self._load_uniform_location(StandardShaderProgram.FS_LIGHT_ATTENUATION_NAME)
         self.ps_light_count = self._load_uniform_location(StandardShaderProgram.FS_LIGHT_COUNT_NAME)
         self.ps_global_ambient = self._load_uniform_location(StandardShaderProgram.FS_GLOBAL_AMBIENT_NAME)
 
@@ -154,9 +156,13 @@ class StandardShaderProgram(ShaderProgram):
         gl.glUniform3fv(self.ps_global_ambient, 1, glm.value_ptr(light_setup.global_ambient))
         for index in range(light_setup.light_count):
             gl.glUniform3fv(
-                self.ps_light_color,
+                self.ps_light_color + index,
                 1,
-                glm.value_ptr(light_setup.lights[0].color))
+                glm.value_ptr(light_setup.lights[index].color))
+            gl.glUniform3fv(
+                self.ps_light_attenuation + index,
+                1,
+                glm.value_ptr(light_setup.lights[index].attenuation))
 
     def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.25, f=50.0):
         aspect = resolution.x / resolution.y
