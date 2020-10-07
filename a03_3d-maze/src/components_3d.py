@@ -14,6 +14,7 @@ class CollisionComponent:
     def __init__(self):
         self.is_colliding_y = False
         self.is_colliding_x = False
+        self.is_colliding_z = False
 
 
 #

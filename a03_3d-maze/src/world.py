@@ -28,7 +28,7 @@ class World(esper.World):
 
         self._setup_systems()
         self._setup_entities()
-        self.maze = _setup_maze(self)
+        self.maze = _setup_maze(self, 30, 30)
         self.update_resolution(resolution)
 
     def cleanup(self):
@@ -108,8 +108,8 @@ class World(esper.World):
             com.CollisionComponent(),
             com.ArrowKeyRotationControlComponent(),
             com.Light(
-                color=glm.vec3(1.0, 1.0, 1.0),
-                attenuation=glm.vec3(0.25, 0.0, 1.0))
+                color=glm.vec3(0.6, 0.3, 1.2),
+                attenuation=glm.vec3(0.1, 0.0, 1.0))
         )
 
         self.camera_id = self.create_entity(

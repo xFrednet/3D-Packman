@@ -148,6 +148,9 @@ class StandardRenderSystem(Processor):
             gl.glBindVertexArray(0)
 
 class ModelRenderer(Processor):
+    def __init__(self):
+        self.map = None
+
     def _create_model_registry(self):
         registry: res.ModelRegistry = self.world.model_registry
         
@@ -160,14 +163,17 @@ class ModelRenderer(Processor):
 
             model_list[model.model_id].append((translation, material))
         
-        return model_list
+        self.map = model_list
     
     def process(self):
         # You should delete this command before you hand in the assignment
         shader: StandardShaderProgram = self.world.standard_shader
         registry: res.ModelRegistry = self.world.model_registry
 
-        models = self._create_model_registry()
+        if self.map is None:
+            self._create_model_registry()
+
+        models = self.map
         for index in range(0, len(models)):
             if len(models[index]) == 0:
                 continue

@@ -11,7 +11,7 @@ def add_physics_systems_to_world(world):
     world.add_processor(GameControlSystem())
     world.add_processor(WasdControlSystem())
     world.add_processor(VelocityToEntityAxis())
-    #world.add_processor(CollisionSystem())
+    world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
     world.add_processor(CameraControlSystem())
 
@@ -61,55 +61,60 @@ class CollisionSystem(esper.Processor):
     """
 
     def process(self):
-        for hero_id, (hero_position, hero_velocity, hero_rectangle, hero_collision) in self.world.get_components(
+        for hero_id, (hero_position, hero_velocity, hero_rectangle, hero_scale, hero_collision) in self.world.get_components(
                 com.Position,
                 com.Velocity,
                 com.Rectangle,
+                com.Scale,
                 com.CollisionComponent):
 
             target_velocity = hero_velocity.value * self.world.delta
 
-            hero_min_x = hero_position.value.x + target_velocity.x + hero_rectangle.min_x()
-            hero_max_x = hero_position.value.x + target_velocity.x + hero_rectangle.max_x()
-            hero_min_y = hero_position.value.y + target_velocity.y + hero_rectangle.min_y()
-            hero_max_y = hero_position.value.y + target_velocity.y + hero_rectangle.max_y()
-            hero_max_z = hero_position.value.z + target_velocity.z + hero_rectangle.max_z()
-            hero_min_z = hero_position.value.z + target_velocity.z + hero_rectangle.min_z()
+            hero_min_x = hero_position.value.x + target_velocity.x + hero_rectangle.min_x() * hero_scale.value.x
+            hero_max_x = hero_position.value.x + target_velocity.x + hero_rectangle.max_x() * hero_scale.value.x
+            hero_min_y = hero_position.value.y + target_velocity.y + hero_rectangle.min_y() * hero_scale.value.y
+            hero_max_y = hero_position.value.y + target_velocity.y + hero_rectangle.max_y() * hero_scale.value.y
+            hero_max_z = hero_position.value.z + target_velocity.z + hero_rectangle.max_z() * hero_scale.value.z
+            hero_min_z = hero_position.value.z + target_velocity.z + hero_rectangle.min_z() * hero_scale.value.z
             hero_collision.is_colliding_y = False
             hero_collision.is_colliding_x = False
+            hero_collision.is_colliding_z = False
 
-            for villan_id, (villan_position, villan_rectangle) in self.world.get_components(
+            for villan_id, (villan_position, villan_rectangle, villan_scale) in self.world.get_components(
                     com.Position,
-                    com.Rectangle):
+                    com.Rectangle,
+                    com.Scale):
 
                 # Don't hit your self
                 if (villan_id == hero_id):
                     continue
 
                 # Positions
-                villan_min_x = villan_position.value.x + villan_rectangle.min_x()
-                villan_max_x = villan_position.value.x + villan_rectangle.max_x()
-                villan_min_y = villan_position.value.y + villan_rectangle.min_y()
-                villan_max_y = villan_position.value.y + villan_rectangle.max_y()
-                villan_min_z = villan_position.value.z + villan_rectangle.min_z()
-                villan_max_z = villan_position.value.z + villan_rectangle.max_z()
+                villan_min_x = villan_position.value.x + villan_rectangle.min_x() * villan_scale.value.x
+                villan_max_x = villan_position.value.x + villan_rectangle.max_x() * villan_scale.value.x
+                villan_min_y = villan_position.value.y + villan_rectangle.min_y() * villan_scale.value.y
+                villan_max_y = villan_position.value.y + villan_rectangle.max_y() * villan_scale.value.y
+                villan_min_z = villan_position.value.z + villan_rectangle.min_z() * villan_scale.value.z
+                villan_max_z = villan_position.value.z + villan_rectangle.max_z() * villan_scale.value.z
 
                 # Collision testing
-                if (hero_max_x < villan_min_x or
-                        hero_min_x >= villan_max_x):
-                    continue
                 if (hero_max_y < villan_min_y or
                         hero_min_y >= villan_max_y):
+                    continue
+                if (hero_max_x < villan_min_x or
+                        hero_min_x >= villan_max_x):
                     continue
                 if (hero_max_z < villan_min_z or
                         hero_min_z >= villan_max_z):
                     continue
 
                 # Find side
-                hero_min_x_old = hero_position.value.x + hero_rectangle.min_x()
-                hero_max_x_old = hero_position.value.x + hero_rectangle.max_x()
-                hero_min_y_old = hero_position.value.y + hero_rectangle.min_y()
-                hero_max_y_old = hero_position.value.y + hero_rectangle.max_y()
+                hero_min_x_old = hero_position.value.x + hero_rectangle.min_x() * hero_scale.value.x
+                hero_max_x_old = hero_position.value.x + hero_rectangle.max_x() * hero_scale.value.x
+                hero_min_y_old = hero_position.value.y + hero_rectangle.min_y() * hero_scale.value.y
+                hero_max_y_old = hero_position.value.y + hero_rectangle.max_y() * hero_scale.value.y
+                hero_min_z_old = hero_position.value.z + hero_rectangle.min_z() * hero_scale.value.z
+                hero_max_z_old = hero_position.value.z + hero_rectangle.max_z() * hero_scale.value.z
 
                 if hero_max_y_old > villan_min_y and hero_min_y_old <= villan_max_y:
                     if hero_min_x_old > villan_max_x and hero_min_x <= villan_max_x:
@@ -123,7 +128,9 @@ class CollisionSystem(esper.Processor):
                     elif hero_max_y_old < villan_min_y and hero_max_y >= villan_min_y:
                         hero_collision.is_colliding_y = True
 
-                if hero_collision.is_colliding_x and hero_collision.is_colliding_y:
+                if (hero_collision.is_colliding_x and
+                        hero_collision.is_colliding_y and
+                        hero_collision.is_colliding_z):
                     return
 
 
