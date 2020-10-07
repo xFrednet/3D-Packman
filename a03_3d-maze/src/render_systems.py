@@ -1,13 +1,12 @@
-from OpenGL import GL as gl
-import glm
-import glfw
-import pygame
-from esper import Processor
 import math
 
+import components as com
+import glm
+import pygame
+from OpenGL import GL as gl
+from esper import Processor
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
-import components as com
 
 
 #
@@ -19,7 +18,7 @@ class UpdateLightSetup(Processor):
 
         light_setup: com.LightSetup = self.world.light_setup
         light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Position).value
-        
+
         light_count = 0
         light_setup.lights.clear()
         for _id, light in self.world.get_component(com.Light):
@@ -27,11 +26,10 @@ class UpdateLightSetup(Processor):
             light_count += 1
             if (light_count >= MAX_LIGHT_COUNT):
                 break
-        
+
         for index in range(light_count, MAX_LIGHT_COUNT):
             light_setup.lights.append(com.Light(glm.vec3(), glm.vec3()))
 
-        
         light_setup.light_count = light_count
         self.world.light_setup = light_setup
 
@@ -49,7 +47,7 @@ class PrepareFrameSystem(Processor):
         self.world.standard_shader.stop()
 
 
-class BuildTranformationMatrixSystem(Processor):
+class BuildTransformationMatrixSystem(Processor):
     def process(self):
         for _id, (mat_target, position, scale, rotation) in self.world.get_components(
                 com.TransformationMatrix,
@@ -102,6 +100,7 @@ class FreeCamOrientation(Processor):
                 math.cos(-rotation.yaw) * (1.0 - abs(height)),
                 height
             )
+
 
 class BuildViewMatrixSystem(Processor):
     def process(self):

@@ -61,7 +61,7 @@ class World(esper.World):
         self.add_processor(rsys.ThirdPersonCameraSystem(), priority=1050)
         self.add_processor(rsys.UpdateLightSetup(), priority=1040)
         self.add_processor(rsys.BuildViewMatrixSystem(), priority=1040)
-        self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1040)
+        self.add_processor(rsys.BuildTransformationMatrixSystem(), priority=1040)
         self.add_processor(rsys.PrepareFrameSystem(), priority=1030)
 
         # Draw
