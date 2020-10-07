@@ -14,7 +14,6 @@ out vec3 color;
 // and rust naming convention not pure c++... well who cares right? ~ xFrednet 2020.10.06
 
 // One material per object
-uniform vec3 u_color;
 uniform vec3 u_diffuse;
 uniform vec3 u_specular;
 uniform uint u_shininess;

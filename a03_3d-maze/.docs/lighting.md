@@ -39,7 +39,7 @@ The calculation of the attenuation factor gives us a relatively wide range to pl
 ![Attenuation graphs](res/attenuation_graphs.png)
 * **Red**: attenuation = (x=0, y=0, z=1). This gives us an infinite light.
 * **Green**: attenuation = (x=1, y=0, z=1).
-* **Blue**: attenuation = (x=3, y=)
+* **Blue**: attenuation = (x=3, y=5, z=1).
 
 ### Q&A about this layout
 * Why do we calculate lambert, phong and other values in the pixel shader?
