@@ -1,12 +1,16 @@
-import components as com
 import esper
+import random
+import math
 import glm
-import physic_systems as psys
-import render_systems as rsys
-from maze import _setup_maze
+
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
-
+import render_systems as rsys
+import render_systems_3d as rsys3d
+import physic_systems as psys
+from maze import _setup_maze
+import components_3d as com
+import ressources as res
 
 class World(esper.World):
     def __init__(self, resolution):
@@ -16,12 +20,12 @@ class World(esper.World):
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
         self.camera_id = 0
-        self.light_setup = com.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
+        self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
+        self.view_matrix = glm.mat4(1.0)
 
         self._setup_systems()
         self._setup_entities()
         self.maze = _setup_maze(self)
-        print(self.maze)
         self.update_resolution(resolution)
 
     def cleanup(self):
@@ -47,28 +51,15 @@ class World(esper.World):
         #
         # Physics
         #
-        self.add_processor(psys.WasdControlSystem(), priority=2110)
-        self.add_processor(psys.VelocityToEntityAxis(), priority=2100)
-        self.add_processor(psys.CollisionSystem(), priority=2090)
-        self.add_processor(psys.MovementSystem(), priority=2080)
-        self.add_processor(psys.CameraControlSystem(), priority=2070)
-        self.add_processor(psys.ResetSystem(), priority=2060)
+        psys.add_physics_systems_to_world(self)
+
         #
         # Rendering
         #
         # Prepare
-        self.add_processor(rsys.FreeCamOrientation(), priority=1050)
-        self.add_processor(rsys.ThirdPersonCameraSystem(), priority=1050)
-        self.add_processor(rsys.UpdateLightSetup(), priority=1040)
-        self.add_processor(rsys.BuildViewMatrixSystem(), priority=1040)
-        self.add_processor(rsys.BuildTranformationMatrixSystem(), priority=1040)
-        self.add_processor(rsys.PrepareFrameSystem(), priority=1030)
-
-        # Draw
-        self.add_processor(rsys.StandardRenderSystem(), priority=1010)
-
-        # finish
-        self.add_processor(rsys.FinishFrameSystem(), priority=1000)
+        self.add_processor(rsys.PrepareFrameSystem())
+        rsys3d.add_3d_render_systems_to_world(self)
+        self.add_processor(rsys.FinishFrameSystem())
 
     def _setup_entities(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...
@@ -116,12 +107,11 @@ class World(esper.World):
           )
 
         self.camera_id = self.create_entity(
-            com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
-            com.CameraOrientation(),
-            com.ViewMatrix(),
-            com.Position(),
-        )
-
+                com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
+                com.CameraOrientation(),
+                com.Position()
+            )
+        
         self.create_entity(
             com.Light(
                 position=glm.vec3(10.0, 10.0, 10.0),

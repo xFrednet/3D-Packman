@@ -9,7 +9,14 @@ class Velocity:
         self.value = glm.vec3(x, y, z)
         self.along_world_axis = along_world_axis
 
+class CollisionComponent:
+    def __init__(self):
+        self.is_colliding_y = False
+        self.is_colliding_x = False
 
+#
+# Control components
+#
 class WasdControlComponent:
     """
     Note: 
@@ -24,6 +31,10 @@ class WasdControlComponent:
 class ArrowKeyRotationControlComponent:
     pass
 
+class Home:
+    def __init__(self, x=0.0, y=0.0, z=0.0):
+        self.position = glm.vec3(x, y, z)
+        self.orientation = glm.vec3(x, y, z)
 
 #
 # Object Translation
@@ -37,30 +48,15 @@ class Scale:
     def __init__(self, scale=1.0):
         self.value = scale
 
-
-class Home:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.position = glm.vec3(x, y, z)
-        self.orientation = glm.vec3(x, y, z)
-
-
 class Rotation:
     def __init__(self, yaw=0.0, pitch=0.0, role=0):
         self.yaw = yaw
         self.pitch = pitch
         self.role = role
 
-
 class TransformationMatrix:
     def __init__(self):
         self.value = glm.mat4x4(1.0)
-
-
-class CollisionComponent:
-    def __init__(self):
-        self.is_colliding_y = False
-        self.is_colliding_x = False
-
 
 #
 # Camera
@@ -80,12 +76,6 @@ class ThirdPersonCamera:
         self.target = target
         self.distance = distance
         self.pitch = pitch
-
-
-class ViewMatrix:
-    def __init__(self):
-        self.value = glm.mat4x4(1.0)
-
 
 #
 # Shape
@@ -156,10 +146,3 @@ class Light:
         # The attenuation is calculates like: 
         #   d := distance
         #   attenuation.x * d^2 + attenuation.y * d + attenuation.z
-
-class LightSetup:
-    def __init__(self, global_ambient):
-        self.lights = []
-        self.global_ambient = global_ambient
-        self.camera_position = glm.vec3()
-        self.light_count = 0

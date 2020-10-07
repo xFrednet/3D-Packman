@@ -5,7 +5,7 @@ https://en.wikipedia.org/wiki/Maze_generation_algorithm
 from random import randint
 import glm
 from vertex_buffer_array import StandardShaderVertexArray
-import components as com
+import components_3d as com
 
 
 # TODO:
