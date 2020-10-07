@@ -18,13 +18,10 @@ def clamp(value, m_min, m_max):
 class ResetSystem(esper.Processor):
     def process(self):
         keys = pygame.key.get_pressed()
-        for _id, (home, position, rotation) in self.world.get_components(com.Home, com.Position, com.Rotation):
+        for _id, (home, position) in self.world.get_components(com.Home, com.Position):
             # Home reset
             if keys[pygame.locals.K_h]:
                 position.value = home.position
-                rotation.yaw = home.orientation.x
-                rotation.pitch = home.orientation.y
-                rotation.role = home.orientation.z
 
 
 class MovementSystem(esper.Processor):

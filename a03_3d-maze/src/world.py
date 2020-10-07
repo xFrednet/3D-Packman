@@ -1,14 +1,11 @@
+import components as com
 import esper
-import random
-import math
 import glm
-
+import physic_systems as psys
+import render_systems as rsys
+from maze import _setup_maze
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
-import render_systems as rsys
-import physic_systems as psys
-from maze import _setup_maze
-import components as com
 
 
 class World(esper.World):
@@ -23,7 +20,8 @@ class World(esper.World):
 
         self._setup_systems()
         self._setup_entities()
-        _setup_maze(self)
+        self.maze = _setup_maze(self)
+        print(self.maze)
         self.update_resolution(resolution)
 
     def cleanup(self):
@@ -55,7 +53,6 @@ class World(esper.World):
         self.add_processor(psys.MovementSystem(), priority=2080)
         self.add_processor(psys.CameraControlSystem(), priority=2070)
         self.add_processor(psys.ResetSystem(), priority=2060)
-
         #
         # Rendering
         #
@@ -106,27 +103,28 @@ class World(esper.World):
 
         player_rect = com.Rectangle(1, 1, 1)
         self.player_object = self.create_entity(
-                StandardShaderVertexArray.from_rectangle(player_rect),
-                com.Position(x=0.0, y=20.0, z=4.0),
-                com.Scale(),
-                com.Rotation(yaw=3.1),
-                com.TransformationMatrix(),
-                com.ObjectMaterial(
-                    color=glm.vec3(1.0, 0.0, 0.0),
-                    diffuse=glm.vec3(1.0, 0.0, 0.0)),
-                com.Velocity(along_world_axis=False),
-                com.WasdControlComponent(speed=10),
-                player_rect,
-                com.CollisionComponent(),
-                com.ArrowKeyRotationControlComponent()
-            )
+            StandardShaderVertexArray.from_rectangle(player_rect),
+            com.Position(x=0.0, y=20.0, z=4.0),
+            com.Scale(),
+            com.Rotation(yaw=3.1),
+            com.TransformationMatrix(),
+            com.ObjectMaterial(
+                color=glm.vec3(1.0, 0.0, 0.0),
+                diffuse=glm.vec3(1.0, 0.0, 0.0)),
+            com.Velocity(along_world_axis=False),
+            com.WasdControlComponent(speed=10),
+            player_rect,
+            com.CollisionComponent(),
+            com.Home(x=2.0, y=2.0, z=2.0),
+            com.ArrowKeyRotationControlComponent()
+        )
         self.camera_id = self.create_entity(
-                com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
-                com.CameraOrientation(),
-                com.ViewMatrix(),
-                com.Position()
-            )
-        
+            com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
+            com.CameraOrientation(),
+            com.ViewMatrix(),
+            com.Position(),
+        )
+
         self.create_entity(
             com.Light(
                 position=glm.vec3(10.0, 10.0, 10.0),
@@ -136,19 +134,19 @@ class World(esper.World):
                 position=glm.vec3(0.0, 0.0, 10.0),
                 color=glm.vec3(1.0, 1.0, 1.0),
                 attenuation=glm.vec3(0.25, 0.25, 0.0)))
-#        self.camera_id = self.create_entity(
-#                com.Position(x=0.0, y=20.0, z=5.0),
-#                com.Velocity(along_world_axis=False),
-#                com.FreeCamera(),
-#                com.Rotation(),
-#                com.WasdControlComponent(speed=10),
-#                com.CameraOrientation(),
-#                com.ArrowKeyRotationControlComponent(),
-#                com.ViewMatrix(),
-#                com.Home(z=5.0),
-#                com.Rectangle(1, 1, 1))
+
+    #        self.camera_id = self.create_entity(
+    #                com.Position(x=0.0, y=20.0, z=5.0),
+    #                com.Velocity(along_world_axis=False),
+    #                com.FreeCamera(),
+    #                com.Rotation(),
+    #                com.WasdControlComponent(speed=10),
+    #                com.CameraOrientation(),
+    #                com.ArrowKeyRotationControlComponent(),
+    #                com.ViewMatrix(),
+    #                com.Home(z=5.0),
+    #                com.Rectangle(1, 1, 1))
 
     def update_resolution(self, resolution):
         self.resolution = resolution
-
         self.standard_shader.update_projection_matrix(resolution)
