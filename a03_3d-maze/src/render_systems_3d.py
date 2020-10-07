@@ -39,7 +39,6 @@ class UpdateLightSetup(Processor):
         
         for index in range(light_count, MAX_LIGHT_COUNT):
             light_setup.lights.append(com.Light(glm.vec3(), glm.vec3()))
-
         
         light_setup.light_count = light_count
         self.world.light_setup = light_setup

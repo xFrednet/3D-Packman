@@ -7,12 +7,12 @@ import math
 import components_3d as com
 
 def add_physics_systems_to_world(world):
+    world.add_processor(GameControlSystem())
     world.add_processor(WasdControlSystem())
     world.add_processor(VelocityToEntityAxis())
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
     world.add_processor(CameraControlSystem())
-    world.add_processor(ResetSystem())
 
 def clamp(value, m_min, m_max):
     if value <= m_min:
@@ -22,12 +22,17 @@ def clamp(value, m_min, m_max):
     return value
 
 
-class ResetSystem(esper.Processor):
+class GameControlSystem(esper.Processor):
     def process(self):
         keys = pygame.key.get_pressed()
-        for _id, (home, position) in self.world.get_components(com.Home, com.Position):
-            # Home reset
-            if keys[pygame.locals.K_h]:
+        
+        # Swap camera
+        if keys[self.world.controls.key_swap_camera]:
+            print("HMMMM")
+
+        # Reset
+        if keys[self.world.controls.key_return_to_home]:
+            for _id, (home, position) in self.world.get_components(com.Home, com.Position):
                 position.value = home.position
 
 
