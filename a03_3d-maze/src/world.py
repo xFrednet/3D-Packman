@@ -92,7 +92,6 @@ class World(esper.World):
         self.add_component(floor, com.TransformationMatrix())
         self.add_component(floor, com.ObjectMaterial(diffuse=glm.vec3(0.8, 0.8, 0.8)))
 
-        player_rect = com.Rectangle(1, 1, 1)
         self.player_object = self.create_entity(
               StandardShaderVertexArray.from_rectangle(player_rect),
               com.Position(x=0.0, y=20.0, z=4.0),
@@ -103,9 +102,12 @@ class World(esper.World):
               com.Velocity(along_world_axis=False),
               com.WasdControlComponent(speed=10),
               com.Home(x=2.0, y=2.0, z=2.0),
-              player_rect,
+              com.Rectangle(1, 1, 1),
               com.CollisionComponent(),
-              com.ArrowKeyRotationControlComponent()
+              com.ArrowKeyRotationControlComponent(),
+              com.Light(
+                color=glm.vec3(1.0, 1.0, 1.0),
+                attenuation=glm.vec3(0.25, 0.0, 1.0))
           )
 
         self.camera_id = self.create_entity(
@@ -115,23 +117,18 @@ class World(esper.World):
             )
         
         self.create_entity(
+            com.Position(10.0, 10.0, 10.0),
             com.Light(
-                position=glm.vec3(10.0, 10.0, 10.0),
                 color=glm.vec3(0.7, 0.6, 0.6)))
-        self.follow_light = self.create_entity(
-            com.Light(
-                position=glm.vec3(0.0, 0.0, 10.0),
-                color=glm.vec3(1.0, 1.0, 1.0),
-                attenuation=glm.vec3(0.25, 0.0, 1.0)))
-        self.backup_cam = self.create_entity(
-                com.Position(x=0.0, y=20.0, z=5.0),
-                com.Velocity(along_world_axis=False),
-                com.FreeCamera(),
-                com.Rotation(),
-                com.WasdControlComponent(speed=10),
-                com.ArrowKeyRotationControlComponent(),
-                com.CameraOrientation(),
-                com.Home(z=5.0))
+        # self.backup_cam = self.create_entity(
+        #         com.Position(x=0.0, y=20.0, z=5.0),
+        #         com.Velocity(along_world_axis=False),
+        #         com.FreeCamera(),
+        #         com.Rotation(),
+        #         com.WasdControlComponent(speed=10),
+        #         com.ArrowKeyRotationControlComponent(),
+        #         com.CameraOrientation(),
+        #         com.Home(z=5.0))
 
 
     def update_resolution(self, resolution):

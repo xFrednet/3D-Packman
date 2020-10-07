@@ -8,6 +8,7 @@ import math
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 import components_3d as com
+import ressources as res
 
 def add_3d_render_systems_to_world(world):
     world.add_processor(FreeCamOrientation())
@@ -24,23 +25,18 @@ def add_3d_render_systems_to_world(world):
 #
 class UpdateLightSetup(Processor):
     def process(self):
-        MAX_LIGHT_COUNT = 4
-
         light_setup: com.LightSetup = self.world.light_setup
         light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Position).value
         
-        light_count = 0
-        light_setup.lights.clear()
-        for _id, light in self.world.get_component(com.Light):
-            light_setup.lights.append(light)
-            light_count += 1
-            if (light_count >= MAX_LIGHT_COUNT):
+        index = 0
+        for _id, (light, position) in self.world.get_components(com.Light, com.Position):
+            light_setup.light_positions[index] = position.value
+            light_setup.lights[index] = light
+            index += 1
+            if (index >= res.LightSetup.MAX_LIGHT_COUNT):
                 break
         
-        for index in range(light_count, MAX_LIGHT_COUNT):
-            light_setup.lights.append(com.Light(glm.vec3(), glm.vec3()))
-        
-        light_setup.light_count = light_count
+        light_setup.light_count = index
         self.world.light_setup = light_setup
 
 class BuildTranformationMatrixSystem(Processor):

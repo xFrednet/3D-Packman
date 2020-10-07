@@ -179,8 +179,6 @@ class WasdControlSystem(esper.Processor):
             if keys[pygame.locals.K_LSHIFT]:
                 velocity.value.z -= control.speed
 
-            self.world.component_for_entity(self.world.follow_light, com.Light).position = position.value
-
 
 class CameraControlSystem(esper.Processor):
     def process(self):
