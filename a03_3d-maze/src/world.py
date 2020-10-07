@@ -51,22 +51,14 @@ class World(esper.World):
         #
         # Physics
         #
-        self.add_processor(psys.WasdControlSystem())
-        self.add_processor(psys.VelocityToEntityAxis())
-        self.add_processor(psys.CollisionSystem())
-        self.add_processor(psys.MovementSystem())
-        self.add_processor(psys.CameraControlSystem())
-        self.add_processor(psys.ResetSystem())
+        psys.add_physics_systems_to_world(self)
 
         #
         # Rendering
         #
         # Prepare
         self.add_processor(rsys.PrepareFrameSystem())
-
-        add_3d_render_systems_to_world(self)
-
-        # finish
+        rsys3d.add_3d_render_systems_to_world(self)
         self.add_processor(rsys.FinishFrameSystem())
 
     def _setup_entities(self):
