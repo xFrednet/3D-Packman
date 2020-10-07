@@ -24,7 +24,7 @@ void main(){
     for (int index = 0; index < MAX_LIGHT_COUNT; index++) {
         to_light[index] = u_light_position[index] - world_position.xyz;
     }
-    surface_normal = (transformationMatrix * vec4(normal, 0.0)).xyz;
+    surface_normal = normalize((transformationMatrix * vec4(normal, 0.0)).xyz);
 
     gl_Position = projectionMatrix * viewMatrix * world_position;
 }

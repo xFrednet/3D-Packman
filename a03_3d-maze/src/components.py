@@ -137,11 +137,9 @@ class Circle:
 #
 class ObjectMaterial:
     def __init__(self,
-            color,
             diffuse=glm.vec3(0, 0, 0),
             specular=glm.vec3(0, 0, 0),
             shininess=5):
-        self.color = color
         self.diffuse = diffuse
         self.specular = specular
         self.shininess = shininess

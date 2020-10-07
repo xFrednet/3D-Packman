@@ -66,7 +66,6 @@ class StandardShaderProgram(ShaderProgram):
     VS_LIGHT_COUNT_NAME = 'u_light_count'
     VS_CAMERA_POSITION_NAME = 'u_camera_position'
 
-    FS_COLOR_NAME = 'u_color'
     FS_DIFFUSE_NAME = 'u_diffuse'
     FS_SPECULAR_NAME = 'u_specular'
     FS_SHININESS_NAME = 'u_shininess'
@@ -102,7 +101,6 @@ class StandardShaderProgram(ShaderProgram):
         self.vs_light_count = self._load_uniform_location(StandardShaderProgram.VS_LIGHT_COUNT_NAME)
         self.vs_camera_position = self._load_uniform_location(StandardShaderProgram.VS_CAMERA_POSITION_NAME)
         
-        self.ps_color = self._load_uniform_location(StandardShaderProgram.FS_COLOR_NAME)
         self.ps_diffuse = self._load_uniform_location(StandardShaderProgram.FS_DIFFUSE_NAME)
         self.ps_specular = self._load_uniform_location(StandardShaderProgram.FS_SPECULAR_NAME)
         self.ps_shininess = self._load_uniform_location(StandardShaderProgram.FS_SHININESS_NAME)
@@ -136,7 +134,6 @@ class StandardShaderProgram(ShaderProgram):
         gl.glUniformMatrix4fv(self.projection_matrix_location, 1, gl.GL_FALSE, glm.value_ptr(matrix))
     
     def set_object_material(self, material):
-        gl.glUniform3fv(self.ps_color, 1, glm.value_ptr(material.color))
         gl.glUniform3fv(self.ps_diffuse, 1, glm.value_ptr(material.diffuse))
         gl.glUniform3fv(self.ps_specular, 1, glm.value_ptr(material.specular))
         gl.glUniform1ui(self.ps_shininess, material.shininess)
