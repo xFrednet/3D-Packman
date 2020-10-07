@@ -6,26 +6,27 @@ from random import randint
 import glm
 from vertex_buffer_array import StandardShaderVertexArray
 import components_3d as com
+import ressources as res
 
 
 # TODO:
 # minimap
 
 
-def unites(i, j, world, w, h, depth):
+def unites(i, j, world, w, h, depth, model_id):
     cube = world.create_entity()
-    rect = com.Rectangle(w, h, depth)
-    world.add_component(cube, rect)
+    world.add_component(cube, com.Model3D(model_id))
     world.add_component(cube, com.Position(i + w / 2, j + h / 2, 2.0))
-    world.add_component(cube, StandardShaderVertexArray.from_rectangle(rect))
-    world.add_component(cube, com.Scale())
+    world.add_component(cube, com.Rectangle(1.0, 1.0, 1.0))
+    world.add_component(cube, com.Scale(float(w), float(h), depth))
     world.add_component(cube, com.Rotation())
     world.add_component(cube, com.TransformationMatrix())
     world.add_component(cube, com.ObjectMaterial(diffuse=glm.vec3(0.4, 0.4, 0.4)))
 
 
-def _setup_maze(world):
-    maze = Maze()
+def _setup_maze(world, width, height):
+    model_id = world.model_registry.get_model_id(res.ModelRegistry.CUBE)
+    maze = Maze(w=width, l=height)
     m = maze.generate_maze()
     scale = 3  # scales the empty space of the maze
     y = 0
@@ -36,22 +37,39 @@ def _setup_maze(world):
         if i % 2 == 0:
             h = 1
         else:
-            h = 3
-        for j in range(len(m[0])):
+            h = scale
+        
+        shape_w = 0
+        shape_x = 0
+        has_shape = False
+        for j in range(len(m[0]) + 1):
             w = 0
             if j % 2 == 0:
                 w = 1
             else:
                 w = scale
-            if m[i][j]:
-                unites(x, y, world, w, h, maze.height)
+            
+            is_set = False
+            if (j < len(m[0])):
+                is_set = m[i][j]
+
+            if is_set:
+                if not has_shape:
+                    has_shape = True
+                    shape_x = x
+                shape_w += w
+            elif has_shape:
+                # Draw last shape
+                unites(shape_x, y, world, shape_w, h, maze.height, model_id)
+                has_shape = False
+                shape_w = 0
             x += w
         y += h
     return m
 
 
 class Maze:
-    def __init__(self, w=10, l=10, h=2.0, complexity=.75, density=.75):
+    def __init__(self, w=30, l=30, h=2.0, complexity=.75, density=.75):
         # min values for w and l are 6
         self.width = w
         self.length = l

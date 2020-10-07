@@ -14,6 +14,7 @@ class CollisionComponent:
     def __init__(self):
         self.is_colliding_y = False
         self.is_colliding_x = False
+        self.is_colliding_z = False
 
 
 #
@@ -49,8 +50,8 @@ class Position:
 
 
 class Scale:
-    def __init__(self, scale=1.0):
-        self.value = scale
+    def __init__(self, x=1.0, y=1.0, z=1.0):
+        self.value = glm.vec3(x, y, z)
 
 
 class Rotation:
@@ -133,6 +134,10 @@ class Circle:
 #
 # Graphics
 #
+class Model3D:
+    def __init__(self, model_id):
+        self.model_id = model_id
+
 class ObjectMaterial:
     def __init__(self,
                  diffuse=glm.vec3(0, 0, 0),

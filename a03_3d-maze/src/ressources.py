@@ -1,6 +1,8 @@
 import glm
 import pygame.locals
 
+from vertex_buffer_array import StandardShaderVertexArray
+
 import components_3d as com
 
 """
@@ -21,3 +23,33 @@ class LightSetup:
         self.global_ambient = global_ambient
         self.camera_position = glm.vec3()
         self.light_count = 0
+
+class ModelRegistry:
+
+    CUBE = "cube"
+
+    def __init__(self):
+        self._index = 0
+        self._name_registry = {}
+        self._model_registry = []
+
+        self._load_default_models()
+    
+    def _load_default_models(self):
+        self.add(ModelRegistry.CUBE, StandardShaderVertexArray.from_rectangle(com.Rectangle(1.0, 1.0, 1.0)))
+
+    def add(self, name, model):
+        index = self._index
+        self._index += 1
+
+        self._name_registry[name] = index
+        self._model_registry.append(model)
+    
+    def get_model_id(self, name):
+        return self._name_registry[name]
+
+    def get_model(self, model_id):
+        return self._model_registry[model_id]
+
+    def get_model_count(self):
+        return self._index
