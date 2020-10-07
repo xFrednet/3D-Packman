@@ -19,9 +19,11 @@ class World(esper.World):
         self.resolution = resolution
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
-        self.camera_id = 0
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
         self.view_matrix = glm.mat4(1.0)
+        self.camera_id = 0
+        self.backup_cam = 0
+        self.controls = res.GameControlState()
 
         self._setup_systems()
         self._setup_entities()
@@ -121,17 +123,15 @@ class World(esper.World):
                 position=glm.vec3(0.0, 0.0, 10.0),
                 color=glm.vec3(1.0, 1.0, 1.0),
                 attenuation=glm.vec3(0.25, 0.0, 1.0)))
-#        self.camera_id = self.create_entity(
-#                com.Position(x=0.0, y=20.0, z=5.0),
-#                com.Velocity(along_world_axis=False),
-#                com.FreeCamera(),
-#                com.Rotation(),
-#                com.WasdControlComponent(speed=10),
-#                com.CameraOrientation(),
-#                com.ArrowKeyRotationControlComponent(),
-#                com.ViewMatrix(),
-#                com.Home(z=5.0),
-#                com.Rectangle(1, 1, 1))
+        self.backup_cam = self.create_entity(
+                com.Position(x=0.0, y=20.0, z=5.0),
+                com.Velocity(along_world_axis=False),
+                com.FreeCamera(),
+                com.Rotation(),
+                com.WasdControlComponent(speed=10),
+                com.ArrowKeyRotationControlComponent(),
+                com.CameraOrientation(),
+                com.Home(z=5.0))
 
 
     def update_resolution(self, resolution):
