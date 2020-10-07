@@ -92,6 +92,7 @@ class World(esper.World):
         self.add_component(floor, com.TransformationMatrix())
         self.add_component(floor, com.ObjectMaterial(diffuse=glm.vec3(0.8, 0.8, 0.8)))
 
+        player_rect = com.Rectangle(1, 1, 1)
         self.player_object = self.create_entity(
               StandardShaderVertexArray.from_rectangle(player_rect),
               com.Position(x=0.0, y=20.0, z=4.0),
@@ -102,7 +103,7 @@ class World(esper.World):
               com.Velocity(along_world_axis=False),
               com.WasdControlComponent(speed=10),
               com.Home(x=2.0, y=2.0, z=2.0),
-              com.Rectangle(1, 1, 1),
+              player_rect,
               com.CollisionComponent(),
               com.ArrowKeyRotationControlComponent(),
               com.Light(
