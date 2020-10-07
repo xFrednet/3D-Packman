@@ -146,10 +146,8 @@ class ObjectMaterial:
 class Light:
     def __init__(
             self,
-            position,
             color,
             attenuation=glm.vec3(0.0, 0.0, 1.0)):
-        self.position = position
         self.color = color
         self.attenuation = attenuation
         # The attenuation is calculates like: 
