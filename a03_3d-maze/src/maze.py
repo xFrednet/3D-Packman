@@ -24,9 +24,7 @@ def unites(i, j, world, w, h, depth):
     world.add_component(cube, com.Scale())
     world.add_component(cube, com.Rotation())
     world.add_component(cube, com.TransformationMatrix())
-    world.add_component(cube, com.ObjectMaterial(
-        color=glm.vec3(0.3, 0.3, 0.3),
-        diffuse=glm.vec3(0.4, 0.4, 0.4)))
+    world.add_component(cube, com.ObjectMaterial(diffuse=glm.vec3(0.4, 0.4, 0.4)))
 
 
 def _setup_maze(world):

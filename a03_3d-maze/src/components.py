@@ -137,19 +137,25 @@ class Circle:
 #
 class ObjectMaterial:
     def __init__(self,
-            color,
             diffuse=glm.vec3(0, 0, 0),
             specular=glm.vec3(0, 0, 0),
             shininess=5):
-        self.color = color
         self.diffuse = diffuse
         self.specular = specular
         self.shininess = shininess
 
 class Light:
-    def __init__(self, position, color):
+    def __init__(
+            self,
+            position,
+            color,
+            attenuation=glm.vec3(0.0, 0.0, 1.0)):
         self.position = position
         self.color = color
+        self.attenuation = attenuation
+        # The attenuation is calculates like: 
+        #   d := distance
+        #   attenuation.x * d^2 + attenuation.y * d + attenuation.z
 
 class LightSetup:
     def __init__(self, global_ambient):

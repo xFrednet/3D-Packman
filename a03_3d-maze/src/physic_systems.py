@@ -62,6 +62,8 @@ class CollisionSystem(esper.Processor):
             hero_max_x = hero_position.value.x + target_velocity.x + hero_rectangle.max_x()
             hero_min_y = hero_position.value.y + target_velocity.y + hero_rectangle.min_y()
             hero_max_y = hero_position.value.y + target_velocity.y + hero_rectangle.max_y()
+            hero_max_z = hero_position.value.z + target_velocity.z + hero_rectangle.max_z()
+            hero_min_z = hero_position.value.z + target_velocity.z + hero_rectangle.min_z()
             hero_collision.is_colliding_y = False
             hero_collision.is_colliding_x = False
 
@@ -78,6 +80,8 @@ class CollisionSystem(esper.Processor):
                 villan_max_x = villan_position.value.x + villan_rectangle.max_x()
                 villan_min_y = villan_position.value.y + villan_rectangle.min_y()
                 villan_max_y = villan_position.value.y + villan_rectangle.max_y()
+                villan_min_z = villan_position.value.z + villan_rectangle.min_z()
+                villan_max_z = villan_position.value.z + villan_rectangle.max_z()
 
                 # Collision testing
                 if (hero_max_x < villan_min_x or
@@ -86,6 +90,10 @@ class CollisionSystem(esper.Processor):
                 if (hero_max_y < villan_min_y or
                         hero_min_y >= villan_max_y):
                     continue
+                if (hero_max_z < villan_min_z or
+                        hero_min_z >= villan_max_z):
+                    continue
+                
 
                 # Find side
                 hero_min_x_old = hero_position.value.x + hero_rectangle.min_x()
@@ -131,9 +139,10 @@ class VelocityToEntityAxis(esper.Processor):
 class WasdControlSystem(esper.Processor):
     def process(self):
         keys = pygame.key.get_pressed()
-        for _id, (control, velocity) in self.world.get_components(
+        for _id, (control, velocity, position) in self.world.get_components(
                 com.WasdControlComponent,
-                com.Velocity):
+                com.Velocity,
+                com.Position):
 
             # Active check
             if not control.active:
@@ -160,6 +169,8 @@ class WasdControlSystem(esper.Processor):
                 velocity.value.z += control.speed
             if keys[pygame.locals.K_LSHIFT]:
                 velocity.value.z -= control.speed
+
+            self.world.component_for_entity(self.world.follow_light, com.Light).position = position.value
 
 
 class CameraControlSystem(esper.Processor):

@@ -91,7 +91,7 @@ class World(esper.World):
             0.0, 0.0, 1.0,
             0.0, 0.0, 1.0,
             0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
+            0.0, 0.0, 1.0
         ])
 
         floor = self.create_entity()
@@ -100,9 +100,7 @@ class World(esper.World):
         self.add_component(floor, com.Scale(100))
         self.add_component(floor, com.Rotation())
         self.add_component(floor, com.TransformationMatrix())
-        self.add_component(floor, com.ObjectMaterial(
-            color=glm.vec3(0.8, 0.8, 0.8),
-            diffuse=glm.vec3(0.8, 0.8, 0.8)))
+        self.add_component(floor, com.ObjectMaterial(diffuse=glm.vec3(0.8, 0.8, 0.8)))
 
         player_rect = com.Rectangle(1, 1, 1)
         self.player_object = self.create_entity(
@@ -111,9 +109,7 @@ class World(esper.World):
                 com.Scale(),
                 com.Rotation(yaw=3.1),
                 com.TransformationMatrix(),
-                com.ObjectMaterial(
-                    color=glm.vec3(1.0, 0.0, 0.0),
-                    diffuse=glm.vec3(1.0, 0.0, 0.0)),
+                com.ObjectMaterial(diffuse=glm.vec3(1.0, 0.0, 0.0)),
                 com.Velocity(along_world_axis=False),
                 com.WasdControlComponent(speed=10),
                 player_rect,
@@ -129,12 +125,13 @@ class World(esper.World):
         
         self.create_entity(
             com.Light(
-                position=glm.vec3(0.0, 0.0, 10.0),
-                color=glm.vec3(1.0, 1.0, 1.0)))
-        self.create_entity(
-            com.Light(
                 position=glm.vec3(10.0, 10.0, 10.0),
-                color=glm.vec3(1.0, 8.0, 6.0)))
+                color=glm.vec3(0.7, 0.6, 0.6)))
+        self.follow_light = self.create_entity(
+            com.Light(
+                position=glm.vec3(0.0, 0.0, 10.0),
+                color=glm.vec3(1.0, 1.0, 1.0),
+                attenuation=glm.vec3(0.25, 0.0, 1.0)))
 #        self.camera_id = self.create_entity(
 #                com.Position(x=0.0, y=20.0, z=5.0),
 #                com.Velocity(along_world_axis=False),
