@@ -6,25 +6,26 @@ from random import randint
 import glm
 from vertex_buffer_array import StandardShaderVertexArray
 import components_3d as com
+import ressources as res
 
 
 # TODO:
 # minimap
 
 
-def unites(i, j, world, w, h, depth):
+def unites(i, j, world, w, h, depth, model_id):
     cube = world.create_entity()
-    rect = com.Rectangle(w, h, depth)
-    world.add_component(cube, rect)
+    world.add_component(cube, com.Model3D(model_id))
     world.add_component(cube, com.Position(i + w / 2, j + h / 2, 2.0))
-    world.add_component(cube, StandardShaderVertexArray.from_rectangle(rect))
-    world.add_component(cube, com.Scale())
+    world.add_component(cube, com.Rectangle(1.0, 1.0, 1.0))
+    world.add_component(cube, com.Scale(float(w), float(h), depth))
     world.add_component(cube, com.Rotation())
     world.add_component(cube, com.TransformationMatrix())
     world.add_component(cube, com.ObjectMaterial(diffuse=glm.vec3(0.4, 0.4, 0.4)))
 
 
 def _setup_maze(world):
+    model_id = world.model_registry.get_model_id(res.ModelRegistry.CUBE)
     maze = Maze()
     m = maze.generate_maze()
     scale = 3  # scales the empty space of the maze
@@ -44,14 +45,14 @@ def _setup_maze(world):
             else:
                 w = scale
             if m[i][j]:
-                unites(x, y, world, w, h, maze.height)
+                unites(x, y, world, w, h, maze.height, model_id)
             x += w
         y += h
     return m
 
 
 class Maze:
-    def __init__(self, w=10, l=10, h=2.0, complexity=.75, density=.75):
+    def __init__(self, w=30, l=30, h=2.0, complexity=.75, density=.75):
         # min values for w and l are 6
         self.width = w
         self.length = l

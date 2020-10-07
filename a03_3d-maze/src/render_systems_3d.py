@@ -18,6 +18,7 @@ def add_3d_render_systems_to_world(world):
 
     world.add_processor(Start3DDrawSystem())
     world.add_processor(StandardRenderSystem())
+    world.add_processor(ModelRenderer())
     world.add_processor(Stop3DDrawSystem())
 
 
@@ -54,7 +55,7 @@ class BuildTransformationMatrixSystem(Processor):
             # mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
             # mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
             # mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
-            mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
+            mat = glm.scale(mat, scale.value)
 
             mat_target.value = mat
 
@@ -118,6 +119,9 @@ class Start3DDrawSystem(Processor):
 class StandardRenderSystem(Processor):
     VERTEX_POS_INDEX = 0
 
+    def _create_model_registry(self):
+        models = [[]] * self.world.model_registry.get_model_count
+
     def process(self):
         # Ugly hacks, because hacker man!!
         # You should delete this command before you hand in the assignment
@@ -139,6 +143,47 @@ class StandardRenderSystem(Processor):
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
 
             # Unbind the thingies
+            gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glDisableVertexAttribArray(shader.NORMAL_ATTR)
+            gl.glBindVertexArray(0)
+
+class ModelRenderer(Processor):
+    def _create_model_registry(self):
+        registry: res.ModelRegistry = self.world.model_registry
+        
+        model_list = [[]] * registry.get_model_count()
+        
+        for _id, (model, translation, material) in self.world.get_components(
+                com.Model3D,
+                com.TransformationMatrix,
+                com.ObjectMaterial):
+
+            model_list[model.model_id].append((translation, material))
+        
+        return model_list
+    
+    def process(self):
+        # You should delete this command before you hand in the assignment
+        shader: StandardShaderProgram = self.world.standard_shader
+        registry: res.ModelRegistry = self.world.model_registry
+
+        models = self._create_model_registry()
+        for index in range(0, len(models)):
+            if len(models[index]) == 0:
+                continue
+            
+            vba = registry.get_model(index)
+
+            # Bind buffers
+            gl.glBindVertexArray(vba.vertex_array_id)
+            gl.glEnableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glEnableVertexAttribArray(shader.NORMAL_ATTR)
+
+            for transformation, material in models[index]:
+                shader.set_transformation_matrix(transformation.value)
+                shader.set_object_material(material)
+                gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
+
             gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
             gl.glDisableVertexAttribArray(shader.NORMAL_ATTR)
             gl.glBindVertexArray(0)

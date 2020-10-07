@@ -11,7 +11,7 @@ def add_physics_systems_to_world(world):
     world.add_processor(GameControlSystem())
     world.add_processor(WasdControlSystem())
     world.add_processor(VelocityToEntityAxis())
-    world.add_processor(CollisionSystem())
+    #world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
     world.add_processor(CameraControlSystem())
 
