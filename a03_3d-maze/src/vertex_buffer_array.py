@@ -51,7 +51,6 @@ class VertexBufferArray:
 
 
 class StandardShaderVertexArray(VertexBufferArray):
-
     def __init__(self, vertex_count):
         VertexBufferArray.__init__(self, vertex_count)
 

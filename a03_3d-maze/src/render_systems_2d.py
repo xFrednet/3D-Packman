@@ -1,47 +1,15 @@
-import math
-
-import components_3d as com
+import components_2d as com
 import glm
 from OpenGL import GL as gl
 from esper import Processor
-from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 
 
-def add_3d_render_systems_to_world(world):
-    world.add_processor(FreeCamOrientation())
-    world.add_processor(ThirdPersonCameraSystem())
-    world.add_processor(UpdateLightSetup())
+def add_2d_render_systems_to_world(world):
     world.add_processor(BuildTransformationMatrixSystem())
-
-    world.add_processor(Start3DDrawSystem())
+    world.add_processor(Start2DDrawSystem())
     world.add_processor(StandardRenderSystem())
-    world.add_processor(Stop3DDrawSystem())
-
-
-#
-# Prepare frame
-#
-class UpdateLightSetup(Processor):
-    def process(self):
-        MAX_LIGHT_COUNT = 4
-
-        light_setup: com.LightSetup = self.world.light_setup
-        light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Position).value
-
-        light_count = 0
-        light_setup.lights.clear()
-        for _id, light in self.world.get_component(com.Light):
-            light_setup.lights.append(light)
-            light_count += 1
-            if (light_count >= MAX_LIGHT_COUNT):
-                break
-
-        for index in range(light_count, MAX_LIGHT_COUNT):
-            light_setup.lights.append(com.Light(glm.vec3(), glm.vec3()))
-
-        light_setup.light_count = light_count
-        self.world.light_setup = light_setup
+    world.add_processor(Stop2DDrawSystem())
 
 
 class BuildTransformationMatrixSystem(Processor):
@@ -62,46 +30,6 @@ class BuildTransformationMatrixSystem(Processor):
             mat_target.value = mat
 
 
-class ThirdPersonCameraSystem(Processor):
-    def process(self):
-        for _id, (position, orientation, third_person_cam) in self.world.get_components(
-                com.Position,
-                com.CameraOrientation,
-                com.ThirdPersonCamera):
-            orientation.look_at = self.world.component_for_entity(third_person_cam.target, com.Position).value
-
-            yaw = self.world.component_for_entity(third_person_cam.target, com.Rotation).yaw
-            pitch = third_person_cam.pitch
-
-            dir_height = math.sin(pitch)
-            dir_vec = glm.vec3(
-                math.sin(yaw) * (1.0 - abs(dir_height)),
-                math.cos(yaw) * (1.0 - abs(dir_height)),
-                dir_height
-            )
-
-            target_pos = self.world.component_for_entity(third_person_cam.target, com.Position).value
-            position.value = target_pos + ((dir_vec * -1) * third_person_cam.distance)
-
-
-class FreeCamOrientation(Processor):
-    def process(self):
-        for _id, (position, orientation, rotation, _free_cam) in self.world.get_components(
-                com.Position,
-                com.CameraOrientation,
-                com.Rotation,
-                com.FreeCamera):
-            height = math.sin(rotation.pitch)
-            orientation.look_at = position.value + glm.vec3(
-                math.sin(-rotation.yaw) * (1.0 - abs(height)),
-                math.cos(-rotation.yaw) * (1.0 - abs(height)),
-                height
-            )
-
-
-#
-# Draw frame
-#
 class Start3DDrawSystem(Processor):
     def process(self):
         # build view matrix

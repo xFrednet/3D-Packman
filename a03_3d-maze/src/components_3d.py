@@ -9,10 +9,12 @@ class Velocity:
         self.value = glm.vec3(x, y, z)
         self.along_world_axis = along_world_axis
 
+
 class CollisionComponent:
     def __init__(self):
         self.is_colliding_y = False
         self.is_colliding_x = False
+
 
 #
 # Control components
@@ -31,10 +33,12 @@ class WasdControlComponent:
 class ArrowKeyRotationControlComponent:
     pass
 
+
 class Home:
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.position = glm.vec3(x, y, z)
         self.orientation = glm.vec3(x, y, z)
+
 
 #
 # Object Translation
@@ -48,15 +52,18 @@ class Scale:
     def __init__(self, scale=1.0):
         self.value = scale
 
+
 class Rotation:
     def __init__(self, yaw=0.0, pitch=0.0, role=0):
         self.yaw = yaw
         self.pitch = pitch
         self.role = role
 
+
 class TransformationMatrix:
     def __init__(self):
         self.value = glm.mat4x4(1.0)
+
 
 #
 # Camera
@@ -76,6 +83,7 @@ class ThirdPersonCamera:
         self.target = target
         self.distance = distance
         self.pitch = pitch
+
 
 #
 # Shape
@@ -127,12 +135,13 @@ class Circle:
 #
 class ObjectMaterial:
     def __init__(self,
-            diffuse=glm.vec3(0, 0, 0),
-            specular=glm.vec3(0, 0, 0),
-            shininess=5):
+                 diffuse=glm.vec3(0, 0, 0),
+                 specular=glm.vec3(0, 0, 0),
+                 shininess=5):
         self.diffuse = diffuse
         self.specular = specular
         self.shininess = shininess
+
 
 class Light:
     def __init__(
