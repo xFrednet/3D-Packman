@@ -4,8 +4,15 @@ import pygame
 import pygame.locals
 import math
 
-import components as com
+import components_3d as com
 
+def add_physics_systems_to_world(world):
+    world.add_processor(WasdControlSystem())
+    world.add_processor(VelocityToEntityAxis())
+    world.add_processor(CollisionSystem())
+    world.add_processor(MovementSystem())
+    world.add_processor(CameraControlSystem())
+    world.add_processor(ResetSystem())
 
 def clamp(value, m_min, m_max):
     if value <= m_min:
