@@ -45,7 +45,7 @@ class ShaderProgram:
             sys.exit(11)
 
     def _load_uniform_location(self, mat_name):
-        return gl.glGetUniformLocation(self.program_id, mat_name);
+        return gl.glGetUniformLocation(self.program_id, mat_name)
 
     def start(self):
         gl.glUseProgram(self.program_id)
