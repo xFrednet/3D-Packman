@@ -1,5 +1,5 @@
 import glm
-
+import math
 
 #
 # Object physics
@@ -89,7 +89,12 @@ class ThirdPersonCamera:
 #
 # Shape
 #
-class Rectangle:
+class BoundingBox:
+    def __init__(self, shape):
+        self.shape = shape
+        self.radius = shape.get_radius()
+
+class Rectangle3D:
     """
     This should not be rotated or scaled. Top view:
     
@@ -102,27 +107,30 @@ class Rectangle:
     """
 
     def __init__(self, width, depth, height):
-        self.width = width
-        self.depth = depth
-        self.height = height
+        self.width = width / 2.0
+        self.depth = depth / 2.0
+        self.height = height / 2.0
 
     def min_x(self):
-        return -self.width / 2
+        return -self.width
 
     def max_x(self):
-        return self.width / 2
+        return self.width
 
     def min_y(self):
-        return -self.depth / 2
+        return -self.depth
 
     def max_y(self):
-        return self.depth / 2
+        return self.depth
 
     def min_z(self):
-        return -self.height / 2
+        return -self.height
 
     def max_z(self):
-        return self.height / 2
+        return self.height
+    
+    def get_radius(self):
+        return math.sqrt(self.width ** 2 + self.depth ** 2 + self.height ** 2)
 
 
 class Circle:

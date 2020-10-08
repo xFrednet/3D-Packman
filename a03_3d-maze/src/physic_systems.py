@@ -49,6 +49,8 @@ class MovementSystem(esper.Processor):
                     planned_velocity.x = 0.0
                 if (collision.is_colliding_y):
                     planned_velocity.y = 0.0
+                if (collision.is_colliding_z):
+                    planned_velocity.z = 0.0
 
             position.value = position.value + planned_velocity
             # print(_id, position.value, velocity.value, self.world.delta)
@@ -61,41 +63,50 @@ class CollisionSystem(esper.Processor):
     """
 
     def process(self):
-        for hero_id, (hero_position, hero_velocity, hero_rectangle, hero_scale, hero_collision) in self.world.get_components(
+        for hero_id, (hero_position, hero_velocity, hero_bounding_box, hero_scale, hero_collision) in self.world.get_components(
                 com.Position,
                 com.Velocity,
-                com.Rectangle,
+                com.BoundingBox,
                 com.Scale,
                 com.CollisionComponent):
 
             target_velocity = hero_velocity.value * self.world.delta
+            hero_confort_zone = hero_bounding_box.radius
 
-            hero_min_x = hero_position.value.x + target_velocity.x + hero_rectangle.min_x() * hero_scale.value.x
-            hero_max_x = hero_position.value.x + target_velocity.x + hero_rectangle.max_x() * hero_scale.value.x
-            hero_min_y = hero_position.value.y + target_velocity.y + hero_rectangle.min_y() * hero_scale.value.y
-            hero_max_y = hero_position.value.y + target_velocity.y + hero_rectangle.max_y() * hero_scale.value.y
-            hero_max_z = hero_position.value.z + target_velocity.z + hero_rectangle.max_z() * hero_scale.value.z
-            hero_min_z = hero_position.value.z + target_velocity.z + hero_rectangle.min_z() * hero_scale.value.z
+            hero_rectangle = hero_bounding_box.shape
+            hero_min_x = hero_position.value.x + target_velocity.x + hero_rectangle.min_x()
+            hero_max_x = hero_position.value.x + target_velocity.x + hero_rectangle.max_x()
+            hero_min_y = hero_position.value.y + target_velocity.y + hero_rectangle.min_y()
+            hero_max_y = hero_position.value.y + target_velocity.y + hero_rectangle.max_y()
+            hero_max_z = hero_position.value.z + target_velocity.z + hero_rectangle.max_z()
+            hero_min_z = hero_position.value.z + target_velocity.z + hero_rectangle.min_z()
             hero_collision.is_colliding_y = False
             hero_collision.is_colliding_x = False
             hero_collision.is_colliding_z = False
 
-            for villan_id, (villan_position, villan_rectangle, villan_scale) in self.world.get_components(
+            for villan_id, (villan_position, villan_bounding_box, villan_scale) in self.world.get_components(
                     com.Position,
-                    com.Rectangle,
+                    com.BoundingBox,
                     com.Scale):
+
+                villan_rectangle = villan_bounding_box.shape
 
                 # Don't hit your self
                 if (villan_id == hero_id):
                     continue
+                
+                # Are they in each others confort zones?
+                if (glm.distance(hero_position.value, villan_position.value) > 
+                        (hero_confort_zone + villan_bounding_box.radius)):
+                    continue
 
                 # Positions
-                villan_min_x = villan_position.value.x + villan_rectangle.min_x() * villan_scale.value.x
-                villan_max_x = villan_position.value.x + villan_rectangle.max_x() * villan_scale.value.x
-                villan_min_y = villan_position.value.y + villan_rectangle.min_y() * villan_scale.value.y
-                villan_max_y = villan_position.value.y + villan_rectangle.max_y() * villan_scale.value.y
-                villan_min_z = villan_position.value.z + villan_rectangle.min_z() * villan_scale.value.z
-                villan_max_z = villan_position.value.z + villan_rectangle.max_z() * villan_scale.value.z
+                villan_min_x = villan_position.value.x + villan_rectangle.min_x()
+                villan_max_x = villan_position.value.x + villan_rectangle.max_x()
+                villan_min_y = villan_position.value.y + villan_rectangle.min_y()
+                villan_max_y = villan_position.value.y + villan_rectangle.max_y()
+                villan_min_z = villan_position.value.z + villan_rectangle.min_z()
+                villan_max_z = villan_position.value.z + villan_rectangle.max_z()
 
                 # Collision testing
                 if (hero_max_y < villan_min_y or

@@ -17,14 +17,14 @@ def unites(i, j, world, w, h, depth, model_id):
     cube = world.create_entity()
     world.add_component(cube, com.Model3D(model_id))
     world.add_component(cube, com.Position(i + w / 2, j + h / 2, 2.0))
-    world.add_component(cube, com.Rectangle(1.0, 1.0, 1.0))
+    world.add_component(cube, com.BoundingBox(com.Rectangle3D(float(w), float(h), depth)))
     world.add_component(cube, com.Scale(float(w), float(h), depth))
     world.add_component(cube, com.Rotation())
     world.add_component(cube, com.TransformationMatrix())
     world.add_component(cube, com.ObjectMaterial(diffuse=glm.vec3(0.4, 0.4, 0.4)))
 
 
-def _setup_maze(world, width, height):
+def _setup_maze(world, width, height, depth=2.0):
     model_id = world.model_registry.get_model_id(res.ModelRegistry.CUBE)
     maze = Maze(w=width, l=height)
     m = maze.generate_maze()
@@ -60,7 +60,7 @@ def _setup_maze(world, width, height):
                 shape_w += w
             elif has_shape:
                 # Draw last shape
-                unites(shape_x, y, world, shape_w, h, maze.height, model_id)
+                unites(shape_x, y, world, shape_w, h, depth, model_id)
                 has_shape = False
                 shape_w = 0
             x += w
@@ -69,14 +69,13 @@ def _setup_maze(world, width, height):
 
 
 class Maze:
-    def __init__(self, w=30, l=30, h=2.0, complexity=.75, density=.75):
+    def __init__(self, w=30, l=30, complexity=.75, density=.75):
         # min values for w and l are 6
         self.width = w
-        self.length = l
-        self.height = h
+        self.height = l
         self.complexity = complexity
         self.density = density
-        self.shape = ((self.length // 2) * 2 + 1, (self.width // 2) * 2 + 1)
+        self.shape = ((self.height // 2) * 2 + 1, (self.width // 2) * 2 + 1)
         self.maze = []
 
     def generate_maze(self):

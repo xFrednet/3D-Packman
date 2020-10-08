@@ -36,7 +36,7 @@ class ModelRegistry:
         self._load_default_models()
     
     def _load_default_models(self):
-        self.add(ModelRegistry.CUBE, StandardShaderVertexArray.from_rectangle(com.Rectangle(1.0, 1.0, 1.0)))
+        self.add(ModelRegistry.CUBE, StandardShaderVertexArray.create_cube())
 
     def add(self, name, model):
         index = self._index
