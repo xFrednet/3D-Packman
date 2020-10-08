@@ -61,22 +61,22 @@ class StandardShaderVertexArray(VertexBufferArray):
         self._load_vertex_buffer_f(StandardShaderProgram.NORMAL_ATTR, data, 3)
 
     @staticmethod
-    def from_rectangle(r):
+    def create_cube():
         # vertices:
         # | Top:    | Bottom: |
         # | ------- | ------- |
         # | ´4   5` | `0   1` |
         # | ´6   7` | `2   3` |
         points = [
-            [r.min_x(), r.max_y(), r.min_z()],
-            [r.max_x(), r.max_y(), r.min_z()],
-            [r.min_x(), r.min_y(), r.min_z()],
-            [r.max_x(), r.min_y(), r.min_z()],
+            [-0.5,  0.5, -0.5],
+            [ 0.5,  0.5, -0.5],
+            [-0.5, -0.5, -0.5],
+            [ 0.5, -0.5, -0.5],
 
-            [r.min_x(), r.max_y(), r.max_z()],
-            [r.max_x(), r.max_y(), r.max_z()],
-            [r.min_x(), r.min_y(), r.max_z()],
-            [r.max_x(), r.min_y(), r.max_z()]
+            [-0.5,  0.5,  0.5],
+            [ 0.5,  0.5,  0.5],
+            [-0.5, -0.5,  0.5],
+            [ 0.5, -0.5,  0.5]
         ]
         side_normals = [
             [0.0, 0.0, -1.0],  # Bottom

@@ -28,7 +28,7 @@ class World(esper.World):
 
         self._setup_systems()
         self._setup_entities()
-        self.maze = _setup_maze(self, 30, 30)
+        self.maze = _setup_maze(self, 50, 50)
         self.update_resolution(resolution)
 
     def cleanup(self):
@@ -87,24 +87,19 @@ class World(esper.World):
 
         floor = self.create_entity()
         self.add_component(floor, vba2)
-        self.add_component(floor, com.Position(0, 0, -2))
-        self.add_component(floor, com.Scale(100))
-        self.add_component(floor, com.Rotation())
+        self.add_component(floor, com.Transformation(position=glm.vec3(0.0, 0.0, -2.0), scale=glm.vec3(100.0, 100.0, 0.0)))
         self.add_component(floor, com.TransformationMatrix())
         self.add_component(floor, com.ObjectMaterial(diffuse=glm.vec3(0.8, 0.8, 0.8)))
 
-        player_rect = com.Rectangle(1, 1, 1)
         self.player_object = self.create_entity(
             com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
-            com.Position(x=0.0, y=20.0, z=4.0),
-            com.Scale(),
-            com.Rotation(yaw=3.1),
+            com.Transformation(position=glm.vec3(2.0, 2.0, 2.0)),
             com.TransformationMatrix(),
             com.ObjectMaterial(diffuse=glm.vec3(1.0, 0.0, 0.0)),
             com.Velocity(along_world_axis=False),
             com.WasdControlComponent(speed=10),
             com.Home(x=2.0, y=2.0, z=2.0),
-            player_rect,
+            com.BoundingBox(com.Rectangle3D(1, 1, 1)),
             com.CollisionComponent(),
             com.ArrowKeyRotationControlComponent(),
             com.Light(
@@ -115,11 +110,11 @@ class World(esper.World):
         self.camera_id = self.create_entity(
                 com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
                 com.CameraOrientation(),
-                com.Position()
+                com.Transformation()
             )
         
         self.create_entity(
-            com.Position(10.0, 10.0, 10.0),
+            com.Transformation(position=glm.vec3(10.0, 10.0, 10.0)),
             com.Light(
                 color=glm.vec3(0.7, 0.6, 0.6)))
         # self.backup_cam = self.create_entity(

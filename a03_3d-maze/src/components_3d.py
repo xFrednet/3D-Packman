@@ -1,5 +1,5 @@
 import glm
-
+import math
 
 #
 # Object physics
@@ -44,22 +44,15 @@ class Home:
 #
 # Object Translation
 #
-class Position:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.value = glm.vec3(x, y, z)
-
-
-class Scale:
-    def __init__(self, x=1.0, y=1.0, z=1.0):
-        self.value = glm.vec3(x, y, z)
-
-
-class Rotation:
-    def __init__(self, yaw=0.0, pitch=0.0, role=0):
-        self.yaw = yaw
-        self.pitch = pitch
-        self.role = role
-
+class Transformation:
+    def __init__(
+            self,
+            position=glm.vec3(),
+            scale=glm.vec3(1.0, 1.0, 1.0),
+            rotation=glm.vec3()):
+        self.position = position
+        self.scale = scale
+        self.rotation = rotation
 
 class TransformationMatrix:
     def __init__(self):
@@ -89,7 +82,12 @@ class ThirdPersonCamera:
 #
 # Shape
 #
-class Rectangle:
+class BoundingBox:
+    def __init__(self, shape):
+        self.shape = shape
+        self.radius = shape.get_radius()
+
+class Rectangle3D:
     """
     This should not be rotated or scaled. Top view:
     
@@ -102,27 +100,30 @@ class Rectangle:
     """
 
     def __init__(self, width, depth, height):
-        self.width = width
-        self.depth = depth
-        self.height = height
+        self.width = width / 2.0
+        self.depth = depth / 2.0
+        self.height = height / 2.0
 
     def min_x(self):
-        return -self.width / 2
+        return -self.width
 
     def max_x(self):
-        return self.width / 2
+        return self.width
 
     def min_y(self):
-        return -self.depth / 2
+        return -self.depth
 
     def max_y(self):
-        return self.depth / 2
+        return self.depth
 
     def min_z(self):
-        return -self.height / 2
+        return -self.height
 
     def max_z(self):
-        return self.height / 2
+        return self.height
+    
+    def get_radius(self):
+        return math.sqrt(self.width ** 2 + self.depth ** 2 + self.height ** 2)
 
 
 class Circle:
