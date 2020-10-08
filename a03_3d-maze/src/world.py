@@ -8,6 +8,7 @@ from vertex_buffer_array import StandardShaderVertexArray
 import render_systems as rsys
 import render_systems_3d as rsys3d
 import physic_systems as psys
+import control_system as consys
 from maze import _setup_maze
 import components_3d as com
 import ressources as res
@@ -20,11 +21,10 @@ class World(esper.World):
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.0
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
-        self.view_matrix = glm.mat4(1.0)
-        self.camera_id = 0
-        self.backup_cam = 0
         self.controls = res.GameControlState()
         self.model_registry = res.ModelRegistry()
+        self.camera_id = 0
+        self.view_matrix = glm.mat4(1.0)
 
         self._setup_systems()
         self._setup_entities()
@@ -54,12 +54,14 @@ class World(esper.World):
         #
         # Physics
         #
+        consys.add_systems_1_to_world(self)
         psys.add_physics_systems_to_world(self)
 
         #
         # Rendering
         #
         # Prepare
+        consys.add_systems_2_to_world(self)
         self.add_processor(rsys.PrepareFrameSystem())
         rsys3d.add_3d_render_systems_to_world(self)
         self.add_processor(rsys.FinishFrameSystem())
@@ -97,17 +99,15 @@ class World(esper.World):
             com.TransformationMatrix(),
             com.ObjectMaterial(diffuse=glm.vec3(1.0, 0.0, 0.0)),
             com.Velocity(along_world_axis=False),
-            com.WasdControlComponent(speed=10),
             com.Home(x=2.0, y=2.0, z=2.0),
             com.BoundingBox(com.Rectangle3D(1, 1, 1)),
             com.CollisionComponent(),
-            com.ArrowKeyRotationControlComponent(),
             com.Light(
                 color=glm.vec3(0.6, 0.3, 1.2),
                 attenuation=glm.vec3(0.1, 0.0, 1.0))
         )
 
-        self.camera_id = self.create_entity(
+        self.player_cam = self.create_entity(
                 com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
                 com.CameraOrientation(),
                 com.Transformation()
@@ -117,15 +117,14 @@ class World(esper.World):
             com.Transformation(position=glm.vec3(10.0, 10.0, 10.0)),
             com.Light(
                 color=glm.vec3(0.7, 0.6, 0.6)))
-        # self.backup_cam = self.create_entity(
-        #         com.Position(x=0.0, y=20.0, z=5.0),
-        #         com.Velocity(along_world_axis=False),
-        #         com.FreeCamera(),
-        #         com.Rotation(),
-        #         com.WasdControlComponent(speed=10),
-        #         com.ArrowKeyRotationControlComponent(),
-        #         com.CameraOrientation(),
-        #         com.Home(z=5.0))
+        self.free_cam = self.create_entity(
+                com.Transformation(glm.vec3(0.0, 10.0, 5.0)),
+                com.Velocity(along_world_axis=False),
+                com.FreeCamera(),
+                com.CameraOrientation(),
+                com.Home(z=5.0))
+            
+        self.camera_id = self.player_cam
 
 
     def update_resolution(self, resolution):
