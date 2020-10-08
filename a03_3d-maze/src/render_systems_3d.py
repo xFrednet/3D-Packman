@@ -28,11 +28,11 @@ def add_3d_render_systems_to_world(world):
 class UpdateLightSetup(Processor):
     def process(self):
         light_setup: com.LightSetup = self.world.light_setup
-        light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Position).value
+        light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Transformation).position
 
         index = 0
-        for _id, (light, position) in self.world.get_components(com.Light, com.Position):
-            light_setup.light_positions[index] = position.value
+        for _id, (light, transformation) in self.world.get_components(com.Light, com.Transformation):
+            light_setup.light_positions[index] = transformation.position
             light_setup.lights[index] = light
             index += 1
             if (index >= res.LightSetup.MAX_LIGHT_COUNT):
@@ -44,31 +44,29 @@ class UpdateLightSetup(Processor):
 
 class BuildTransformationMatrixSystem(Processor):
     def process(self):
-        for _id, (mat_target, position, scale, rotation) in self.world.get_components(
+        for _id, (mat_target, transformation) in self.world.get_components(
                 com.TransformationMatrix,
-                com.Position,
-                com.Scale,
-                com.Rotation):
+                com.Transformation):
             mat = glm.mat4x4(1.0)
-            mat = glm.translate(mat, position.value)
+            mat = glm.translate(mat, transformation.position)
             # No rotation for you
             # mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
             # mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
             # mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
-            mat = glm.scale(mat, scale.value)
+            mat = glm.scale(mat, transformation.scale)
 
             mat_target.value = mat
 
 
 class ThirdPersonCameraSystem(Processor):
     def process(self):
-        for _id, (position, orientation, third_person_cam) in self.world.get_components(
-                com.Position,
+        for _id, (transformation, orientation, third_person_cam) in self.world.get_components(
+                com.Transformation,
                 com.CameraOrientation,
                 com.ThirdPersonCamera):
-            orientation.look_at = self.world.component_for_entity(third_person_cam.target, com.Position).value
+            orientation.look_at = self.world.component_for_entity(third_person_cam.target, com.Transformation).position
 
-            yaw = self.world.component_for_entity(third_person_cam.target, com.Rotation).yaw
+            yaw = self.world.component_for_entity(third_person_cam.target, com.Transformation).rotation.x
             pitch = third_person_cam.pitch
 
             dir_height = math.sin(pitch)
@@ -78,21 +76,20 @@ class ThirdPersonCameraSystem(Processor):
                 dir_height
             )
 
-            target_pos = self.world.component_for_entity(third_person_cam.target, com.Position).value
-            position.value = target_pos + ((dir_vec * -1) * third_person_cam.distance)
+            target_pos = self.world.component_for_entity(third_person_cam.target, com.Transformation).position
+            transformation.position = target_pos + ((dir_vec * -1) * third_person_cam.distance)
 
 
 class FreeCamOrientation(Processor):
     def process(self):
-        for _id, (position, orientation, rotation, _free_cam) in self.world.get_components(
-                com.Position,
+        for _id, (transformation, orientation, rotation, _free_cam) in self.world.get_components(
+                com.Transformation,
                 com.CameraOrientation,
-                com.Rotation,
                 com.FreeCamera):
             height = math.sin(rotation.pitch)
-            orientation.look_at = position.value + glm.vec3(
-                math.sin(-rotation.yaw) * (1.0 - abs(height)),
-                math.cos(-rotation.yaw) * (1.0 - abs(height)),
+            orientation.look_at = transformation.position + glm.vec3(
+                math.sin(-transformation.rotation.x) * (1.0 - abs(height)),
+                math.cos(-transformation.rotation.x) * (1.0 - abs(height)),
                 height
             )
 
@@ -103,10 +100,10 @@ class FreeCamOrientation(Processor):
 class Start3DDrawSystem(Processor):
     def process(self):
         # build view matrix
-        position = self.world.component_for_entity(self.world.camera_id, com.Position)
+        position = self.world.component_for_entity(self.world.camera_id, com.Transformation).position
         orientation = self.world.component_for_entity(self.world.camera_id, com.CameraOrientation)
         self.world.view_matrix = glm.lookAt(
-            position.value,
+            position,
             orientation.look_at,
             orientation.up)
 

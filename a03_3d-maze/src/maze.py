@@ -16,10 +16,10 @@ import ressources as res
 def unites(i, j, world, w, h, depth, model_id):
     cube = world.create_entity()
     world.add_component(cube, com.Model3D(model_id))
-    world.add_component(cube, com.Position(i + w / 2, j + h / 2, 2.0))
+    world.add_component(cube, com.Transformation(
+        position=glm.vec3(i + w / 2, j + h / 2, 2.0),
+        scale=glm.vec3(float(w), float(h), depth)))
     world.add_component(cube, com.BoundingBox(com.Rectangle3D(float(w), float(h), depth)))
-    world.add_component(cube, com.Scale(float(w), float(h), depth))
-    world.add_component(cube, com.Rotation())
     world.add_component(cube, com.TransformationMatrix())
     world.add_component(cube, com.ObjectMaterial(diffuse=glm.vec3(0.4, 0.4, 0.4)))
 

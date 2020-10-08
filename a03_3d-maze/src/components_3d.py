@@ -44,22 +44,15 @@ class Home:
 #
 # Object Translation
 #
-class Position:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.value = glm.vec3(x, y, z)
-
-
-class Scale:
-    def __init__(self, x=1.0, y=1.0, z=1.0):
-        self.value = glm.vec3(x, y, z)
-
-
-class Rotation:
-    def __init__(self, yaw=0.0, pitch=0.0, role=0):
-        self.yaw = yaw
-        self.pitch = pitch
-        self.role = role
-
+class Transformation:
+    def __init__(
+            self,
+            position=glm.vec3(),
+            scale=glm.vec3(1.0, 1.0, 1.0),
+            rotation=glm.vec3()):
+        self.position = position
+        self.scale = scale
+        self.rotation = rotation
 
 class TransformationMatrix:
     def __init__(self):
