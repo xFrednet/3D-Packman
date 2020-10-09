@@ -39,9 +39,9 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
     world.create_entity(
         com.Model3D(model_id),
         com.Transformation(
-            position=glm.vec3(maze.center.x, maze.center.y, -(wall_width / 2)),
-            scale=glm.vec3(floor_size.x, floor_size.y, wall_width)),
-        com.BoundingBox(com.Rectangle3D(floor_size.x, floor_size.y, wall_width)),
+            position=glm.vec3(maze.center.x, maze.center.y, -(path_width / 2)),
+            scale=glm.vec3(floor_size.x, floor_size.y, path_width)),
+        com.BoundingBox(com.Rectangle3D(floor_size.x, floor_size.y, path_width)),
         com.TransformationMatrix(),
         com.ObjectMaterial(
             diffuse=glm.vec3(0.6, 0.6, 0.6),

@@ -10,26 +10,32 @@ import ressources as res
 
 def add_physics_systems_to_world(world):
     world.add_processor(VelocityToEntityAxis())
+    world.add_processor(GravitySystem())
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
+    world.add_processor(GravitySystem())
 
 
 class MovementSystem(esper.Processor):
     def process(self):
         for entity_id, (transformation, velocity) in self.world.get_components(com.Transformation, com.Velocity):
             planned_velocity = velocity.value * self.world.delta
-
-            if (self.world.has_component(entity_id, com.CollisionComponent)):
-                collision = self.world.component_for_entity(entity_id, com.CollisionComponent)
-                if (collision.is_colliding_x):
-                    planned_velocity.x = 0.0
-                if (collision.is_colliding_y):
-                    planned_velocity.y = 0.0
-                if (collision.is_colliding_z):
-                    planned_velocity.z = 0.0
-
             transformation.position = transformation.position + planned_velocity
-            # print(_id, position.value, velocity.value, self.world.delta)
+
+class GravitySystem(esper.Processor):
+    def process(self):
+        for entity_id, (velocity, phys, collision) in self.world.get_components(
+                com.Velocity, 
+                com.PhysicsObject,
+                com.CollisionComponent):
+            if (collision.is_colliding_z):
+                phys.air_time = 0.0
+            else:
+                gravity = 9.0
+                old_grav = phys.air_time**2 * gravity
+                phys.air_time += self.world.delta
+                new_grav = phys.air_time**2 * gravity
+                velocity.value.z -= new_grav - old_grav
 
 
 class CollisionSystem(esper.Processor):
@@ -50,6 +56,10 @@ class CollisionSystem(esper.Processor):
 
             hero_rectangle = hero_bounding_box.shape
             hero_target_pos = hero_transformation.position + target_velocity
+
+            hero_collision.is_colliding_x = False
+            hero_collision.is_colliding_y = False
+            hero_collision.is_colliding_z = False
 
             for villan_id, (villan_tranformation, villan_bounding_box) in self.world.get_components(
                     com.Transformation,
@@ -90,14 +100,17 @@ class CollisionSystem(esper.Processor):
                 if gap.x <= gap.y and gap.x <= gap.z:
                     offset = hero_rectangle.width + villan_rectangle.width
                     hero_target_pos.x = villan_tranformation.position.x + math.copysign(offset, old_diff.x)
+                    hero_collision.is_colliding_x = True
                 elif gap.y <= gap.z:
                     if old_gap_x <= 0:
                         continue 
                     offset = hero_rectangle.depth + villan_rectangle.depth
                     hero_target_pos.y = villan_tranformation.position.y + math.copysign(offset, old_diff.y)
+                    hero_collision.is_colliding_y = True
                 else:
                     offset = hero_rectangle.height + villan_rectangle.height
                     hero_target_pos.z = villan_tranformation.position.z + math.copysign(offset, old_diff.z)
+                    hero_collision.is_colliding_z = True
             
             hero_velocity.value = (hero_target_pos - hero_transformation.position) / self.world.delta
 

@@ -20,12 +20,12 @@ class World(esper.World):
         self.resolution = resolution
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
-        self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.0, 0.0, 0.0))
+        self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
         self.controls = res.GameControlState()
         self.model_registry = res.ModelRegistry()
         self.camera_id = 0
         self.view_matrix = glm.mat4(1.0)
-        self.maze = _setup_maze(self, 30, 30)
+        self.maze = _setup_maze(self, 30, 30, depth=1.5)
 
         self._setup_systems()
         self._setup_entities()
@@ -78,6 +78,7 @@ class World(esper.World):
             com.Home(x=2.0, y=2.0, z=2.0),
             com.BoundingBox(com.Rectangle3D(1, 1, 1)),
             com.CollisionComponent(),
+            com.PhysicsObject(),
             com.Light(
                 color=glm.vec3(0.6, 0.3, 1.2),
                 attenuation=glm.vec3(0.1, 0.0, 1.0))
