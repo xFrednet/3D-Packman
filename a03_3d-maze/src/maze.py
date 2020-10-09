@@ -2,7 +2,8 @@
 Python implementation of a maze generation algorithm:
 https://en.wikipedia.org/wiki/Maze_generation_algorithm
 """
-from random import randint
+from random import randint, uniform
+import math
 import glm
 from vertex_buffer_array import StandardShaderVertexArray
 import components_3d as com
@@ -13,31 +14,49 @@ import ressources as res
 # minimap
 
 
-def unites(i, j, world, w, h, depth, model_id):
-    cube = world.create_entity()
-    world.add_component(cube, com.Model3D(model_id))
-    world.add_component(cube, com.Transformation(
-        position=glm.vec3(i + w / 2, j + h / 2, 0.0),
-        scale=glm.vec3(float(w), float(h), depth)))
-    world.add_component(cube, com.BoundingBox(com.Rectangle3D(float(w), float(h), depth)))
-    world.add_component(cube, com.TransformationMatrix())
-    world.add_component(cube, com.ObjectMaterial(diffuse=glm.vec3(0.4, 0.4, 0.4)))
+def unites(i, j, world, w, h, depth, model_id, diffuse):
+    cube = world.create_entity(
+        com.Model3D(model_id),
+        com.Transformation(
+            position=glm.vec3(i + w / 2, j + h / 2, depth / 2),
+            scale=glm.vec3(float(w), float(h), depth)),
+        com.BoundingBox(com.Rectangle3D(float(w), float(h), depth)),
+        com.TransformationMatrix(),
+        com.ObjectMaterial(diffuse=diffuse)
+    )
 
 
-def _setup_maze(world, width, height, depth=2.0):
+def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0):
     model_id = world.model_registry.get_model_id(res.ModelRegistry.CUBE)
     maze = Maze(w=width, l=height)
     m = maze.generate_maze()
-    scale = 3  # scales the empty space of the maze
     y = 0
     m[1][1] = False
+
+    # Le floor
+    floor_size = glm.vec2(width * (wall_width + path_width) / 2, height * (wall_width + path_width) / 2)
+    maze.center = glm.vec3(floor_size.x / 2, floor_size.y / 2, 0)
+    world.create_entity(
+        com.Model3D(model_id),
+        com.Transformation(
+            position=glm.vec3(maze.center.x, maze.center.y, -(wall_width / 2)),
+            scale=glm.vec3(floor_size.x, floor_size.y, wall_width)),
+        com.BoundingBox(com.Rectangle3D(floor_size.x, floor_size.y, wall_width)),
+        com.TransformationMatrix(),
+        com.ObjectMaterial(
+            diffuse=glm.vec3(0.6, 0.6, 0.6),
+            specular=glm.vec3(0.2, 0.3, 0.6),
+            shininess=6)
+    )
+
+    # Le Walls
     for i in range(len(m[0])):
         x = 0
         h = 0
         if i % 2 == 0:
-            h = 1
+            h = wall_width
         else:
-            h = scale
+            h = path_width
         
         shape_w = 0
         shape_x = 0
@@ -45,9 +64,9 @@ def _setup_maze(world, width, height, depth=2.0):
         for j in range(len(m[0]) + 1):
             w = 0
             if j % 2 == 0:
-                w = 1
+                w = wall_width
             else:
-                w = scale
+                w = path_width
             
             is_set = False
             if (j < len(m[0])):
@@ -60,12 +79,18 @@ def _setup_maze(world, width, height, depth=2.0):
                 shape_w += w
             elif has_shape:
                 # Draw last shape
-                unites(shape_x, y, world, shape_w, h, depth, model_id)
+                diffuse = glm.vec3(
+                    shape_x / floor_size.x,
+                    y / floor_size.y,
+                    math.sin(y / 10.0)
+                )
+                unites(shape_x, y, world, shape_w, h, depth, model_id, diffuse)
                 has_shape = False
                 shape_w = 0
+
             x += w
         y += h
-    return m
+    return maze
 
 
 class Maze:
@@ -77,6 +102,7 @@ class Maze:
         self.density = density
         self.shape = ((self.height // 2) * 2 + 1, (self.width // 2) * 2 + 1)
         self.maze = []
+        self.center = glm.vec3()
 
     def generate_maze(self):
         complexity = int(self.complexity * (5 * (self.shape[0] + self.shape[1])))

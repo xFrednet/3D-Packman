@@ -20,15 +20,15 @@ class World(esper.World):
         self.resolution = resolution
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
-        self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
+        self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.0, 0.0, 0.0))
         self.controls = res.GameControlState()
         self.model_registry = res.ModelRegistry()
         self.camera_id = 0
         self.view_matrix = glm.mat4(1.0)
+        self.maze = _setup_maze(self, 30, 30)
 
         self._setup_systems()
         self._setup_entities()
-        self.maze = _setup_maze(self, 50, 50)
         self.update_resolution(resolution)
 
     def cleanup(self):
@@ -69,30 +69,6 @@ class World(esper.World):
     def _setup_entities(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...
         # WTF. I'm always amazed by the comments I leave in my code. ~xFrednet 2020.09.23
-        vba2 = StandardShaderVertexArray(6)
-        vba2.load_position_data([
-            -0.1, 0.1, 0.0,
-            -0.1, -0.1, 0.0,
-            0.1, -0.1, 0.0,
-            -0.1, 0.1, 0.0,
-            0.1, -0.1, 0.0,
-            0.1, 0.1, 0.0
-        ])
-        vba2.load_normal_data([
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0,
-            0.0, 0.0, 1.0
-        ])
-
-        floor = self.create_entity()
-        self.add_component(floor, vba2)
-        self.add_component(floor, com.Transformation(position=glm.vec3(0.0, 0.0, -2.0), scale=glm.vec3(100.0, 100.0, 0.0)))
-        self.add_component(floor, com.TransformationMatrix())
-        self.add_component(floor, com.ObjectMaterial(diffuse=glm.vec3(0.8, 0.8, 0.8)))
-
         self.player_object = self.create_entity(
             com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
             com.Transformation(position=glm.vec3(2.0, 2.0, 2.0)),
@@ -114,7 +90,7 @@ class World(esper.World):
             )
         
         self.create_entity(
-            com.Transformation(position=glm.vec3(10.0, 10.0, 10.0)),
+            com.Transformation(position=glm.vec3(self.maze.center.x, self.maze.center.y, 10.0)),
             com.Light(
                 color=glm.vec3(0.7, 0.6, 0.6)))
         self.free_cam = self.create_entity(

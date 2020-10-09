@@ -250,7 +250,7 @@ class StandardShaderProgram(ShaderProgram):
                 1,
                 glm.value_ptr(light_setup.lights[index].attenuation))
 
-    def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.25, f=50.0):
+    def update_projection_matrix(self, resolution, fov=(math.pi / 2), n=0.5, f=100.0):
         aspect = resolution.x / resolution.y
 
         top = n * math.tan(fov / 2)
