@@ -1,52 +1,41 @@
 import math
-
-import components_3d as com
 import esper
 import glm
 import pygame
 import pygame.locals
 
+import components_3d as com
+import ressources as res
+
 
 def add_physics_systems_to_world(world):
-    world.add_processor(WasdControlSystem())
     world.add_processor(VelocityToEntityAxis())
+    world.add_processor(GravitySystem())
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
-    world.add_processor(CameraControlSystem())
-    world.add_processor(ResetSystem())
-
-
-def clamp(value, m_min, m_max):
-    if value <= m_min:
-        return m_min
-    if value >= m_max:
-        return m_max
-    return value
-
-
-class ResetSystem(esper.Processor):
-    def process(self):
-        keys = pygame.key.get_pressed()
-        for _id, (home, position) in self.world.get_components(com.Home, com.Position):
-            # Home reset
-            if keys[pygame.locals.K_h]:
-                position.value = home.position
+    world.add_processor(GravitySystem())
 
 
 class MovementSystem(esper.Processor):
     def process(self):
-        for entity_id, (position, velocity) in self.world.get_components(com.Position, com.Velocity):
+        for entity_id, (transformation, velocity) in self.world.get_components(com.Transformation, com.Velocity):
             planned_velocity = velocity.value * self.world.delta
+            transformation.position = transformation.position + planned_velocity
 
-            if (self.world.has_component(entity_id, com.CollisionComponent)):
-                collision = self.world.component_for_entity(entity_id, com.CollisionComponent)
-                if (collision.is_colliding_x):
-                    planned_velocity.x = 0.0
-                if (collision.is_colliding_y):
-                    planned_velocity.y = 0.0
-
-            position.value = position.value + planned_velocity
-            # print(_id, position.value, velocity.value, self.world.delta)
+class GravitySystem(esper.Processor):
+    def process(self):
+        for entity_id, (velocity, phys, collision) in self.world.get_components(
+                com.Velocity, 
+                com.PhysicsObject,
+                com.CollisionComponent):
+            if (collision.is_colliding_z):
+                phys.air_time = 0.0
+            else:
+                gravity = 9.0
+                old_grav = phys.air_time**2 * gravity
+                phys.air_time += self.world.delta
+                new_grav = phys.air_time**2 * gravity
+                velocity.value.z -= new_grav - old_grav
 
 
 class CollisionSystem(esper.Processor):
@@ -56,144 +45,91 @@ class CollisionSystem(esper.Processor):
     """
 
     def process(self):
-        for hero_id, (hero_position, hero_velocity, hero_rectangle, hero_collision) in self.world.get_components(
-                com.Position,
+        for hero_id, (hero_transformation, hero_velocity, hero_bounding_box, hero_collision) in self.world.get_components(
+                com.Transformation,
                 com.Velocity,
-                com.Rectangle,
+                com.BoundingBox,
                 com.CollisionComponent):
 
             target_velocity = hero_velocity.value * self.world.delta
+            hero_confort_zone = hero_bounding_box.radius
 
-            hero_min_x = hero_position.value.x + target_velocity.x + hero_rectangle.min_x()
-            hero_max_x = hero_position.value.x + target_velocity.x + hero_rectangle.max_x()
-            hero_min_y = hero_position.value.y + target_velocity.y + hero_rectangle.min_y()
-            hero_max_y = hero_position.value.y + target_velocity.y + hero_rectangle.max_y()
-            hero_max_z = hero_position.value.z + target_velocity.z + hero_rectangle.max_z()
-            hero_min_z = hero_position.value.z + target_velocity.z + hero_rectangle.min_z()
-            hero_collision.is_colliding_y = False
+            hero_rectangle = hero_bounding_box.shape
+            hero_target_pos = hero_transformation.position + target_velocity
+
             hero_collision.is_colliding_x = False
+            hero_collision.is_colliding_y = False
+            hero_collision.is_colliding_z = False
 
-            for villan_id, (villan_position, villan_rectangle) in self.world.get_components(
-                    com.Position,
-                    com.Rectangle):
+            for villan_id, (villan_tranformation, villan_bounding_box) in self.world.get_components(
+                    com.Transformation,
+                    com.BoundingBox):
+
+                villan_rectangle = villan_bounding_box.shape
 
                 # Don't hit your self
                 if (villan_id == hero_id):
                     continue
-
-                # Positions
-                villan_min_x = villan_position.value.x + villan_rectangle.min_x()
-                villan_max_x = villan_position.value.x + villan_rectangle.max_x()
-                villan_min_y = villan_position.value.y + villan_rectangle.min_y()
-                villan_max_y = villan_position.value.y + villan_rectangle.max_y()
-                villan_min_z = villan_position.value.z + villan_rectangle.min_z()
-                villan_max_z = villan_position.value.z + villan_rectangle.max_z()
-
-                # Collision testing
-                if (hero_max_x < villan_min_x or
-                        hero_min_x >= villan_max_x):
+                
+                # Are they in each others confort zones?
+                if (glm.distance(villan_tranformation.position, villan_tranformation.position) > 
+                        (hero_confort_zone + villan_bounding_box.radius)):
                     continue
-                if (hero_max_y < villan_min_y or
-                        hero_min_y >= villan_max_y):
+                
+                diff = glm.vec3(
+                    villan_tranformation.position.x - hero_target_pos.x,
+                    villan_tranformation.position.y - hero_target_pos.y,
+                    villan_tranformation.position.z - hero_target_pos.z
+                )
+                gap = glm.vec3(
+                    (hero_rectangle.width + villan_rectangle.width) - abs(diff.x),
+                    (hero_rectangle.depth + villan_rectangle.depth) - abs(diff.y),
+                    (hero_rectangle.height + villan_rectangle.height) - abs(diff.z)
+                )
+
+                old_gap_x = (
+                    (hero_rectangle.width + villan_rectangle.width) - 
+                    abs(villan_tranformation.position.x - hero_transformation.position.x))
+                
+                # One side is outside
+                if gap.x < 0.0 or gap.y < 0.0 or gap.z < 0.0:
                     continue
-                if (hero_max_z < villan_min_z or
-                        hero_min_z >= villan_max_z):
-                    continue
+                
+                old_diff = hero_transformation.position - villan_tranformation.position
 
-                # Find side
-                hero_min_x_old = hero_position.value.x + hero_rectangle.min_x()
-                hero_max_x_old = hero_position.value.x + hero_rectangle.max_x()
-                hero_min_y_old = hero_position.value.y + hero_rectangle.min_y()
-                hero_max_y_old = hero_position.value.y + hero_rectangle.max_y()
-
-                if hero_max_y_old > villan_min_y and hero_min_y_old <= villan_max_y:
-                    if hero_min_x_old > villan_max_x and hero_min_x <= villan_max_x:
-                        hero_collision.is_colliding_x = True
-                    elif hero_max_x_old < villan_min_x and hero_max_x >= villan_min_x:
-                        hero_collision.is_colliding_x = True
-
-                if hero_max_x_old > villan_min_x and hero_min_x_old <= villan_max_x:
-                    if hero_min_y_old > villan_max_y and hero_min_y <= villan_max_y:
-                        hero_collision.is_colliding_y = True
-                    elif hero_max_y_old < villan_min_y and hero_max_y >= villan_min_y:
-                        hero_collision.is_colliding_y = True
-
-                if hero_collision.is_colliding_x and hero_collision.is_colliding_y:
-                    return
+                if gap.x <= gap.y and gap.x <= gap.z:
+                    offset = hero_rectangle.width + villan_rectangle.width
+                    hero_target_pos.x = villan_tranformation.position.x + math.copysign(offset, old_diff.x)
+                    hero_collision.is_colliding_x = True
+                elif gap.y <= gap.z:
+                    if old_gap_x <= 0:
+                        continue 
+                    offset = hero_rectangle.depth + villan_rectangle.depth
+                    hero_target_pos.y = villan_tranformation.position.y + math.copysign(offset, old_diff.y)
+                    hero_collision.is_colliding_y = True
+                else:
+                    offset = hero_rectangle.height + villan_rectangle.height
+                    hero_target_pos.z = villan_tranformation.position.z + math.copysign(offset, old_diff.z)
+                    hero_collision.is_colliding_z = True
+            
+            hero_velocity.value = (hero_target_pos - hero_transformation.position) / self.world.delta
 
 
 class VelocityToEntityAxis(esper.Processor):
     def process(self):
-        for _id, (velocity, rotation) in self.world.get_components(com.Velocity, com.Rotation):
+        for _id, (velocity, transformation) in self.world.get_components(com.Velocity, com.Transformation):
             if velocity.along_world_axis:
                 continue
-
+            
+            rotation = transformation.rotation
             new_v = glm.vec3()
 
-            new_v.x += math.sin(rotation.yaw) * velocity.value.y
-            new_v.y += math.cos(rotation.yaw) * velocity.value.y
+            new_v.x += math.sin(rotation.x) * velocity.value.y
+            new_v.y += math.cos(rotation.x) * velocity.value.y
 
-            new_v.x += math.cos(-rotation.yaw) * velocity.value.x
-            new_v.y += math.sin(-rotation.yaw) * velocity.value.x
+            new_v.x += math.cos(-rotation.x) * velocity.value.x
+            new_v.y += math.sin(-rotation.x) * velocity.value.x
 
             new_v.z = velocity.value.z
 
             velocity.value = new_v
-
-
-class WasdControlSystem(esper.Processor):
-    def process(self):
-        keys = pygame.key.get_pressed()
-        for _id, (control, velocity, position) in self.world.get_components(
-                com.WasdControlComponent,
-                com.Velocity,
-                com.Position):
-
-            # Active check
-            if not control.active:
-                continue
-
-            direction = glm.vec3()
-
-            # WASD
-            if keys[pygame.locals.K_w]:
-                direction.y += 1
-            if keys[pygame.locals.K_s]:
-                direction.y -= 1
-            if keys[pygame.locals.K_a]:
-                direction.x -= 1
-            if keys[pygame.locals.K_d]:
-                direction.x += 1
-
-            if glm.length(direction) > 0.001:
-                velocity.value = glm.normalize(direction) * control.speed
-            else:
-                velocity.value = glm.vec3()
-
-            if keys[pygame.locals.K_SPACE]:
-                velocity.value.z += control.speed
-            if keys[pygame.locals.K_LSHIFT]:
-                velocity.value.z -= control.speed
-
-            self.world.component_for_entity(self.world.follow_light, com.Light).position = position.value
-
-
-class CameraControlSystem(esper.Processor):
-    def process(self):
-        keys = pygame.key.get_pressed()
-        for _id, (rotation, _control) in self.world.get_components(com.Rotation, com.ArrowKeyRotationControlComponent):
-
-            pitch_change = 0.0
-            if keys[pygame.locals.K_UP]:
-                pitch_change += 0.1
-            if keys[pygame.locals.K_DOWN]:
-                pitch_change -= 0.1
-            rotation.pitch = clamp(
-                rotation.pitch + pitch_change,
-                (math.pi - 0.2) / -2,
-                (math.pi - 0.2) / 2)
-
-            if keys[pygame.locals.K_LEFT]:
-                rotation.yaw -= 0.1
-            if keys[pygame.locals.K_RIGHT]:
-                rotation.yaw += 0.1

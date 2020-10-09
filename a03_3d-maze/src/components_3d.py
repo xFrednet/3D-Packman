@@ -1,5 +1,5 @@
 import glm
-
+import math
 
 #
 # Object physics
@@ -14,26 +14,16 @@ class CollisionComponent:
     def __init__(self):
         self.is_colliding_y = False
         self.is_colliding_x = False
+        self.is_colliding_z = False
+
+class PhysicsObject:
+    def __init__(self):
+        self.air_time = 0.0
 
 
 #
 # Control components
 #
-class WasdControlComponent:
-    """
-    Note: 
-        1. This component required the entity to have a Velocity component
-        2. The system moves the component along the XYZ axis"""
-
-    def __init__(self, speed=10.0, active=True):
-        self.speed = speed
-        self.active = active
-
-
-class ArrowKeyRotationControlComponent:
-    pass
-
-
 class Home:
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.position = glm.vec3(x, y, z)
@@ -43,22 +33,15 @@ class Home:
 #
 # Object Translation
 #
-class Position:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.value = glm.vec3(x, y, z)
-
-
-class Scale:
-    def __init__(self, scale=1.0):
-        self.value = scale
-
-
-class Rotation:
-    def __init__(self, yaw=0.0, pitch=0.0, role=0):
-        self.yaw = yaw
-        self.pitch = pitch
-        self.role = role
-
+class Transformation:
+    def __init__(
+            self,
+            position=glm.vec3(),
+            scale=glm.vec3(1.0, 1.0, 1.0),
+            rotation=glm.vec3()):
+        self.position = position
+        self.scale = scale
+        self.rotation = rotation
 
 class TransformationMatrix:
     def __init__(self):
@@ -88,7 +71,12 @@ class ThirdPersonCamera:
 #
 # Shape
 #
-class Rectangle:
+class BoundingBox:
+    def __init__(self, shape):
+        self.shape = shape
+        self.radius = shape.get_radius()
+
+class Rectangle3D:
     """
     This should not be rotated or scaled. Top view:
     
@@ -101,27 +89,53 @@ class Rectangle:
     """
 
     def __init__(self, width, depth, height):
-        self.width = width
-        self.depth = depth
-        self.height = height
+        self.width = width / 2.0
+        self.depth = depth / 2.0
+        self.height = height / 2.0
 
     def min_x(self):
-        return -self.width / 2
+        return -self.width
 
     def max_x(self):
-        return self.width / 2
+        return self.width
 
     def min_y(self):
-        return -self.depth / 2
+        return -self.depth
 
     def max_y(self):
-        return self.depth / 2
+        return self.depth
 
     def min_z(self):
-        return -self.height / 2
+        return -self.height
 
     def max_z(self):
-        return self.height / 2
+        return self.height
+    
+    def get_radius(self):
+        return math.sqrt(self.width ** 2 + self.depth ** 2 + self.height ** 2)
+
+#    def get_corners(self, rotation):
+#        x_axis = glm.vec3(
+#            math.cos(-rotation.x) * self.width,
+#            math.sin(-rotation.x) * self.width,
+#            0.0)
+#        y_axis = glm.vec3(
+#            math.sin(rotation.x) * self.depth,
+#            math.cos(rotation.x) * self.depth,
+#            0.0)
+#        z_axis = glm.vec3(0.0, 0.0, self.height)
+#
+#        return [
+#             x_axis + y_axis + z_axis,
+#             x_axis - y_axis + z_axis,
+#            -x_axis + y_axis + z_axis,
+#            -x_axis - y_axis + z_axis,
+#
+#             x_axis + y_axis - z_axis,
+#             x_axis - y_axis - z_axis,
+#            -x_axis + y_axis - z_axis,
+#            -x_axis - y_axis - z_axis
+#        ]
 
 
 class Circle:
@@ -133,6 +147,10 @@ class Circle:
 #
 # Graphics
 #
+class Model3D:
+    def __init__(self, model_id):
+        self.model_id = model_id
+
 class ObjectMaterial:
     def __init__(self,
                  diffuse=glm.vec3(0, 0, 0),
@@ -146,10 +164,8 @@ class ObjectMaterial:
 class Light:
     def __init__(
             self,
-            position,
             color,
             attenuation=glm.vec3(0.0, 0.0, 1.0)):
-        self.position = position
         self.color = color
         self.attenuation = attenuation
         # The attenuation is calculates like: 

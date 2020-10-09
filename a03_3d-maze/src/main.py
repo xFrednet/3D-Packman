@@ -3,7 +3,7 @@ import glm
 
 from world import World
 
-RESOLUTION = 720, 480
+RESOLUTION = 1024, 720
 FPS = 60
 
 
@@ -17,7 +17,7 @@ def game_loop(world):
         # Pygame implementation stolen from:
         # https://stackoverflow.com/questions/24039804/pygame-current-time-millis-and-delta-time
         millis = pygame.time.get_ticks()
-        world.delta = (millis - last_millis) / 1000.0
+        world.delta = min(max((millis - last_millis) / 1000.0, 0.00000001), 0.1)
         last_millis = millis
 
         # Get events

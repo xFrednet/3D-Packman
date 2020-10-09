@@ -6,16 +6,17 @@ from OpenGL import GL as gl
 from esper import Processor
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
+import components_3d as com
+import ressources as res
 
 
 def add_3d_render_systems_to_world(world):
-    world.add_processor(FreeCamOrientation())
-    world.add_processor(ThirdPersonCameraSystem())
     world.add_processor(UpdateLightSetup())
     world.add_processor(BuildTransformationMatrixSystem())
 
     world.add_processor(Start3DDrawSystem())
     world.add_processor(StandardRenderSystem())
+    world.add_processor(ModelRenderer())
     world.add_processor(Stop3DDrawSystem())
 
 
@@ -24,79 +25,35 @@ def add_3d_render_systems_to_world(world):
 #
 class UpdateLightSetup(Processor):
     def process(self):
-        MAX_LIGHT_COUNT = 4
-
         light_setup: com.LightSetup = self.world.light_setup
-        light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Position).value
+        light_setup.camera_position = self.world.component_for_entity(self.world.camera_id, com.Transformation).position
 
-        light_count = 0
-        light_setup.lights.clear()
-        for _id, light in self.world.get_component(com.Light):
-            light_setup.lights.append(light)
-            light_count += 1
-            if (light_count >= MAX_LIGHT_COUNT):
+        index = 0
+        for _id, (light, transformation) in self.world.get_components(com.Light, com.Transformation):
+            light_setup.light_positions[index] = transformation.position
+            light_setup.lights[index] = light
+            index += 1
+            if (index >= res.LightSetup.MAX_LIGHT_COUNT):
                 break
-
-        for index in range(light_count, MAX_LIGHT_COUNT):
-            light_setup.lights.append(com.Light(glm.vec3(), glm.vec3()))
-
-        light_setup.light_count = light_count
+        
+        light_setup.light_count = index
         self.world.light_setup = light_setup
 
 
 class BuildTransformationMatrixSystem(Processor):
     def process(self):
-        for _id, (mat_target, position, scale, rotation) in self.world.get_components(
+        for _id, (mat_target, transformation) in self.world.get_components(
                 com.TransformationMatrix,
-                com.Position,
-                com.Scale,
-                com.Rotation):
+                com.Transformation):
             mat = glm.mat4x4(1.0)
-            mat = glm.translate(mat, position.value)
+            mat = glm.translate(mat, transformation.position)
             # No rotation for you
             # mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
             # mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
             # mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
-            mat = glm.scale(mat, glm.vec3(scale.value, scale.value, scale.value))
+            mat = glm.scale(mat, transformation.scale)
 
             mat_target.value = mat
-
-
-class ThirdPersonCameraSystem(Processor):
-    def process(self):
-        for _id, (position, orientation, third_person_cam) in self.world.get_components(
-                com.Position,
-                com.CameraOrientation,
-                com.ThirdPersonCamera):
-            orientation.look_at = self.world.component_for_entity(third_person_cam.target, com.Position).value
-
-            yaw = self.world.component_for_entity(third_person_cam.target, com.Rotation).yaw
-            pitch = third_person_cam.pitch
-
-            dir_height = math.sin(pitch)
-            dir_vec = glm.vec3(
-                math.sin(yaw) * (1.0 - abs(dir_height)),
-                math.cos(yaw) * (1.0 - abs(dir_height)),
-                dir_height
-            )
-
-            target_pos = self.world.component_for_entity(third_person_cam.target, com.Position).value
-            position.value = target_pos + ((dir_vec * -1) * third_person_cam.distance)
-
-
-class FreeCamOrientation(Processor):
-    def process(self):
-        for _id, (position, orientation, rotation, _free_cam) in self.world.get_components(
-                com.Position,
-                com.CameraOrientation,
-                com.Rotation,
-                com.FreeCamera):
-            height = math.sin(rotation.pitch)
-            orientation.look_at = position.value + glm.vec3(
-                math.sin(-rotation.yaw) * (1.0 - abs(height)),
-                math.cos(-rotation.yaw) * (1.0 - abs(height)),
-                height
-            )
 
 
 #
@@ -105,10 +62,10 @@ class FreeCamOrientation(Processor):
 class Start3DDrawSystem(Processor):
     def process(self):
         # build view matrix
-        position = self.world.component_for_entity(self.world.camera_id, com.Position)
+        position = self.world.component_for_entity(self.world.camera_id, com.Transformation).position
         orientation = self.world.component_for_entity(self.world.camera_id, com.CameraOrientation)
         self.world.view_matrix = glm.lookAt(
-            position.value,
+            position,
             orientation.look_at,
             orientation.up)
 
@@ -120,6 +77,9 @@ class Start3DDrawSystem(Processor):
 
 class StandardRenderSystem(Processor):
     VERTEX_POS_INDEX = 0
+
+    def _create_model_registry(self):
+        models = [[]] * self.world.model_registry.get_model_count
 
     def process(self):
         # Ugly hacks, because hacker man!!
@@ -142,6 +102,53 @@ class StandardRenderSystem(Processor):
             gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
 
             # Unbind the thingies
+            gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glDisableVertexAttribArray(shader.NORMAL_ATTR)
+            gl.glBindVertexArray(0)
+
+class ModelRenderer(Processor):
+    def __init__(self):
+        self.map = None
+
+    def _create_model_registry(self):
+        registry: res.ModelRegistry = self.world.model_registry
+        
+        model_list = [[]] * registry.get_model_count()
+        
+        for _id, (model, translation, material) in self.world.get_components(
+                com.Model3D,
+                com.TransformationMatrix,
+                com.ObjectMaterial):
+
+            model_list[model.model_id].append((translation, material))
+        
+        self.map = model_list
+    
+    def process(self):
+        # You should delete this command before you hand in the assignment
+        shader: StandardShaderProgram = self.world.standard_shader
+        registry: res.ModelRegistry = self.world.model_registry
+
+        if self.map is None:
+            self._create_model_registry()
+
+        models = self.map
+        for index in range(0, len(models)):
+            if len(models[index]) == 0:
+                continue
+            
+            vba = registry.get_model(index)
+
+            # Bind buffers
+            gl.glBindVertexArray(vba.vertex_array_id)
+            gl.glEnableVertexAttribArray(shader.POSITION_ATTR)
+            gl.glEnableVertexAttribArray(shader.NORMAL_ATTR)
+
+            for transformation, material in models[index]:
+                shader.set_transformation_matrix(transformation.value)
+                shader.set_object_material(material)
+                gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
+
             gl.glDisableVertexAttribArray(shader.POSITION_ATTR)
             gl.glDisableVertexAttribArray(shader.NORMAL_ATTR)
             gl.glBindVertexArray(0)
