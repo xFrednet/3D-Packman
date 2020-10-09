@@ -1,41 +1,17 @@
 import math
-
-import components_3d as com
 import esper
 import glm
 import pygame
 import pygame.locals
 
+import components_3d as com
+import ressources as res
+
 
 def add_physics_systems_to_world(world):
-    world.add_processor(GameControlSystem())
-    world.add_processor(WasdControlSystem())
     world.add_processor(VelocityToEntityAxis())
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
-    world.add_processor(CameraControlSystem())
-
-
-def clamp(value, m_min, m_max):
-    if value <= m_min:
-        return m_min
-    if value >= m_max:
-        return m_max
-    return value
-
-
-class GameControlSystem(esper.Processor):
-    def process(self):
-        keys = pygame.key.get_pressed()
-        
-        # Swap camera
-        if keys[self.world.controls.key_swap_camera]:
-            print("HMMMM")
-
-        # Reset
-        if keys[self.world.controls.key_return_to_home]:
-            for _id, (home, transformation) in self.world.get_components(com.Home, com.Transformation):
-                transformation.position = home.position
 
 
 class MovementSystem(esper.Processor):
@@ -161,58 +137,3 @@ class VelocityToEntityAxis(esper.Processor):
             new_v.z = velocity.value.z
 
             velocity.value = new_v
-
-
-class WasdControlSystem(esper.Processor):
-    def process(self):
-        keys = pygame.key.get_pressed()
-        for _id, (control, velocity) in self.world.get_components(
-                com.WasdControlComponent,
-                com.Velocity):
-
-            # Active check
-            if not control.active:
-                continue
-
-            direction = glm.vec3()
-
-            # WASD
-            if keys[pygame.locals.K_w]:
-                direction.y += 1
-            if keys[pygame.locals.K_s]:
-                direction.y -= 1
-            if keys[pygame.locals.K_a]:
-                direction.x -= 1
-            if keys[pygame.locals.K_d]:
-                direction.x += 1
-
-            if glm.length(direction) > 0.001:
-                velocity.value = glm.normalize(direction) * control.speed
-            else:
-                velocity.value = glm.vec3()
-
-            if keys[pygame.locals.K_SPACE]:
-                velocity.value.z += control.speed
-            if keys[pygame.locals.K_LSHIFT]:
-                velocity.value.z -= control.speed
-
-
-class CameraControlSystem(esper.Processor):
-    def process(self):
-        keys = pygame.key.get_pressed()
-        for _id, (transformation, _control) in self.world.get_components(com.Transformation, com.ArrowKeyRotationControlComponent):
-
-            pitch_change = 0.0
-            if keys[pygame.locals.K_UP]:
-                pitch_change += 0.1
-            if keys[pygame.locals.K_DOWN]:
-                pitch_change -= 0.1
-            transformation.rotation.y = clamp(
-                transformation.rotation.y + pitch_change,
-                (math.pi - 0.2) / -2,
-                (math.pi - 0.2) / 2)
-
-            if keys[pygame.locals.K_LEFT]:
-                transformation.rotation.x -= 0.1
-            if keys[pygame.locals.K_RIGHT]:
-                transformation.rotation.x += 0.1

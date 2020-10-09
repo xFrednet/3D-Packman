@@ -11,8 +11,6 @@ import ressources as res
 
 
 def add_3d_render_systems_to_world(world):
-    world.add_processor(FreeCamOrientation())
-    world.add_processor(ThirdPersonCameraSystem())
     world.add_processor(UpdateLightSetup())
     world.add_processor(BuildTransformationMatrixSystem())
 
@@ -56,42 +54,6 @@ class BuildTransformationMatrixSystem(Processor):
             mat = glm.scale(mat, transformation.scale)
 
             mat_target.value = mat
-
-
-class ThirdPersonCameraSystem(Processor):
-    def process(self):
-        for _id, (transformation, orientation, third_person_cam) in self.world.get_components(
-                com.Transformation,
-                com.CameraOrientation,
-                com.ThirdPersonCamera):
-            orientation.look_at = self.world.component_for_entity(third_person_cam.target, com.Transformation).position
-
-            yaw = self.world.component_for_entity(third_person_cam.target, com.Transformation).rotation.x
-            pitch = third_person_cam.pitch
-
-            dir_height = math.sin(pitch)
-            dir_vec = glm.vec3(
-                math.sin(yaw) * (1.0 - abs(dir_height)),
-                math.cos(yaw) * (1.0 - abs(dir_height)),
-                dir_height
-            )
-
-            target_pos = self.world.component_for_entity(third_person_cam.target, com.Transformation).position
-            transformation.position = target_pos + ((dir_vec * -1) * third_person_cam.distance)
-
-
-class FreeCamOrientation(Processor):
-    def process(self):
-        for _id, (transformation, orientation, rotation, _free_cam) in self.world.get_components(
-                com.Transformation,
-                com.CameraOrientation,
-                com.FreeCamera):
-            height = math.sin(rotation.pitch)
-            orientation.look_at = transformation.position + glm.vec3(
-                math.sin(-transformation.rotation.x) * (1.0 - abs(height)),
-                math.cos(-transformation.rotation.x) * (1.0 - abs(height)),
-                height
-            )
 
 
 #

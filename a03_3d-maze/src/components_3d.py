@@ -20,21 +20,6 @@ class CollisionComponent:
 #
 # Control components
 #
-class WasdControlComponent:
-    """
-    Note: 
-        1. This component required the entity to have a Velocity component
-        2. The system moves the component along the XYZ axis"""
-
-    def __init__(self, speed=10.0, active=True):
-        self.speed = speed
-        self.active = active
-
-
-class ArrowKeyRotationControlComponent:
-    pass
-
-
 class Home:
     def __init__(self, x=0.0, y=0.0, z=0.0):
         self.position = glm.vec3(x, y, z)

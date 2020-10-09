@@ -10,9 +10,23 @@ Ressources are data objects that only get initiated by the world as world variab
 """
 
 class GameControlState:
+
+    FREE_CAM_MODE = 1
+    PLAYER_MODE = 0
+
     def __init__(self):
+        self.control_mode = GameControlState.PLAYER_MODE
+
         self.key_swap_camera = pygame.locals.K_m
+        self.key_swap_camera_state = False
         self.key_return_to_home = pygame.locals.K_h
+        self.key_return_to_home_state = False
+
+        self.player_speed = 10.0
+        self.player_vertical_speed = 5.0
+        self.free_camera_speed = 10.0
+        self.free_camera_vertical_speed = 5.0
+
 
 class LightSetup:
     MAX_LIGHT_COUNT = 4
