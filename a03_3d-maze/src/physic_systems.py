@@ -38,7 +38,6 @@ class CollisionSystem(esper.Processor):
     detection on the x and y direction. 
     """
 
-
     def process(self):
         for hero_id, (hero_transformation, hero_velocity, hero_bounding_box, hero_collision) in self.world.get_components(
                 com.Transformation,
@@ -51,7 +50,6 @@ class CollisionSystem(esper.Processor):
 
             hero_rectangle = hero_bounding_box.shape
             hero_target_pos = hero_transformation.position + target_velocity
-            collisions = []
 
             for villan_id, (villan_tranformation, villan_bounding_box) in self.world.get_components(
                     com.Transformation,
@@ -100,13 +98,6 @@ class CollisionSystem(esper.Processor):
                 else:
                     offset = hero_rectangle.height + villan_rectangle.height
                     hero_target_pos.z = villan_tranformation.position.z + math.copysign(offset, old_diff.z)
-            
-#            if gap.x <= gap.y and gap.x <= gap.z:
-#                offset = hero_rectangle.width + villan_rectangle.width
-#                hero_target_pos.x = villan_tranformation.position.x + math.copysign(offset, old_diff.x)
-#            elif gap.y <= gap.z:
-#                offset = hero_rectangle.depth + villan_rectangle.depth
-#                hero_target_pos.y = villan_tranformation.position.y + math.copysign(offset, old_diff.y)
             
             hero_velocity.value = (hero_target_pos - hero_transformation.position) / self.world.delta
 
