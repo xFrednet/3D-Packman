@@ -34,8 +34,13 @@ class GameControlSystem(esper.Processor):
 
         # Reset
         if keys[controls.key_return_to_home] and not controls.key_return_to_home_state:
-            for _id, (home, transformation) in self.world.get_components(com.Home, com.Transformation):
+            for _id, (home, transformation, velocity) in self.world.get_components(
+                    com.Home,
+                    com.Transformation,
+                    com.Velocity):
                 transformation.position = home.position
+                velocity.value = glm.vec3()
+
         
         controls.key_swap_camera_state = keys[controls.key_swap_camera]
         controls.key_return_to_home_state = keys[controls.key_return_to_home]
@@ -58,16 +63,19 @@ class GameControlSystem(esper.Processor):
             self._wasd_movement(
                 self.world.player_object,
                 controls.player_speed,
-                controls.player_vertical_speed)
+                False,
+                0.0)
             self._arrow_key_rotation(self.world.player_object)
+            self._player_jump()
         else:
             self._wasd_movement(
                 self.world.free_cam,
                 controls.free_camera_speed,
+                True,
                 controls.free_camera_vertical_speed)
             self._arrow_key_rotation(self.world.free_cam)
 
-    def _wasd_movement(self, entity_id, speed, vertical_speed):
+    def _wasd_movement(self, entity_id, speed, vertical_movement, vertical_speed):
         keys = pygame.key.get_pressed()
         velocity = self.world.component_for_entity(entity_id, com.Velocity)
 
@@ -83,14 +91,18 @@ class GameControlSystem(esper.Processor):
             direction.x += 1
 
         if glm.length(direction) > 0.001:
-            velocity.value = glm.normalize(direction) * speed
+            new_v = glm.normalize(direction) * speed
+            velocity.value.x = new_v.x
+            velocity.value.y = new_v.y
         else:
-            velocity.value = glm.vec3()
+            velocity.value.x = 0.0
+            velocity.value.y = 0.0
 
-        if keys[pygame.locals.K_SPACE]:
-            velocity.value.z += vertical_speed
-        if keys[pygame.locals.K_LSHIFT]:
-            velocity.value.z -= vertical_speed
+        if (vertical_movement):
+            if keys[pygame.locals.K_SPACE]:
+                velocity.value.z = vertical_speed
+            if keys[pygame.locals.K_LSHIFT]:
+                velocity.value.z = vertical_speed
     
     def _arrow_key_rotation(self, entity_id):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)
@@ -110,6 +122,15 @@ class GameControlSystem(esper.Processor):
             transformation.rotation.x -= 0.1
         if keys[pygame.locals.K_RIGHT]:
             transformation.rotation.x += 0.1
+    
+    def _player_jump(self):
+        collision = self.world.component_for_entity(self.world.player_object, com.CollisionComponent)
+        if (collision.is_colliding_z):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.locals.K_SPACE]:
+                v = self.world.component_for_entity(self.world.player_object, com.Velocity)
+                v.value.z += self.world.controls.player_jump_height
+
 
 class ThirdPersonCameraSystem(esper.Processor):
     def process(self):

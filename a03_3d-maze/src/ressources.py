@@ -23,7 +23,7 @@ class GameControlState:
         self.key_return_to_home_state = False
 
         self.player_speed = 10.0
-        self.player_vertical_speed = 5.0
+        self.player_jump_height = 15.0
         self.free_camera_speed = 10.0
         self.free_camera_vertical_speed = 5.0
 
