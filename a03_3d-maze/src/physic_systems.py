@@ -51,6 +51,7 @@ class CollisionSystem(esper.Processor):
 
             hero_rectangle = hero_bounding_box.shape
             hero_target_pos = hero_transformation.position + target_velocity
+            collisions = []
 
             for villan_id, (villan_tranformation, villan_bounding_box) in self.world.get_components(
                     com.Transformation,
@@ -77,6 +78,10 @@ class CollisionSystem(esper.Processor):
                     (hero_rectangle.depth + villan_rectangle.depth) - abs(diff.y),
                     (hero_rectangle.height + villan_rectangle.height) - abs(diff.z)
                 )
+
+                old_gap_x = (
+                    (hero_rectangle.width + villan_rectangle.width) - 
+                    abs(villan_tranformation.position.x - hero_transformation.position.x))
                 
                 # One side is outside
                 if gap.x < 0.0 or gap.y < 0.0 or gap.z < 0.0:
@@ -88,14 +93,21 @@ class CollisionSystem(esper.Processor):
                     offset = hero_rectangle.width + villan_rectangle.width
                     hero_target_pos.x = villan_tranformation.position.x + math.copysign(offset, old_diff.x)
                 elif gap.y <= gap.z:
+                    if old_gap_x <= 0:
+                        continue 
                     offset = hero_rectangle.depth + villan_rectangle.depth
                     hero_target_pos.y = villan_tranformation.position.y + math.copysign(offset, old_diff.y)
                 else:
                     offset = hero_rectangle.height + villan_rectangle.height
                     hero_target_pos.z = villan_tranformation.position.z + math.copysign(offset, old_diff.z)
-
-                    return
-
+            
+#            if gap.x <= gap.y and gap.x <= gap.z:
+#                offset = hero_rectangle.width + villan_rectangle.width
+#                hero_target_pos.x = villan_tranformation.position.x + math.copysign(offset, old_diff.x)
+#            elif gap.y <= gap.z:
+#                offset = hero_rectangle.depth + villan_rectangle.depth
+#                hero_target_pos.y = villan_tranformation.position.y + math.copysign(offset, old_diff.y)
+            
             hero_velocity.value = (hero_target_pos - hero_transformation.position) / self.world.delta
 
 

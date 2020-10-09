@@ -28,7 +28,7 @@ class World(esper.World):
 
         self._setup_systems()
         self._setup_entities()
-        self.maze = _setup_maze(self, 30, 30)
+        self.maze = _setup_maze(self, 50, 50)
         self.update_resolution(resolution)
 
     def cleanup(self):
