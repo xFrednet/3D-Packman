@@ -3,13 +3,10 @@ Python implementation of a maze generation algorithm:
 https://en.wikipedia.org/wiki/Maze_generation_algorithm
 """
 from random import randint
+
+import components_3d as com
 import glm
 from vertex_buffer_array import StandardShaderVertexArray
-import components_3d as com
-
-
-# TODO:
-# minimap
 
 
 def unites(i, j, world, w, h, depth):
