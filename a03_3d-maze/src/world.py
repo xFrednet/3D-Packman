@@ -19,7 +19,7 @@ class World(esper.World):
 
         self.resolution = resolution
         self.standard_shader = StandardShaderProgram()
-        self.delta = 0.0
+        self.delta = 0.00001
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
         self.controls = res.GameControlState()
         self.model_registry = res.ModelRegistry()
@@ -28,7 +28,7 @@ class World(esper.World):
 
         self._setup_systems()
         self._setup_entities()
-        self.maze = _setup_maze(self, 50, 50)
+        self.maze = _setup_maze(self, 30, 30)
         self.update_resolution(resolution)
 
     def cleanup(self):

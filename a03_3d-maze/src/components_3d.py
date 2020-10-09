@@ -110,6 +110,29 @@ class Rectangle3D:
     def get_radius(self):
         return math.sqrt(self.width ** 2 + self.depth ** 2 + self.height ** 2)
 
+    def get_corners(self, rotation):
+        x_axis = glm.vec3(
+            math.cos(-rotation.x) * self.width,
+            math.sin(-rotation.x) * self.width,
+            0.0)
+        y_axis = glm.vec3(
+            math.sin(rotation.x) * self.depth,
+            math.cos(rotation.x) * self.depth,
+            0.0)
+        z_axis = glm.vec3(0.0, 0.0, self.height)
+
+        return [
+             x_axis + y_axis + z_axis,
+             x_axis - y_axis + z_axis,
+            -x_axis + y_axis + z_axis,
+            -x_axis - y_axis + z_axis,
+
+             x_axis + y_axis - z_axis,
+             x_axis - y_axis - z_axis,
+            -x_axis + y_axis - z_axis,
+            -x_axis - y_axis - z_axis
+        ]
+
 
 class Circle:
     def __init__(self, center_x, center_y, radius):

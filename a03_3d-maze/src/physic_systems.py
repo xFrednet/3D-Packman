@@ -38,6 +38,7 @@ class CollisionSystem(esper.Processor):
     detection on the x and y direction. 
     """
 
+
     def process(self):
         for hero_id, (hero_transformation, hero_velocity, hero_bounding_box, hero_collision) in self.world.get_components(
                 com.Transformation,
@@ -49,15 +50,7 @@ class CollisionSystem(esper.Processor):
             hero_confort_zone = hero_bounding_box.radius
 
             hero_rectangle = hero_bounding_box.shape
-            hero_min_x = hero_transformation.position.x + target_velocity.x + hero_rectangle.min_x()
-            hero_max_x = hero_transformation.position.x + target_velocity.x + hero_rectangle.max_x()
-            hero_min_y = hero_transformation.position.y + target_velocity.y + hero_rectangle.min_y()
-            hero_max_y = hero_transformation.position.y + target_velocity.y + hero_rectangle.max_y()
-            hero_max_z = hero_transformation.position.z + target_velocity.z + hero_rectangle.max_z()
-            hero_min_z = hero_transformation.position.z + target_velocity.z + hero_rectangle.min_z()
-            hero_collision.is_colliding_y = False
-            hero_collision.is_colliding_x = False
-            hero_collision.is_colliding_z = False
+            hero_target_pos = hero_transformation.position + target_velocity
 
             for villan_id, (villan_tranformation, villan_bounding_box) in self.world.get_components(
                     com.Transformation,
@@ -73,50 +66,37 @@ class CollisionSystem(esper.Processor):
                 if (glm.distance(villan_tranformation.position, villan_tranformation.position) > 
                         (hero_confort_zone + villan_bounding_box.radius)):
                     continue
-
-                # Positions
-                villan_min_x = villan_tranformation.position.x + villan_rectangle.min_x()
-                villan_max_x = villan_tranformation.position.x + villan_rectangle.max_x()
-                villan_min_y = villan_tranformation.position.y + villan_rectangle.min_y()
-                villan_max_y = villan_tranformation.position.y + villan_rectangle.max_y()
-                villan_min_z = villan_tranformation.position.z + villan_rectangle.min_z()
-                villan_max_z = villan_tranformation.position.z + villan_rectangle.max_z()
-
-                # Collision testing
-                if (hero_max_y < villan_min_y or
-                        hero_min_y >= villan_max_y):
+                
+                diff = glm.vec3(
+                    villan_tranformation.position.x - hero_target_pos.x,
+                    villan_tranformation.position.y - hero_target_pos.y,
+                    villan_tranformation.position.z - hero_target_pos.z
+                )
+                gap = glm.vec3(
+                    (hero_rectangle.width + villan_rectangle.width) - abs(diff.x),
+                    (hero_rectangle.depth + villan_rectangle.depth) - abs(diff.y),
+                    (hero_rectangle.height + villan_rectangle.height) - abs(diff.z)
+                )
+                
+                # One side is outside
+                if gap.x < 0.0 or gap.y < 0.0 or gap.z < 0.0:
                     continue
-                if (hero_max_x < villan_min_x or
-                        hero_min_x >= villan_max_x):
-                    continue
-                if (hero_max_z < villan_min_z or
-                        hero_min_z >= villan_max_z):
-                    continue
+                
+                old_diff = hero_transformation.position - villan_tranformation.position
 
-                # Find side
-                hero_min_x_old = hero_transformation.position.x + hero_rectangle.min_x()
-                hero_max_x_old = hero_transformation.position.x + hero_rectangle.max_x()
-                hero_min_y_old = hero_transformation.position.y + hero_rectangle.min_y()
-                hero_max_y_old = hero_transformation.position.y + hero_rectangle.max_y()
-                hero_min_z_old = hero_transformation.position.z + hero_rectangle.min_z()
-                hero_max_z_old = hero_transformation.position.z + hero_rectangle.max_z()
+                if gap.x <= gap.y and gap.x <= gap.z:
+                    offset = hero_rectangle.width + villan_rectangle.width
+                    hero_target_pos.x = villan_tranformation.position.x + math.copysign(offset, old_diff.x)
+                elif gap.y <= gap.z:
+                    offset = hero_rectangle.depth + villan_rectangle.depth
+                    hero_target_pos.y = villan_tranformation.position.y + math.copysign(offset, old_diff.y)
+                else:
+                    offset = hero_rectangle.height + villan_rectangle.height
+                    hero_target_pos.z = villan_tranformation.position.z + math.copysign(offset, old_diff.z)
 
-                if hero_max_y_old > villan_min_y and hero_min_y_old <= villan_max_y:
-                    if hero_min_x_old > villan_max_x and hero_min_x <= villan_max_x:
-                        hero_collision.is_colliding_x = True
-                    elif hero_max_x_old < villan_min_x and hero_max_x >= villan_min_x:
-                        hero_collision.is_colliding_x = True
-
-                if hero_max_x_old > villan_min_x and hero_min_x_old <= villan_max_x:
-                    if hero_min_y_old > villan_max_y and hero_min_y <= villan_max_y:
-                        hero_collision.is_colliding_y = True
-                    elif hero_max_y_old < villan_min_y and hero_max_y >= villan_min_y:
-                        hero_collision.is_colliding_y = True
-
-                if (hero_collision.is_colliding_x and
-                        hero_collision.is_colliding_y and
-                        hero_collision.is_colliding_z):
                     return
+
+            hero_velocity.value = (hero_target_pos - hero_transformation.position) / self.world.delta
 
 
 class VelocityToEntityAxis(esper.Processor):
