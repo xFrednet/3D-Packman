@@ -17,7 +17,7 @@ def unites(i, j, world, w, h, depth, model_id):
     cube = world.create_entity()
     world.add_component(cube, com.Model3D(model_id))
     world.add_component(cube, com.Transformation(
-        position=glm.vec3(i + w / 2, j + h / 2, 2.0),
+        position=glm.vec3(i + w / 2, j + h / 2, 0.0),
         scale=glm.vec3(float(w), float(h), depth)))
     world.add_component(cube, com.BoundingBox(com.Rectangle3D(float(w), float(h), depth)))
     world.add_component(cube, com.TransformationMatrix())

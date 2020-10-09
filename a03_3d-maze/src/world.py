@@ -19,7 +19,7 @@ class World(esper.World):
 
         self.resolution = resolution
         self.standard_shader = StandardShaderProgram()
-        self.delta = 0.0
+        self.delta = 0.00001
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
         self.controls = res.GameControlState()
         self.model_registry = res.ModelRegistry()
