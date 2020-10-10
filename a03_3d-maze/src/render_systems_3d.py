@@ -7,7 +7,7 @@ from esper import Processor
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 import components_3d as com
-import ressources as res
+import resources as res
 
 
 def add_3d_render_systems_to_world(world):

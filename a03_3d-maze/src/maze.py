@@ -7,7 +7,7 @@ import math
 import glm
 from vertex_buffer_array import StandardShaderVertexArray
 import components_3d as com
-import ressources as res
+import resources as res
 
 
 # TODO:
