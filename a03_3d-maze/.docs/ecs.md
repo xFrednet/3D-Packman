@@ -91,8 +91,8 @@ The system order is determined by the registration on the world instance. Our ga
 | 12    | `Start3DDrawSystem`               | Creates the `ViewMatrix`. Starts the 3D shader program and uploads the `ViewMatrix` and `LightSetup` as uniforms to the 3D shader.|
 | 13    | `StandardRenderSystem`            | This system renders all entities with a `StandardShaderVertexArray` component (It rebinds the VBO every time and is therefor not optimized for larger operations). <br>(`StandardShaderVertexArray` && `TransformationMatrix` && `ObjectMaterial`) |
 | 14    | `ModelRenderer`                   | This renders all entities with a `Model3D` reference. This is optimized to draw multiple entities without rebinding the VertexBufferArray.<br>(`Model3D` && `TransformationMatrix` && `ObjectMaterial`) |
-| 15    | `Stop3DDrawSystem`                |                |
-| 11    | `FinishFrameSystem`               |                |
+| 15    | `Stop3DDrawSystem`                | This stops the 3D shader program |
+| 16    | `FinishFrameSystem`               | This displays the content of the frame buffer  |
 
 ## Theoretical Multi-threading
 The execution order in ECS is very interesting to say the least. A system operates on one entity at a time and only on a few components of that entity. This basically screams multi threading at least in Rust <3. 
@@ -113,7 +113,7 @@ Systems are usually focussed on just one entity without effecting others. The `M
 A system could be executed for multiple entities at once. The movement of one entity doesn't effect the movement of a different entity (if the collision detection was calculated beforehand). The `MovementSystem` could therefore execute on all entities at once 
 
 ### Multi threading on different components
-Systems are usually focussed on just a small selection on components. This would in theory enable us to operate on different components of the same entity with different systems. This possibility is also one of the main aspects to thing of when designing components. We use a fictional example where we split up the `Transformation` class into the `Rotation` and `Position` with corresponding systems to modify them.
+Systems are usually focussed on just a small selection on components. This would in theory enable us to operate on different components of the same entity with different systems. This possibility is also one of the main aspects to think about when designing components. We use a fictional example where we split up the `Transformation` class into the `Rotation` and `Position` with corresponding systems to modify them.
 
 ```
    +--- [ MotionSystem ] ---+
@@ -121,5 +121,12 @@ Systems are usually focussed on just a small selection on components. This would
    +--- [RotationSystem] ---+
 ```
 
-## Limitations
+### Threading potential in our system
+Esper sadly doesn't support any multi-threading. We still created a simple overview of how our game could be multi-threaded without changing any system or component.
+![multi-threading potential](res/multi-threading_potential.png)
+
 ## Final thoughts
+### xFrednet
+I enjoyed working with this new architecture and adding some potential of reuse to the system. The potential of multi-threading and the different view of entities was and still is very intriguing for me. Working on this project has also enabled me to understand the architecture and systems that use this architecture better. (Examples are ) However, I noticed that I still spend a lot of time learning how to use this system properly. 
+
+ [Amethyst](https://amethyst.rs) with some additions from our own experience. A similar architecture is also used by the [Godot engine](https://godotengine.org)
