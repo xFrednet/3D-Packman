@@ -5,7 +5,7 @@ import pygame
 import pygame.locals
 
 import components_3d as com
-import ressources as res
+import resources as res
 
 def add_systems_1_to_world(world):
     world.add_processor(GameControlSystem())

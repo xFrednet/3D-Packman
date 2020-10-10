@@ -5,7 +5,7 @@ import pygame
 import pygame.locals
 
 import components_3d as com
-import ressources as res
+import resources as res
 
 
 def add_physics_systems_to_world(world):

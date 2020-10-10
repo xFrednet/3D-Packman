@@ -11,7 +11,7 @@ import physic_systems as psys
 import control_system as consys
 from maze import _setup_maze
 import components_3d as com
-import ressources as res
+import resources as res
 
 class World(esper.World):
     def __init__(self, resolution):
