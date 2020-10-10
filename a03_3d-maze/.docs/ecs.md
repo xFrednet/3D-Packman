@@ -71,29 +71,28 @@ Light(
 ```
 
 ## System order
-The system order is determined by the registration on the world instance. Our game has the following execution order.
+The system order is determined by the registration on the world instance. Our game has the following execution order:
 | Order | System                            | Responsibility |
 | ----: | --------------------------------- | -------------- |
 | ===== | **Game control**                  | ============== |
-| 1     | `GameControlSystem`               |                |
+| 1     | `GameControlSystem`               | This takes the player input and routes it to the player object or to the current camera. |
 | ===== | **Physics**                       | ============== |
-| 2     | `VelocityToEntityAxis`            |                |
-| 3     | `GravitySystem`                   |                |
-| 4     | `CollisionSystem`                 |                |
-| 5     | `MovementSystem`                  |                |
-| 6     | `GravitySystem`                   |                |
+| 2     | `VelocityToEntityAxis`            | This translates the xy-velocity from the world axis to the orientation of the object it self.<br> (`Transformation` &&`Velocity(along_world_axis==False)`) |
+| 3     | `GravitySystem`                   | This applies a gravity effect of _air_time² * 9.0_ <br> (`Velocity` && `PhysicsObject` && `CollisionComponent`) |
+| 4     | `CollisionSystem`                 | This checks if an entity with the `CollisionComponent` collides with a different `BoundingBox`. This is setup by a different sub query <br> (`Transformation` && `Velocity` && `BoundingBox` && `CollisionComponent`) |
+| 5     | `MovementSystem`                  | Applies the `Velocity` to the position <br>(`Transformation` && `Velocity`) |
 | ===== | **Cameras**                       | ============== |
-| 7     | `ThirdPersonCameraSystem`         |                |
-| 8     | `FreeCamOrientation`              |                |
+| 6     | `ThirdPersonCameraSystem`         | This translates the target position and rotation to the `CameraOrientation` component of the camera.<br> (`Transformation` && `CameraOrientation` && `ThirdPersonCamera`)|
+| 7     | `FreeCamOrientation`              | This translates the camera position and orientation into the `CameraOrientation` component of the camera.<br> (`Transformation` && `CameraOrientation` && `FreeCamera`) |
 | ===== | **Rendering**                     | ============== |
-| 9     | `PrepareFrameSystem`              |                |
-| 10    | `UpdateLightSetup`                |                |
-| 11    | `BuildTransformationMatrixSystem` |                |
-| 12    | `FinishFrameSystem`               |                |
-| 13    | `Start3DDrawSystem`               |                |
-| 14    | `StandardRenderSystem`            |                |
-| 15    | `ModelRenderer`                   |                |
-| 16    | `Stop3DDrawSystem`                |                |
+| 8     | `PrepareFrameSystem`              | This clears the screen and depth buffer |
+| 9     | `UpdateLightSetup`                | This loads the current lights into the `LightSetup` resource instance in the world.<br>(`Light` && `Transformation`)|
+| 10    | `BuildTransformationMatrixSystem` | This builds the transformation matrices for all entities that have a `TransformationMatrix`. <br>(`TransformationMatrix` && `Transformation`)|
+| 12    | `Start3DDrawSystem`               | Creates the `ViewMatrix`. Starts the 3D shader program and uploads the `ViewMatrix` and `LightSetup` as uniforms to the 3D shader.|
+| 13    | `StandardRenderSystem`            | This system renders all entities with a `StandardShaderVertexArray` component (It rebinds the VBO every time and is therefor not optimized for larger operations). <br>(`StandardShaderVertexArray` && `TransformationMatrix` && `ObjectMaterial`) |
+| 14    | `ModelRenderer`                   | This renders all entities with a `Model3D` reference. This is optimized to draw multiple entities without rebinding the VertexBufferArray.<br>(`Model3D` && `TransformationMatrix` && `ObjectMaterial`) |
+| 15    | `Stop3DDrawSystem`                |                |
+| 11    | `FinishFrameSystem`               |                |
 
 ## Theoretical Multi-threading
 The execution order in ECS is very interesting to say the least. A system operates on one entity at a time and only on a few components of that entity. This basically screams multi threading at least in Rust <3. 
