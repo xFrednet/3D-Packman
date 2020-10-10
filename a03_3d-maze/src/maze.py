@@ -2,16 +2,12 @@
 Python implementation of a maze generation algorithm:
 https://en.wikipedia.org/wiki/Maze_generation_algorithm
 """
-from random import randint, uniform
 import math
-import glm
-from vertex_buffer_array import StandardShaderVertexArray
+from random import randint
+
 import components_3d as com
+import glm
 import ressources as res
-
-
-# TODO:
-# minimap
 
 
 def unites(i, j, world, w, h, depth, model_id, diffuse):
@@ -31,7 +27,7 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
     maze = Maze(w=width, l=height)
     m = maze.generate_maze()
     y = 0
-    m[1][1] = False
+    m[1][1] = False  # always free
 
     # Le floor
     floor_size = glm.vec2(width * (wall_width + path_width) / 2, height * (wall_width + path_width) / 2)
@@ -48,7 +44,8 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
             specular=glm.vec3(0.2, 0.3, 0.6),
             shininess=6)
     )
-
+    empty_areas_loc = []
+    # i + w / 2, j + h / 2
     # Le Walls
     for i in range(len(m[0])):
         x = 0
@@ -57,7 +54,7 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
             h = wall_width
         else:
             h = path_width
-        
+
         shape_w = 0
         shape_x = 0
         has_shape = False
@@ -67,11 +64,9 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
                 w = wall_width
             else:
                 w = path_width
-            
             is_set = False
-            if (j < len(m[0])):
+            if j < len(m[0]):
                 is_set = m[i][j]
-
             if is_set:
                 if not has_shape:
                     has_shape = True
@@ -87,14 +82,15 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
                 unites(shape_x, y, world, shape_w, h, depth, model_id, diffuse)
                 has_shape = False
                 shape_w = 0
-
+            else:
+                empty_areas_loc.append([x, y])
             x += w
         y += h
-    return maze
+    return empty_areas_loc, maze.center
 
 
 class Maze:
-    def __init__(self, w=30, l=30, complexity=.75, density=.75):
+    def __init__(self, w=30, l=30, complexity=0.75, density=0.75):
         # min values for w and l are 6
         self.width = w
         self.height = l
@@ -111,11 +107,11 @@ class Maze:
         for a in range(self.shape[0]):
             arr = [False] * self.shape[0]
             m.append(arr)
-        # Make borders
+        # Le borders
         m[0] = m[len(m) - 1] = [True] * self.shape[0]
         for i in range(1, len(m) - 1):
             m[i][0] = m[i][len(m) - 1] = True
-        # Open cubes
+        # Le open cubes
         for _ in range(density):
             x, y = randint(0, self.shape[0] // 2) * 2, randint(0, self.shape[1] // 2) * 2
             m[y][x] = True

@@ -1,11 +1,8 @@
 import math
-import esper
-import glm
-import pygame
-import pygame.locals
 
 import components_3d as com
-import ressources as res
+import esper
+import glm
 
 
 def add_physics_systems_to_world(world):
@@ -22,19 +19,20 @@ class MovementSystem(esper.Processor):
             planned_velocity = velocity.value * self.world.delta
             transformation.position = transformation.position + planned_velocity
 
+
 class GravitySystem(esper.Processor):
     def process(self):
         for entity_id, (velocity, phys, collision) in self.world.get_components(
-                com.Velocity, 
+                com.Velocity,
                 com.PhysicsObject,
                 com.CollisionComponent):
-            if (collision.is_colliding_z):
+            if collision.is_colliding_z:
                 phys.air_time = 0.0
             else:
                 gravity = 9.0
-                old_grav = phys.air_time**2 * gravity
+                old_grav = phys.air_time ** 2 * gravity
                 phys.air_time += self.world.delta
-                new_grav = phys.air_time**2 * gravity
+                new_grav = phys.air_time ** 2 * gravity
                 velocity.value.z -= new_grav - old_grav
 
 
@@ -45,7 +43,11 @@ class CollisionSystem(esper.Processor):
     """
 
     def process(self):
-        for hero_id, (hero_transformation, hero_velocity, hero_bounding_box, hero_collision) in self.world.get_components(
+        for hero_id, (
+                hero_transformation,
+                hero_velocity,
+                hero_bounding_box,
+                hero_collision) in self.world.get_components(
                 com.Transformation,
                 com.Velocity,
                 com.BoundingBox,
@@ -68,14 +70,14 @@ class CollisionSystem(esper.Processor):
                 villan_rectangle = villan_bounding_box.shape
 
                 # Don't hit your self
-                if (villan_id == hero_id):
+                if villan_id == hero_id:
                     continue
-                
+
                 # Are they in each others confort zones?
-                if (glm.distance(villan_tranformation.position, villan_tranformation.position) > 
+                if (glm.distance(villan_tranformation.position, villan_tranformation.position) >
                         (hero_confort_zone + villan_bounding_box.radius)):
                     continue
-                
+
                 diff = glm.vec3(
                     villan_tranformation.position.x - hero_target_pos.x,
                     villan_tranformation.position.y - hero_target_pos.y,
@@ -88,13 +90,13 @@ class CollisionSystem(esper.Processor):
                 )
 
                 old_gap_x = (
-                    (hero_rectangle.width + villan_rectangle.width) - 
-                    abs(villan_tranformation.position.x - hero_transformation.position.x))
-                
+                        (hero_rectangle.width + villan_rectangle.width) -
+                        abs(villan_tranformation.position.x - hero_transformation.position.x))
+
                 # One side is outside
                 if gap.x < 0.0 or gap.y < 0.0 or gap.z < 0.0:
                     continue
-                
+
                 old_diff = hero_transformation.position - villan_tranformation.position
 
                 if gap.x <= gap.y and gap.x <= gap.z:
@@ -103,7 +105,7 @@ class CollisionSystem(esper.Processor):
                     hero_collision.is_colliding_x = True
                 elif gap.y <= gap.z:
                     if old_gap_x <= 0:
-                        continue 
+                        continue
                     offset = hero_rectangle.depth + villan_rectangle.depth
                     hero_target_pos.y = villan_tranformation.position.y + math.copysign(offset, old_diff.y)
                     hero_collision.is_colliding_y = True
@@ -111,7 +113,7 @@ class CollisionSystem(esper.Processor):
                     offset = hero_rectangle.height + villan_rectangle.height
                     hero_target_pos.z = villan_tranformation.position.z + math.copysign(offset, old_diff.z)
                     hero_collision.is_colliding_z = True
-            
+
             hero_velocity.value = (hero_target_pos - hero_transformation.position) / self.world.delta
 
 
@@ -120,7 +122,7 @@ class VelocityToEntityAxis(esper.Processor):
         for _id, (velocity, transformation) in self.world.get_components(com.Velocity, com.Transformation):
             if velocity.along_world_axis:
                 continue
-            
+
             rotation = transformation.rotation
             new_v = glm.vec3()
 

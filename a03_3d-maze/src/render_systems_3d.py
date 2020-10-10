@@ -1,13 +1,10 @@
-import math
-
 import components_3d as com
 import glm
+import ressources as res
 from OpenGL import GL as gl
 from esper import Processor
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
-import components_3d as com
-import ressources as res
 
 
 def add_3d_render_systems_to_world(world):
@@ -33,9 +30,9 @@ class UpdateLightSetup(Processor):
             light_setup.light_positions[index] = transformation.position
             light_setup.lights[index] = light
             index += 1
-            if (index >= res.LightSetup.MAX_LIGHT_COUNT):
+            if index >= res.LightSetup.MAX_LIGHT_COUNT:
                 break
-        
+
         light_setup.light_count = index
         self.world.light_setup = light_setup
 
@@ -106,24 +103,24 @@ class StandardRenderSystem(Processor):
             gl.glDisableVertexAttribArray(shader.NORMAL_ATTR)
             gl.glBindVertexArray(0)
 
+
 class ModelRenderer(Processor):
     def __init__(self):
         self.map = None
 
     def _create_model_registry(self):
         registry: res.ModelRegistry = self.world.model_registry
-        
+
         model_list = [[]] * registry.get_model_count()
-        
+
         for _id, (model, translation, material) in self.world.get_components(
                 com.Model3D,
                 com.TransformationMatrix,
                 com.ObjectMaterial):
-
             model_list[model.model_id].append((translation, material))
-        
+
         self.map = model_list
-    
+
     def process(self):
         # You should delete this command before you hand in the assignment
         shader: StandardShaderProgram = self.world.standard_shader
@@ -136,7 +133,7 @@ class ModelRenderer(Processor):
         for index in range(0, len(models)):
             if len(models[index]) == 0:
                 continue
-            
+
             vba = registry.get_model(index)
 
             # Bind buffers

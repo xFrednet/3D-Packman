@@ -6,7 +6,6 @@ class ObjLoader:
         self.get_values(filename, swapyz)
 
     def get_values(self, filename, swapyz):
-        faces = []
         for line in open(filename, "r"):
             if line.startswith('#'): continue
             values = line.split()
@@ -24,18 +23,28 @@ class ObjLoader:
             elif values[0] == 'f':
                 for v in values[1:]:
                     w = v.split('/')
-                    arr = [int(w[0]), int(w[2])]
-                    faces.append(arr)
-        self.faces = faces
+                    self.faces.append(int(w[0]))
+                    self.faces.append(int(w[2]))
 
     def get_obj(self):
-        return self.faces, self.vertices, self.normals
+        vertices = []
+        normals = []
+        for i in range(len(self.vertices)):
+            for j in range(len(self.vertices[i])):
+                vertices.append(self.vertices[i][j])
+        for i in range(len(self.normals)):
+            for j in range(len(self.normals[i])):
+                normals.append(self.normals[i][j])
+        return self.faces, vertices, normals
 
 
 if __name__ == '__main__':
     filename = 'male.obj'
     fil = ObjLoader(filename)
     obj = fil.get_obj()
+    print(obj[0])
+    print(obj[1])
+    print(obj[2])
 
 """
 v 1.405868 -0.033901 1.428365

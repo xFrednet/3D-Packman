@@ -1,17 +1,17 @@
-import esper
 import random
-import math
-import glm
 
-from shader_program import StandardShaderProgram
-from vertex_buffer_array import StandardShaderVertexArray
+import components_3d as com
+import control_system as consys
+import esper
+import glm
+import physic_systems as psys
 import render_systems as rsys
 import render_systems_3d as rsys3d
-import physic_systems as psys
-import control_system as consys
-from maze import _setup_maze
-import components_3d as com
 import ressources as res
+from maze import _setup_maze
+from shader_program import StandardShaderProgram
+from vertex_buffer_array import StandardShaderVertexArray
+
 
 class World(esper.World):
     def __init__(self, resolution):
@@ -26,7 +26,6 @@ class World(esper.World):
         self.camera_id = 0
         self.view_matrix = glm.mat4(1.0)
         self.maze = _setup_maze(self, 30, 30, depth=1.5)
-
         self._setup_systems()
         self._setup_entities()
         self.update_resolution(resolution)
@@ -83,26 +82,45 @@ class World(esper.World):
                 color=glm.vec3(0.6, 0.3, 1.2),
                 attenuation=glm.vec3(0.1, 0.0, 1.0))
         )
+        # ghost
+        ghosts = len(self.maze[0]) // 10
+        if ghosts < 5:
+            ghosts = 5
+        for i in range(ghosts):
+            coord = random.randint(0, len(self.maze[0]) - 1)
+            r = random.random()
+            g = random.random()
+            b = random.random()
+            x, y = self.maze[0][coord]
+            self.ghost = self.create_entity(
+                com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
+                com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0)),
+                com.TransformationMatrix(),
+                com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
+                com.Velocity(along_world_axis=False),
+                com.BoundingBox(com.Rectangle3D(1, 1, 1)),
+                com.CollisionComponent(),
+                com.PhysicsObject()
+            )
 
         self.player_cam = self.create_entity(
-                com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
-                com.CameraOrientation(),
-                com.Transformation()
-            )
-        
+            com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
+            com.CameraOrientation(),
+            com.Transformation()
+        )
+
         self.create_entity(
-            com.Transformation(position=glm.vec3(self.maze.center.x, self.maze.center.y, 10.0)),
+            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 10.0)),
             com.Light(
                 color=glm.vec3(0.7, 0.6, 0.6)))
         self.free_cam = self.create_entity(
-                com.Transformation(glm.vec3(0.0, 10.0, 5.0)),
-                com.Velocity(along_world_axis=False),
-                com.FreeCamera(),
-                com.CameraOrientation(),
-                com.Home(z=5.0))
-            
-        self.camera_id = self.player_cam
+            com.Transformation(glm.vec3(0.0, 10.0, 5.0)),
+            com.Velocity(along_world_axis=False),
+            com.FreeCamera(),
+            com.CameraOrientation(),
+            com.Home(z=5.0))
 
+        self.camera_id = self.player_cam
 
     def update_resolution(self, resolution):
         self.resolution = resolution
