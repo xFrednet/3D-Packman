@@ -127,6 +127,9 @@ Esper sadly doesn't support any multi-threading. We still created a simple overv
 
 ## Final thoughts
 ### xFrednet
-I enjoyed working with this new architecture and adding some potential of reuse to the system. The potential of multi-threading and the different view of entities was and still is very intriguing for me. Working on this project has also enabled me to understand the architecture and systems that use this architecture better. (Examples are ) However, I noticed that I still spend a lot of time learning how to use this system properly. 
+I enjoyed working with this new architecture and adding some potential of reuse to the system. The potential of multi-threading and the different view of entities was and still is very intriguing for me. Working on this project has also enabled me to understand the architecture and systems that use this architecture better. (Examples are [Godot](https://godotengine.org) and [Amethyst](https://amethyst.rs) and other data driven systems.)
 
- [Amethyst](https://amethyst.rs) with some additions from our own experience. A similar architecture is also used by the [Godot engine](https://godotengine.org)
+However, I noticed that I still spend a lot of time learning how to use this system properly. And that is also my main complaint about the system. Well that and the performance. I have the feeling that Esper is quite performance intensive due to the continues query and no use of multi-threading. The architecture we used seems also a bit overkill for the size of the project.
+
+All of that being said. Would I use a ECS again? Yes definitely. I'm used to programming games and I always end up at a point where I need some code in several objects with different types. This architecture solves this problem completely. But it also has it mentioned down sides and it's more complicated for other team members as well :) 
+
