@@ -1,16 +1,14 @@
+import components_3d as com
 import glm
 import pygame.locals
-
 from vertex_buffer_array import StandardShaderVertexArray
 
-import components_3d as com
+"""
+Resources are data objects that only get initiated by the world as world variables
+"""
 
-"""
-Ressources are data objects that only get initiated by the world as world variables
-"""
 
 class GameControlState:
-
     FREE_CAM_MODE = 1
     PLAYER_MODE = 0
 
@@ -38,9 +36,10 @@ class LightSetup:
         self.camera_position = glm.vec3()
         self.light_count = 0
 
-class ModelRegistry:
 
+class ModelRegistry:
     CUBE = "cube"
+    FILENAME = 'myObj.obj'
 
     def __init__(self):
         self._index = 0
@@ -48,7 +47,7 @@ class ModelRegistry:
         self._model_registry = []
 
         self._load_default_models()
-    
+
     def _load_default_models(self):
         self.add(ModelRegistry.CUBE, StandardShaderVertexArray.create_cube())
 
@@ -58,7 +57,7 @@ class ModelRegistry:
 
         self._name_registry[name] = index
         self._model_registry.append(model)
-    
+
     def get_model_id(self, name):
         return self._name_registry[name]
 
