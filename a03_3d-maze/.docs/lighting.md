@@ -1,7 +1,7 @@
 # Lighting
 
 ## Lighting components
-The required lighting information is stored within the game as a part of the [ECT](.docs/ecs.md). The main components needed for the lighting setup are:
+The required lighting information is stored within the game as a part of the [ECT](ecs.md). The main components needed for the lighting setup are:
 
 | Component      | Responsibility                                                          |
 | -------------- | ----------------------------------------------------------------------- |
