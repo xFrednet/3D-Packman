@@ -1,6 +1,5 @@
-import pygame
 import glm
-
+import pygame
 from world import World
 
 RESOLUTION = 1024, 720
@@ -11,7 +10,7 @@ def game_loop(world):
     clock = pygame.time.Clock()
     last_millis = pygame.time.get_ticks()
 
-    while True:
+    while world.running:
         # Delta timing. See https://en.wikipedia.org/wiki/Delta_timing
         # Trust me, this gets important in larger games
         # Pygame implementation stolen from:
@@ -39,7 +38,7 @@ def main():
     pygame.display.init()
     pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF | pygame.OPENGL)
     pygame.display.set_caption("Le 3D maze of time")
-
+    running = True
     world = World(glm.vec2(RESOLUTION))
 
     game_loop(world)

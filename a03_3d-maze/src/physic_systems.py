@@ -10,18 +10,15 @@ def add_physics_systems_to_world(world):
     world.add_processor(GravitySystem())
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
-    world.add_processor(GameLogicSystem())
+    world.add_processor(GhostSystem())
 
 
-class GameLogicSystem(esper.Processor):
+class GhostSystem(esper.Processor):
     def process(self):
-        for entity_id, (phys,
-                        collision,
-                        velocity) in \
-                self.world.get_components(com.PhysicsObject,
-                                          com.CollisionComponent,
-                                          com.Velocity):
-            pass
+        for e_id, (ghost_col, ghost, velocity) in self.world.get_components(com.CollisionComponent, com.Ghost,
+                                                                            com.Velocity):
+            if self.world.player_object in ghost_col.failed:
+                self.world.damage_player()
 
 
 class MovementSystem(esper.Processor):
@@ -106,7 +103,7 @@ class CollisionSystem(esper.Processor):
                 # One side is outside
                 if gap.x < 0.0 or gap.y < 0.0 or gap.z < 0.0: continue
                 # Has collided and append
-                if villain_id is not 1:
+                if not villain_id == 1:
                     hero_collision.failed.append(villain_id)
 
                 old_diff = hero_transformation.position - villain_transformation.position
