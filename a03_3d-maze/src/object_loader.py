@@ -1,5 +1,6 @@
 from vertex_buffer_array import StandardShaderVertexArray
 
+
 class ObjLoader:
     def __init__(self, filename, swapyz=False):
         self.vertices = []
@@ -27,7 +28,6 @@ class ObjLoader:
                     w = v.split('/')
                     self.faces.append([int(w[0]) - 1, int(w[2]) - 1])
 
-
     def get_obj(self):
         normals = []
         vertices = []
@@ -37,7 +37,6 @@ class ObjLoader:
                 vertices.append(self.vertices[index][j])
             for j in range(3):
                 normals.append(self.normals[face[1]][j])
-
 
         vba = StandardShaderVertexArray(len(self.faces))
         vba.load_position_data(vertices)
@@ -49,6 +48,3 @@ if __name__ == '__main__':
     filename = 'myObj.obj'
     fil = ObjLoader(filename)
     obj = fil.get_obj()
-
-
-

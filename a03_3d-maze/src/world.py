@@ -9,9 +9,9 @@ import render_systems as rsys
 import render_systems_3d as rsys3d
 import resources as res
 from maze import _setup_maze
+from object_loader import ObjLoader
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
-from object_loader import ObjLoader
 
 
 class World(esper.World):
@@ -19,6 +19,7 @@ class World(esper.World):
         super().__init__()
 
         self.resolution = resolution
+        self.life = 3
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
@@ -69,11 +70,19 @@ class World(esper.World):
     def _setup_entities(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...
         # WTF. I'm always amazed by the comments I leave in my code. ~xFrednet 2020.09.23
+        color = 0
+        if self.life == 2:
+            color = 1
+        elif self.life == 1:
+            color = 0.7
+        else:
+            color = 1.0
+
         self.player_object = self.create_entity(
             com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
             com.Transformation(position=glm.vec3(2.0, 2.0, 2.0)),
             com.TransformationMatrix(),
-            com.ObjectMaterial(diffuse=glm.vec3(1.0, 0.0, 0.0)),
+            com.ObjectMaterial(diffuse=glm.vec3(color, 0.0, 0.0)),
             com.Velocity(along_world_axis=False),
             com.Home(x=2.0, y=2.0, z=2.0),
             com.BoundingBox(com.Rectangle3D(1, 1, 1)),
@@ -84,7 +93,7 @@ class World(esper.World):
                 attenuation=glm.vec3(0.1, 0.0, 1.0))
         )
         # ghost
-        ghosts = min((len(self.maze[0]) // 10), self.light_setup.MAX_LIGHT_COUNT-2)
+        ghosts = min((len(self.maze[0]) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
         if ghosts < 5:
             ghosts = 5
         for i in range(ghosts):
@@ -94,8 +103,8 @@ class World(esper.World):
             b = random.random()
             x, y = self.maze[0][coord]
             self.ghost = self.create_entity(
-                ObjLoader('myObj.obj').get_obj(),
-                com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0)),
+                ObjLoader(res.ModelRegistry.FILENAME).get_obj(),
+                com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0), scale=glm.vec3(2, 2, 2)),
                 com.TransformationMatrix(),
                 com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
                 com.Velocity(along_world_axis=True),

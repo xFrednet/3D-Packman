@@ -39,6 +39,7 @@ class LightSetup:
 
 class ModelRegistry:
     CUBE = "cube"
+    FILENAME = 'myObj.obj'
 
     def __init__(self):
         self._index = 0

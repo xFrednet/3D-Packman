@@ -12,11 +12,16 @@ class Velocity:
         self.along_world_axis = along_world_axis
 
 
+class Ghost:
+    pass
+
+
 class CollisionComponent:
     def __init__(self):
         self.is_colliding_y = False
         self.is_colliding_x = False
         self.is_colliding_z = False
+        self.failed = []
 
 
 class PhysicsObject:
@@ -62,8 +67,7 @@ class CameraOrientation:
 
 
 class FreeCamera:
-    def __init__(self, position=glm.vec3()):
-        self.position = position
+    pass
 
 
 class ThirdPersonCamera:
@@ -86,7 +90,7 @@ class Rectangle3D:
     """
     This should not be rotated or scaled. Top view:
     
-     width (x axis)
+    width (x axis)
     #######
     #  1  # depth (y axis)
     #######
