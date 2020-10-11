@@ -98,14 +98,26 @@ class World(esper.World):
             self.ghost = self.create_entity(
                 com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.GHOST)),
                 com.Ghost(),
-                com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0), scale=glm.vec3(2, 2, 2)),
+                com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0), scale=glm.vec3(2.0, 2.0, 2.0)),
                 com.TransformationMatrix(),
                 com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
                 com.Velocity(along_world_axis=True),
-                com.BoundingBox(com.Rectangle3D(1, 1, 1)),
+                com.BoundingBox(com.Rectangle3D(2, 2, 2)),
                 com.CollisionComponent(),
                 com.PhysicsObject()
             )
+
+        self.win_object = self.create_entity(
+            com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
+            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 1.0), scale=glm.vec3(2.0, 2.0, 3.0)),
+            com.Win(),
+            com.TransformationMatrix(),
+            com.ObjectMaterial(diffuse=glm.vec3(0.0, 0.0, 0.0)),
+            com.Velocity(along_world_axis=False),
+            com.BoundingBox(com.Rectangle3D(2, 2, 2.0)),
+            com.CollisionComponent(),
+            com.PhysicsObject()
+        )
 
         self.player_cam = self.create_entity(
             com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
@@ -145,6 +157,11 @@ class World(esper.World):
             print(f'You have {self.life} live left!')
         else:
             print(f'You have {self.life} lives left!')
+
+    def won_game(self):
+        print('YOu Won The Game!')
+        time.sleep(3)
+        self.running = False
 
     def update_resolution(self, resolution):
         self.resolution = resolution

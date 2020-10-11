@@ -11,6 +11,14 @@ def add_physics_systems_to_world(world):
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
     world.add_processor(GhostSystem())
+    world.add_processor(WinSystem())
+
+
+class WinSystem(esper.Processor):
+    def process(self):
+        for e_id, (col, win) in self.world.get_components(com.CollisionComponent, com.Win):
+            if self.world.player_object in col.failed:
+                self.world.won_game()
 
 
 class GhostSystem(esper.Processor):
