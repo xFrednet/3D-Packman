@@ -101,7 +101,7 @@ class World(esper.World):
                 com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0), scale=glm.vec3(2.0, 2.0, 2.0)),
                 com.TransformationMatrix(),
                 com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
-                com.Velocity(along_world_axis=True),
+                com.Velocity(random.uniform(-1, 1), random.uniform(-1, 1), 0, along_world_axis=True),
                 com.BoundingBox(com.Rectangle3D(2, 2, 2)),
                 com.CollisionComponent(),
                 com.PhysicsObject()

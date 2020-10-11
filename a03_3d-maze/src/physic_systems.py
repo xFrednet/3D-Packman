@@ -3,6 +3,7 @@ import math
 import components_3d as com
 import esper
 import glm
+import random as rand
 
 
 def add_physics_systems_to_world(world):
@@ -22,11 +23,17 @@ class WinSystem(esper.Processor):
 
 
 class GhostSystem(esper.Processor):
+    SPEED = 5.0
     def process(self):
         for e_id, (ghost_col, ghost, velocity) in self.world.get_components(com.CollisionComponent, com.Ghost,
                                                                             com.Velocity):
             if self.world.player_object in ghost_col.failed:
                 self.world.damage_player()
+
+            if ghost_col.is_colliding_y or ghost_col.is_colliding_x:
+                velocity.value = glm.normalize(
+                    glm.vec3(rand.uniform(-1.0, 1.0), rand.uniform(-1.0, 1.0), 0.0)
+                ) * GhostSystem.SPEED
 
 
 class MovementSystem(esper.Processor):
