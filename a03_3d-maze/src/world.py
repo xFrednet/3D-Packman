@@ -29,8 +29,10 @@ class World(esper.World):
         self.camera_id = 0
         self.view_matrix = glm.mat4(1.0)
         self.maze = _setup_maze(self, 30, 30, depth=1.5)
+        
         self._setup_systems()
         self._setup_entities()
+        self._setup_level_objects()
         self.update_resolution(resolution)
 
     def cleanup(self):
@@ -73,7 +75,9 @@ class World(esper.World):
         # WTF. I'm always amazed by the comments I leave in my code. ~xFrednet 2020.09.23
         self.player_object = self.create_entity(
             com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
-            com.Transformation(position=glm.vec3(2.0, 2.0, 2.0)),
+            com.Transformation(
+                position=glm.vec3(2.0, 2.0, 2.0),
+                rotation=glm.vec3(0.0, 0.0, 0.0)),
             com.TransformationMatrix(),
             com.ObjectMaterial(diffuse=glm.vec3(0.3 * self.life, 0.0, 0.0)),
             com.Velocity(along_world_axis=False),
@@ -85,6 +89,29 @@ class World(esper.World):
                 color=glm.vec3(0.6, 0.3, 1.2),
                 attenuation=glm.vec3(0.1, 0.0, 1.0))
         )
+        
+        self.player_cam = self.create_entity(
+            com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
+            com.CameraOrientation(),
+            com.Transformation()
+        )
+
+        self.free_cam = self.create_entity(
+            com.Transformation(position=glm.vec3(0.0, 10.0, 5.0), rotation=glm.vec3()),
+            com.Velocity(along_world_axis=False),
+            com.FreeCamera(),
+            com.CameraOrientation(),
+            com.Home(z=5.0))
+
+        self.camera_id = self.player_cam
+    
+    def _setup_level_objects(self):
+        # Central light
+        self.create_entity(
+            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 10.0)),
+            com.Light(
+                color=glm.vec3(0.4, 0.3, 0.3)))
+
         # ghost
         ghosts = min((len(self.maze[0]) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
         if ghosts < 5:
@@ -109,40 +136,22 @@ class World(esper.World):
 
         self.win_object = self.create_entity(
             com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
-            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 1.0), scale=glm.vec3(2.0, 2.0, 3.0)),
+            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 1.0), scale=glm.vec3(0.5, 0.5, 0.5)),
             com.Win(),
             com.TransformationMatrix(),
-            com.ObjectMaterial(diffuse=glm.vec3(0.0, 0.0, 0.0)),
+            com.ObjectMaterial(diffuse=glm.vec3(0.5, 0.5, 0.5)),
             com.Velocity(along_world_axis=False),
-            com.BoundingBox(com.Rectangle3D(2, 2, 2.0)),
+            com.BoundingBox(com.Rectangle3D(0.5, 0.5, 0.5)),
             com.CollisionComponent(),
-            com.PhysicsObject()
-        )
-
-        self.player_cam = self.create_entity(
-            com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
-            com.CameraOrientation(),
-            com.Transformation()
-        )
-
-        self.create_entity(
-            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 10.0)),
             com.Light(
-                color=glm.vec3(0.7, 0.6, 0.6)))
-        self.free_cam = self.create_entity(
-            com.Transformation(glm.vec3(0.0, 10.0, 5.0)),
-            com.Velocity(along_world_axis=False),
-            com.FreeCamera(),
-            com.CameraOrientation(),
-            com.Home(z=5.0))
-
-        self.camera_id = self.player_cam
+                color=glm.vec3(1.0, 0.8, 0.0),
+                attenuation=glm.vec3(0.35, -0.36, 0.1))
+        )
 
     def damage_player(self):
         self.life -= 1
-        self.component_for_entity(self.player_object, com.ObjectMaterial).diffuse = glm.vec3(0.3 * self.life,
-                                                                                             0.0,
-                                                                                             0.0)
+        self.component_for_entity(self.player_object, com.ObjectMaterial).diffuse = \
+            glm.vec3(0.3 * self.life, 0.0, 0.0)
         for _id, (home, transformation, velocity) in self.get_components(
                 com.Home,
                 com.Transformation,

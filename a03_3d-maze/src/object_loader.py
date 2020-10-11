@@ -1,26 +1,26 @@
 from vertex_buffer_array import StandardShaderVertexArray
-
+import sys
 
 class ObjLoader:
-    def __init__(self, filename, swapyz=False):
+    def __init__(self, filename, swap_yz=False):
         self.vertices = []
         self.normals = []
         self.faces = []
-        self.get_values(filename, swapyz)
+        self.get_values(filename, swap_yz)
 
-    def get_values(self, filename, swapyz):
-        for line in open(filename, "r"):
+    def get_values(self, filename, swap_yz):
+        for line in open(sys.path[0] + "/" + filename, "r"):
             if line.startswith('#'): continue
             values = line.split()
             if not values: continue
             if values[0] == 'v':
                 v = list(map(float, values[1:4]))
-                if swapyz:
+                if swap_yz:
                     v = [v[0], v[2], v[1]]
                 self.vertices.append(v)
             elif values[0] == 'vn':
                 v = list(map(float, values[1:4]))
-                if swapyz:
+                if swap_yz:
                     v = [v[0], v[2], v[1]]
                 self.normals.append(v)
             elif values[0] == 'f':

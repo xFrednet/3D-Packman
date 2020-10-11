@@ -40,7 +40,7 @@ class LightSetup:
 
 class ModelRegistry:
     CUBE = "cube"
-    GHOST = 'myObj.obj'
+    GHOST = "ghost"
 
     def __init__(self):
         self._index = 0
@@ -51,7 +51,7 @@ class ModelRegistry:
 
     def _load_default_models(self):
         self.add(ModelRegistry.CUBE, StandardShaderVertexArray.create_cube())
-        self.add(ModelRegistry.GHOST, ObjLoader('myObj.obj').get_obj())
+        self.add(ModelRegistry.GHOST, ObjLoader("my_obj.obj").get_obj())
 
     def add(self, name, model):
         index = self._index
