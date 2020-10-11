@@ -16,6 +16,10 @@ class Ghost:
     pass
 
 
+class Win:
+    pass
+
+
 class CollisionComponent:
     def __init__(self):
         self.is_colliding_y = False

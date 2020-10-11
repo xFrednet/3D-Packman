@@ -3,6 +3,7 @@ import math
 import components_3d as com
 import esper
 import glm
+import random as rand
 
 
 def add_physics_systems_to_world(world):
@@ -10,18 +11,29 @@ def add_physics_systems_to_world(world):
     world.add_processor(GravitySystem())
     world.add_processor(CollisionSystem())
     world.add_processor(MovementSystem())
-    world.add_processor(GameLogicSystem())
+    world.add_processor(GhostSystem())
+    world.add_processor(WinSystem())
 
 
-class GameLogicSystem(esper.Processor):
+class WinSystem(esper.Processor):
     def process(self):
-        for entity_id, (phys,
-                        collision,
-                        velocity) in \
-                self.world.get_components(com.PhysicsObject,
-                                          com.CollisionComponent,
-                                          com.Velocity):
-            pass
+        for e_id, (col, win) in self.world.get_components(com.CollisionComponent, com.Win):
+            if self.world.player_object in col.failed:
+                self.world.won_game()
+
+
+class GhostSystem(esper.Processor):
+    SPEED = 5.0
+    def process(self):
+        for e_id, (ghost_col, ghost, velocity) in self.world.get_components(com.CollisionComponent, com.Ghost,
+                                                                            com.Velocity):
+            if self.world.player_object in ghost_col.failed:
+                self.world.damage_player()
+
+            if ghost_col.is_colliding_y or ghost_col.is_colliding_x:
+                velocity.value = glm.normalize(
+                    glm.vec3(rand.uniform(-1.0, 1.0), rand.uniform(-1.0, 1.0), 0.0)
+                ) * GhostSystem.SPEED
 
 
 class MovementSystem(esper.Processor):
@@ -106,7 +118,7 @@ class CollisionSystem(esper.Processor):
                 # One side is outside
                 if gap.x < 0.0 or gap.y < 0.0 or gap.z < 0.0: continue
                 # Has collided and append
-                if villain_id is not 1:
+                if not villain_id == 1:
                     hero_collision.failed.append(villain_id)
 
                 old_diff = hero_transformation.position - villain_transformation.position

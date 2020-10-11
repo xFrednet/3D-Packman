@@ -109,7 +109,9 @@ class ModelRenderer(Processor):
     def _create_model_registry(self):
         registry: res.ModelRegistry = self.world.model_registry
 
-        model_list = [[]] * registry.get_model_count()
+        model_list = []
+        for index in range(registry.get_model_count()):
+            model_list.append([])
 
         for _id, (model, translation, material) in self.world.get_components(
                 com.Model3D,
