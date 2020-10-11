@@ -77,7 +77,7 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
                 diffuse = glm.vec3(
                     shape_x / floor_size.x,
                     y / floor_size.y,
-                    math.sin(y / 10.0)
+                    abs(math.cos(y / 10.0))
                 )
                 unites(shape_x, y, world, shape_w, h, depth, model_id, diffuse)
                 has_shape = False
