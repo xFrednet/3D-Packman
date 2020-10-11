@@ -1,5 +1,6 @@
 import components_3d as com
 import glm
+from object_loader import ObjLoader
 import pygame.locals
 from vertex_buffer_array import StandardShaderVertexArray
 
@@ -39,7 +40,7 @@ class LightSetup:
 
 class ModelRegistry:
     CUBE = "cube"
-    FILENAME = 'myObj.obj'
+    GHOST = 'myObj.obj'
 
     def __init__(self):
         self._index = 0
@@ -50,6 +51,7 @@ class ModelRegistry:
 
     def _load_default_models(self):
         self.add(ModelRegistry.CUBE, StandardShaderVertexArray.create_cube())
+        self.add(ModelRegistry.GHOST, ObjLoader('myObj.obj').get_obj())
 
     def add(self, name, model):
         index = self._index
