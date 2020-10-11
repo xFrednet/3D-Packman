@@ -1,5 +1,7 @@
-import glm
 import math
+
+import glm
+
 
 #
 # Object physics
@@ -15,6 +17,7 @@ class CollisionComponent:
         self.is_colliding_y = False
         self.is_colliding_x = False
         self.is_colliding_z = False
+
 
 class PhysicsObject:
     def __init__(self):
@@ -43,6 +46,7 @@ class Transformation:
         self.scale = scale
         self.rotation = rotation
 
+
 class TransformationMatrix:
     def __init__(self):
         self.value = glm.mat4x4(1.0)
@@ -58,7 +62,8 @@ class CameraOrientation:
 
 
 class FreeCamera:
-    pass
+    def __init__(self, position=glm.vec3()):
+        self.position = position
 
 
 class ThirdPersonCamera:
@@ -75,6 +80,7 @@ class BoundingBox:
     def __init__(self, shape):
         self.shape = shape
         self.radius = shape.get_radius()
+
 
 class Rectangle3D:
     """
@@ -110,9 +116,10 @@ class Rectangle3D:
 
     def max_z(self):
         return self.height
-    
+
     def get_radius(self):
         return math.sqrt(self.width ** 2 + self.depth ** 2 + self.height ** 2)
+
 
 #    def get_corners(self, rotation):
 #        x_axis = glm.vec3(
@@ -150,6 +157,7 @@ class Circle:
 class Model3D:
     def __init__(self, model_id):
         self.model_id = model_id
+
 
 class ObjectMaterial:
     def __init__(self,
