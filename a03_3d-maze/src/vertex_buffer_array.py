@@ -90,12 +90,12 @@ class StandardShaderVertexArray(VertexBufferArray):
 
         # Mapping indices
         sides = [
-            [0, 2, 1, 1, 2, 3],  # Bottom
+            [2, 0, 1, 2, 1, 3],  # Bottom
             [4, 6, 5, 5, 6, 7],  # Top
             [2, 3, 7, 6, 2, 7],  # Front
-            [5, 4, 0, 5, 0, 1],  # Back
-            [6, 4, 0, 2, 0, 6],  # Left
-            [7, 5, 3, 5, 3, 1]   # Right
+            [4, 5, 0, 0, 5, 1],  # Back
+            [6, 4, 0, 0, 2, 6],  # Left
+            [5, 7, 3, 5, 3, 1]   # Right
         ]
 
         # Mapping
