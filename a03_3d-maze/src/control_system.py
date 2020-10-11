@@ -149,8 +149,8 @@ class ThirdPersonCameraSystem(esper.Processor):
 
             dir_height = math.sin(pitch)
             dir_vec = glm.vec3(
-                math.sin(yaw) * (1.0 - abs(dir_height)),
                 math.cos(yaw) * (1.0 - abs(dir_height)),
+                math.sin(yaw) * (1.0 - abs(dir_height)),
                 dir_height
             )
 
@@ -166,7 +166,7 @@ class FreeCamOrientation(esper.Processor):
                 com.FreeCamera):
             height = math.sin(transformation.rotation.y)
             orientation.look_at = transformation.position + glm.vec3(
-                math.sin(transformation.rotation.x) * (1.0 - abs(height)),
                 math.cos(transformation.rotation.x) * (1.0 - abs(height)),
+                math.sin(transformation.rotation.x) * (1.0 - abs(height)),
                 height
             )

@@ -138,11 +138,11 @@ class VelocityToEntityAxis(esper.Processor):
             rotation = transformation.rotation
             new_v = glm.vec3()
 
-            new_v.x += math.sin(rotation.x) * velocity.value.y
-            new_v.y += math.cos(rotation.x) * velocity.value.y
+            new_v.x += math.cos(rotation.x) * velocity.value.y
+            new_v.y += math.sin(rotation.x) * velocity.value.y
 
-            new_v.x += math.cos(-rotation.x) * velocity.value.x
-            new_v.y += math.sin(-rotation.x) * velocity.value.x
+            new_v.x += math.sin(-rotation.x) * velocity.value.x
+            new_v.y += math.cos(-rotation.x) * velocity.value.x
 
             new_v.z = velocity.value.z
 
