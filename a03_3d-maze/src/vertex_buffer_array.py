@@ -1,10 +1,7 @@
 import ctypes
 
 from OpenGL import GL as gl
-from object_loader import ObjLoader
 from shader_program import StandardShaderProgram
-
-FILENAME = 'male.obj'
 
 
 class VertexBufferArray:
@@ -12,8 +9,7 @@ class VertexBufferArray:
         self.vertex_array_id = gl.glGenVertexArrays(1)
         self.vertex_count = vertex_count
         self.__vertex_buffer = []
-        fil = ObjLoader(FILENAME)
-        self.obj = fil.get_obj()
+        self.__obj_vertex_buffer = []
 
     def cleanup(self):
         for vb in self.__vertex_buffer:
@@ -65,14 +61,6 @@ class StandardShaderVertexArray(VertexBufferArray):
     def load_normal_data(self, data):
         self._load_vertex_buffer_f(StandardShaderProgram.NORMAL_ATTR, data, 3)
 
-    def load_obj(self):
-        le = len(self.obj[0])
-        vertices = self.obj[1]
-        normals = self.obj[2]
-        vba = StandardShaderVertexArray(le * le)
-        vba.load_position_data(vertices)
-        vba.load_normal_data(normals)
-
     @staticmethod
     def create_cube():
         # vertices:
@@ -107,7 +95,7 @@ class StandardShaderVertexArray(VertexBufferArray):
             [2, 3, 7, 6, 2, 7],  # Front
             [5, 4, 0, 5, 0, 1],  # Back
             [6, 4, 0, 2, 0, 6],  # Left
-            [7, 5, 3, 5, 3, 1]  # Right
+            [7, 5, 3, 5, 3, 1]   # Right
         ]
 
         # Mapping

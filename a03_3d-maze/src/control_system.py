@@ -102,10 +102,11 @@ class GameControlSystem(esper.Processor):
             velocity.value.y = 0.0
 
         if vertical_movement:
+            velocity.value.z = 0
             if keys[pygame.locals.K_SPACE]:
-                velocity.value.z = vertical_speed
+                velocity.value.z += vertical_speed
             if keys[pygame.locals.K_LSHIFT]:
-                velocity.value.z = vertical_speed
+                velocity.value.z -= vertical_speed
 
     def _arrow_key_rotation(self, entity_id):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)

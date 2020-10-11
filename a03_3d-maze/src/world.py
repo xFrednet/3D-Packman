@@ -11,6 +11,7 @@ import ressources as res
 from maze import _setup_maze
 from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
+from object_loader import ObjLoader
 
 
 class World(esper.World):
@@ -83,7 +84,7 @@ class World(esper.World):
                 attenuation=glm.vec3(0.1, 0.0, 1.0))
         )
         # ghost
-        ghosts = len(self.maze[0]) // 10
+        ghosts = min((len(self.maze[0]) // 10), self.light_setup.MAX_LIGHT_COUNT-2)
         if ghosts < 5:
             ghosts = 5
         for i in range(ghosts):
@@ -93,11 +94,11 @@ class World(esper.World):
             b = random.random()
             x, y = self.maze[0][coord]
             self.ghost = self.create_entity(
-                com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
+                ObjLoader('myObj.obj').get_obj(),
                 com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0)),
                 com.TransformationMatrix(),
                 com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
-                com.Velocity(along_world_axis=False),
+                com.Velocity(along_world_axis=True),
                 com.BoundingBox(com.Rectangle3D(1, 1, 1)),
                 com.CollisionComponent(),
                 com.PhysicsObject()

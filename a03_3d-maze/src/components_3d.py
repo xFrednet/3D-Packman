@@ -62,7 +62,8 @@ class CameraOrientation:
 
 
 class FreeCamera:
-    pass
+    def __init__(self, position=glm.vec3()):
+        self.position = position
 
 
 class ThirdPersonCamera:
