@@ -9,6 +9,7 @@ class VertexBufferArray:
         self.vertex_array_id = gl.glGenVertexArrays(1)
         self.vertex_count = vertex_count
         self.__vertex_buffer = []
+        self.__obj_vertex_buffer = []
 
     def cleanup(self):
         for vb in self.__vertex_buffer:
@@ -68,15 +69,15 @@ class StandardShaderVertexArray(VertexBufferArray):
         # | ´4   5` | `0   1` |
         # | ´6   7` | `2   3` |
         points = [
-            [-0.5,  0.5, -0.5],
-            [ 0.5,  0.5, -0.5],
+            [-0.5, 0.5, -0.5],
+            [0.5, 0.5, -0.5],
             [-0.5, -0.5, -0.5],
-            [ 0.5, -0.5, -0.5],
+            [0.5, -0.5, -0.5],
 
-            [-0.5,  0.5,  0.5],
-            [ 0.5,  0.5,  0.5],
-            [-0.5, -0.5,  0.5],
-            [ 0.5, -0.5,  0.5]
+            [-0.5, 0.5, 0.5],
+            [0.5, 0.5, 0.5],
+            [-0.5, -0.5, 0.5],
+            [0.5, -0.5, 0.5]
         ]
         side_normals = [
             [0.0, 0.0, -1.0],  # Bottom
@@ -94,7 +95,7 @@ class StandardShaderVertexArray(VertexBufferArray):
             [2, 3, 7, 6, 2, 7],  # Front
             [5, 4, 0, 5, 0, 1],  # Back
             [6, 4, 0, 2, 0, 6],  # Left
-            [7, 5, 3, 5, 3, 1]  # Right
+            [7, 5, 3, 5, 3, 1]   # Right
         ]
 
         # Mapping

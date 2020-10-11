@@ -1,5 +1,7 @@
-import glm
 import math
+
+import glm
+
 
 #
 # Object physics
@@ -10,11 +12,17 @@ class Velocity:
         self.along_world_axis = along_world_axis
 
 
+class Ghost:
+    pass
+
+
 class CollisionComponent:
     def __init__(self):
         self.is_colliding_y = False
         self.is_colliding_x = False
         self.is_colliding_z = False
+        self.failed = []
+
 
 class PhysicsObject:
     def __init__(self):
@@ -42,6 +50,7 @@ class Transformation:
         self.position = position
         self.scale = scale
         self.rotation = rotation
+
 
 class TransformationMatrix:
     def __init__(self):
@@ -76,11 +85,12 @@ class BoundingBox:
         self.shape = shape
         self.radius = shape.get_radius()
 
+
 class Rectangle3D:
     """
     This should not be rotated or scaled. Top view:
     
-     width (x axis)
+    width (x axis)
     #######
     #  1  # depth (y axis)
     #######
@@ -110,9 +120,10 @@ class Rectangle3D:
 
     def max_z(self):
         return self.height
-    
+
     def get_radius(self):
         return math.sqrt(self.width ** 2 + self.depth ** 2 + self.height ** 2)
+
 
 #    def get_corners(self, rotation):
 #        x_axis = glm.vec3(
@@ -150,6 +161,7 @@ class Circle:
 class Model3D:
     def __init__(self, model_id):
         self.model_id = model_id
+
 
 class ObjectMaterial:
     def __init__(self,

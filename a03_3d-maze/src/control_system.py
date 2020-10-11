@@ -1,18 +1,21 @@
 import math
+
+import components_3d as com
 import esper
 import glm
 import pygame
 import pygame.locals
-
-import components_3d as com
 import resources as res
+
 
 def add_systems_1_to_world(world):
     world.add_processor(GameControlSystem())
 
+
 def add_systems_2_to_world(world):
     world.add_processor(ThirdPersonCameraSystem())
     world.add_processor(FreeCamOrientation())
+
 
 def clamp(value, m_min, m_max):
     if value <= m_min:
@@ -20,6 +23,7 @@ def clamp(value, m_min, m_max):
     if value >= m_max:
         return m_max
     return value
+
 
 class GameControlSystem(esper.Processor):
 
@@ -41,12 +45,11 @@ class GameControlSystem(esper.Processor):
                 transformation.position = home.position
                 velocity.value = glm.vec3()
 
-        
         controls.key_swap_camera_state = keys[controls.key_swap_camera]
         controls.key_return_to_home_state = keys[controls.key_return_to_home]
 
         self._acknowledge_input()
-    
+
     def _swap_camera(self):
         controls: res.GameControlState = self.world.controls
         if controls.control_mode == res.GameControlState.PLAYER_MODE:
@@ -58,7 +61,7 @@ class GameControlSystem(esper.Processor):
 
     def _acknowledge_input(self):
         controls: res.GameControlState = self.world.controls
-        
+
         if controls.control_mode == res.GameControlState.PLAYER_MODE:
             self._wasd_movement(
                 self.world.player_object,
@@ -98,12 +101,13 @@ class GameControlSystem(esper.Processor):
             velocity.value.x = 0.0
             velocity.value.y = 0.0
 
-        if (vertical_movement):
+        if vertical_movement:
+            velocity.value.z = 0
             if keys[pygame.locals.K_SPACE]:
-                velocity.value.z = vertical_speed
+                velocity.value.z += vertical_speed
             if keys[pygame.locals.K_LSHIFT]:
-                velocity.value.z = vertical_speed
-    
+                velocity.value.z -= vertical_speed
+
     def _arrow_key_rotation(self, entity_id):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)
 
@@ -122,10 +126,10 @@ class GameControlSystem(esper.Processor):
             transformation.rotation.x -= 0.1
         if keys[pygame.locals.K_RIGHT]:
             transformation.rotation.x += 0.1
-    
+
     def _player_jump(self):
         collision = self.world.component_for_entity(self.world.player_object, com.CollisionComponent)
-        if (collision.is_colliding_z):
+        if collision.is_colliding_z:
             keys = pygame.key.get_pressed()
             if keys[pygame.locals.K_SPACE]:
                 v = self.world.component_for_entity(self.world.player_object, com.Velocity)
