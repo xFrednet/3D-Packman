@@ -84,9 +84,8 @@ class World(esper.World):
             com.BoundingBox(com.Rectangle3D(1, 1, 1)),
             com.CollisionComponent(),
             com.PhysicsObject(),
-            com.Light(
-                color=glm.vec3(0.6, 0.3, 1.2),
-                attenuation=glm.vec3(0.1, 0.0, 1.0))
+            com.Light(attenuation=glm.vec3(0.1, 0.0, 1.0)),
+            com.LightAnimation(base_color=glm.vec3(0.5, 0.2, 1.1), add_color=glm.vec3(0.1, 0.1, 0.1), delta_factor=0.5)
         )
 
         self.player_cam = self.create_entity(
@@ -127,11 +126,11 @@ class World(esper.World):
             self.ghost = self.create_entity(
                 com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.GHOST)),
                 com.Ghost(),
-                com.Transformation(position=position, scale=glm.vec3(2.0, 2.0, 2.0)),
+                com.Transformation(position=position, scale=glm.vec3(1.0, 1.0, 0.8)),
                 com.TransformationMatrix(),
                 com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
                 com.Velocity(random.uniform(-1, 1), random.uniform(-1, 1), 0, along_world_axis=True),
-                com.BoundingBox(com.Rectangle3D(2, 2, 2)),
+                com.BoundingBox(com.Rectangle3D(2.0, 2.0, 3.0)),
                 com.CollisionComponent(),
                 com.PhysicsObject(),
                 com.Home(position=position)
@@ -143,9 +142,8 @@ class World(esper.World):
             com.Velocity(),
             com.BoundingBox(com.Rectangle3D(1.0, 1.0, 1.0)),
             com.CollisionComponent(),
-            com.Light(
-                color=glm.vec3(1.0, 0.8, 0.0),
-                attenuation=glm.vec3(0.35, -0.36, 0.1))
+            com.Light(attenuation=glm.vec3(0.35, -0.36, 0.1)),
+            com.LightAnimation(base_color=glm.vec3(1.0, 0.8, 0.0), add_color=glm.vec3(0.1, 0.1, 0.1))
         )
 
     def damage_player(self):
@@ -182,6 +180,7 @@ class World(esper.World):
             self._swap_camera()
 
         # Animation
+        self.component_for_entity(self.win_object, com.LightAnimation).enabled = False
         self.component_for_entity(self.win_object, com.Win).game_over = True
 
     def _swap_camera(self):

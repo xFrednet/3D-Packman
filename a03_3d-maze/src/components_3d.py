@@ -37,10 +37,13 @@ class PhysicsObject:
         self.air_time = 0.0
 
 
-# class LightAnimation:
-#     def __init__(self, color):
-#         self.color = color
-#         self.attenuation
+class LightAnimation:
+    def __init__(self, base_color, add_color, delta_factor=1.0):
+        self.base_color = base_color
+        self.add_color = add_color
+        self.delta_factor = delta_factor
+        self.animation_delta = 0.0
+        self.enabled = True
 
 #
 # Control components
@@ -189,10 +192,10 @@ class ObjectMaterial:
 class Light:
     def __init__(
             self,
-            color,
+            color=glm.vec3(),
             attenuation=glm.vec3(0.0, 0.0, 1.0)):
-        self.color = color
-        self.attenuation = attenuation
+        self.color = color * 1.0
+        self.attenuation = attenuation * 1.0
         # The attenuation is calculates like: 
         #   d := distance
         #   attenuation.x * d^2 + attenuation.y * d + attenuation.z
