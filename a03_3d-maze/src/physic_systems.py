@@ -124,11 +124,19 @@ class CollisionSystem(esper.Processor):
                                           com.BoundingBox,
                                           com.CollisionComponent):
 
+            hero_rotation = hero_transformation.rotation.x
             target_velocity = hero_velocity.value * self.world.delta
             hero_comfort_zone = hero_bounding_box.radius
 
             hero_rectangle = hero_bounding_box.shape
             hero_target_pos = hero_transformation.position + target_velocity
+            hero_rectangle_width = (
+                hero_rectangle.width * abs(math.cos(hero_rotation)) +
+                hero_rectangle.depth * abs(math.sin(hero_rotation)))
+            hero_rectangle_depth = (
+                hero_rectangle.width * abs(math.sin(hero_rotation)) +
+                hero_rectangle.depth * abs(math.cos(hero_rotation)))
+            hero_rectangle_height = hero_rectangle.height
 
             hero_collision.is_colliding_x = False
             hero_collision.is_colliding_y = False
@@ -154,13 +162,13 @@ class CollisionSystem(esper.Processor):
                     villain_transformation.position.z - hero_target_pos.z
                 )
                 gap = glm.vec3(
-                    (hero_rectangle.width + villain_rectangle.width) - abs(diff.x),
-                    (hero_rectangle.depth + villain_rectangle.depth) - abs(diff.y),
-                    (hero_rectangle.height + villain_rectangle.height) - abs(diff.z)
+                    (hero_rectangle_width + villain_rectangle.width) - abs(diff.x),
+                    (hero_rectangle_depth + villain_rectangle.depth) - abs(diff.y),
+                    (hero_rectangle_height + villain_rectangle.height) - abs(diff.z)
                 )
 
                 old_gap_x = (
-                        (hero_rectangle.width + villain_rectangle.width) -
+                        (hero_rectangle_width + villain_rectangle.width) -
                         abs(villain_transformation.position.x - hero_transformation.position.x))
 
                 # One side is outside
@@ -172,17 +180,17 @@ class CollisionSystem(esper.Processor):
                 old_diff = hero_transformation.position - villain_transformation.position
 
                 if gap.x <= gap.y and gap.x <= gap.z:
-                    offset = hero_rectangle.width + villain_rectangle.width
+                    offset = max(hero_rectangle_width + villain_rectangle.width, 0)
                     hero_target_pos.x = villain_transformation.position.x + math.copysign(offset, old_diff.x)
                     hero_collision.is_colliding_x = True
                 elif gap.y <= gap.z:
                     if old_gap_x <= 0:
                         continue
-                    offset = hero_rectangle.depth + villain_rectangle.depth
+                    offset = max(hero_rectangle_depth + villain_rectangle.depth, 0)
                     hero_target_pos.y = villain_transformation.position.y + math.copysign(offset, old_diff.y)
                     hero_collision.is_colliding_y = True
                 else:
-                    offset = hero_rectangle.height + villain_rectangle.height
+                    offset = hero_rectangle_height + villain_rectangle.height
                     hero_target_pos.z = villain_transformation.position.z + math.copysign(offset, old_diff.z)
                     hero_collision.is_colliding_z = True
 
