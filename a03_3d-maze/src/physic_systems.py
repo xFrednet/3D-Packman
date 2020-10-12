@@ -20,17 +20,19 @@ def add_physics_systems_to_world(world):
 
 class WinSystem(esper.Processor):
     def process(self):
-        for e_id, (col, win, light) in self.world.get_components(com.CollisionComponent, com.Win, com.Light):
+        for e_id, (col, win, light) in self.world.get_components(com.CollisionReport, com.Win, com.Light):
             if win.game_over:
                 win.animation_time += self.world.delta
                 if win.animation_time < 5.0:
                     if win.won:
-                        light.color *= 1.075
+                        light.color *= 1.2
                     else:
                         light.attenuation.x -= 0.2 * self.world.delta
             elif self.world.player_object in col.failed:
                 win.won = True
                 self.world.won_game()
+                animation = self.world.component_for_entity(e_id, com.LightAnimation)
+                light.color = animation.base_color + animation.add_color
 
 
 class GhostSystem(esper.Processor):
@@ -42,15 +44,18 @@ class GhostSystem(esper.Processor):
         self.free_light_count = 0
 
     def process(self):
-        for e_id, (ghost_col, velocity, animation, light, ghost) in self.world.get_components(
+        for e_id, (ghost_col, report, velocity, animation, light, ghost) in self.world.get_components(
                 com.CollisionComponent,
+                com.CollisionReport,
                 com.Velocity,
                 com.LightAnimation,
                 com.Light,
                 com.Ghost):
 
-            if self.world.player_object in ghost_col.failed:
+            if self.world.player_object in report.failed:
                 self.world.damage_player()
+
+            report.failed.clear()
 
             if ghost_col.is_colliding_y or ghost_col.is_colliding_x or glm.length(velocity.value) < 1:
                 velocity.value = glm.normalize(
@@ -128,7 +133,6 @@ class CollisionSystem(esper.Processor):
             hero_collision.is_colliding_x = False
             hero_collision.is_colliding_y = False
             hero_collision.is_colliding_z = False
-            hero_collision.failed = []
 
             for villain_id, (villain_transformation, villain_bounding_box) in self.world.get_components(
                     com.Transformation,
@@ -162,8 +166,8 @@ class CollisionSystem(esper.Processor):
                 # One side is outside
                 if gap.x < 0.0 or gap.y < 0.0 or gap.z < 0.0: continue
                 # Has collided and append
-                if not villain_id == 1:
-                    hero_collision.failed.append(villain_id)
+                if self.world.has_components(villain_id, com.CollisionReport):
+                    self.world.component_for_entity(villain_id, com.CollisionReport).failed.append(hero_id)
 
                 old_diff = hero_transformation.position - villain_transformation.position
 

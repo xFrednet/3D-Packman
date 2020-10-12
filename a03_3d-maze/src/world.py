@@ -133,11 +133,12 @@ class World(esper.World):
             self.ghost = self.create_entity(
                 com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.GHOST)),
                 com.Ghost(),
-                com.Transformation(position=position, scale=glm.vec3(1.0, 1.0, 0.8)),
+                com.Transformation(position=position, scale=glm.vec3(0.7, 0.7, 0.8)),
                 com.TransformationMatrix(),
                 com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
                 com.Velocity(random.uniform(-1, 1), random.uniform(-1, 1), 0, along_world_axis=True),
-                com.BoundingBox(com.Rectangle3D(2.0, 2.0, 3.0)),
+                com.BoundingBox(com.Rectangle3D(1.4, 1.4, 3.0)),
+                com.CollisionReport(),
                 com.CollisionComponent(),
                 com.PhysicsObject(),
                 com.Home(position=position),
@@ -150,7 +151,7 @@ class World(esper.World):
             com.Win(),
             com.Velocity(),
             com.BoundingBox(com.Rectangle3D(1.0, 1.0, 1.0)),
-            com.CollisionComponent(),
+            com.CollisionReport(),
             com.Light(attenuation=glm.vec3(0.35, -0.36, 0.1)),
             com.LightAnimation(base_color=glm.vec3(1.0, 0.8, 0.0), add_color=glm.vec3(0.1, 0.1, 0.1))
         )
@@ -175,7 +176,7 @@ class World(esper.World):
 
     def end_game(self):
         # Clear collisions
-        for _id, collision in self.get_component(com.CollisionComponent):
+        for _id, collision in self.get_component(com.CollisionReport):
             collision.failed.clear()
 
         # Setup top-down camera
