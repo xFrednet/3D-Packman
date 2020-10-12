@@ -1,5 +1,4 @@
 import random
-import time
 
 import components_3d as com
 import control_system as consys
@@ -15,12 +14,13 @@ from vertex_buffer_array import StandardShaderVertexArray
 
 
 class World(esper.World):
-    def __init__(self, resolution):
+    def __init__(self, resolution, level):
         super().__init__()
 
         self.resolution = resolution
         self.state = res.STATE_RUNNING
         self.life = 3
+        self.level = level
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
@@ -28,8 +28,10 @@ class World(esper.World):
         self.model_registry = res.ModelRegistry()
         self.camera_id = 0
         self.view_matrix = glm.mat4(1.0)
-        self.maze = _setup_maze(self, 30, 30, depth=1.5)
-        
+        self.maze_width = 30
+        self.maze_length = 30
+        self.maze = _setup_maze(self, self.maze_width, self.maze_length, depth=1.5)
+
         self._setup_systems()
         self._setup_entities()
         self._setup_level_objects()
@@ -89,7 +91,7 @@ class World(esper.World):
             com.Light(attenuation=glm.vec3(0.1, 0.0, 1.0)),
             com.LightAnimation(base_color=glm.vec3(0.5, 0.2, 1.1), add_color=glm.vec3(0.1, 0.1, 0.1), delta_factor=0.5)
         )
-        
+
         self.player_cam = self.create_entity(
             com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
             com.CameraOrientation(),
@@ -106,7 +108,7 @@ class World(esper.World):
             com.Home(position, rotation))
 
         self.camera_id = self.player_cam
-    
+
     def _setup_level_objects(self):
         # Central light
         self.create_entity(
@@ -116,10 +118,12 @@ class World(esper.World):
 
         # ghost
         ghost_light_count = self.light_setup.MAX_LIGHT_COUNT - 2 - 1
-        ghosts = min((len(self.maze.empty_areas_loc) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
+        min_val = min(self.maze_width, self.maze_length)
+        ghosts = self.level * min_val * 0.2
+        # fallback
         if ghosts < 5:
             ghosts = 5
-        for i in range(ghosts):
+        for i in range(int(ghosts)):
             coord = random.randint(0, len(self.maze.empty_areas_loc) - 1)
             r = random.random()
             g = random.random()
@@ -159,7 +163,7 @@ class World(esper.World):
             print(f'You have {self.life} lives left!')
             self.home_entities()
         elif self.life == 1:
-            print(f'You have {self.life} live left!')
+            print(f'You have {self.life} life left!')
             self.home_entities()
         else:
             print('Game Over!')
@@ -183,7 +187,7 @@ class World(esper.World):
         self.controls.allow_camera_swap = False
         if self.controls.control_mode == res.GameControlState.PLAYER_MODE:
             self._swap_camera()
-        
+
         # Animation
         self.component_for_entity(self.win_object, com.LightAnimation).enabled = False
         self.component_for_entity(self.win_object, com.Win).game_over = True
