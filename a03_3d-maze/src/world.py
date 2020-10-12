@@ -20,7 +20,6 @@ class World(esper.World):
         self.resolution = resolution
         self.state = res.STATE_RUNNING
         self.life = 3
-        self.level = 1
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
@@ -115,12 +114,7 @@ class World(esper.World):
                 color=glm.vec3(0.5, 0.4, 0.4)))
 
         # ghost
-        ghosts = 5
-        print(len(self.maze.empty_areas_loc))
-        if self.level == 3:
-            ghosts = (len(self.maze.empty_areas_loc) // 10)
-        elif self.level == 2:
-            ghosts = (len(self.maze.empty_areas_loc) // 20)
+        ghosts = min((len(self.maze.empty_areas_loc) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
         if ghosts < 5:
             ghosts = 5
         for i in range(ghosts):
