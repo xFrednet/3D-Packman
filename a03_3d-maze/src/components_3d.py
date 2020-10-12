@@ -18,7 +18,10 @@ class Ghost:
 
 
 class Win:
-    pass
+    def __init__(self):
+        self.game_over = False
+        self.animation_time = 0
+        self.won = False
 
 
 class CollisionComponent:
@@ -34,13 +37,18 @@ class PhysicsObject:
         self.air_time = 0.0
 
 
+# class LightAnimation:
+#     def __init__(self, color):
+#         self.color = color
+#         self.attenuation
+
 #
 # Control components
 #
 class Home:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
-        self.position = glm.vec3(x, y, z)
-        self.orientation = glm.vec3(x, y, z)
+    def __init__(self, position=glm.vec3(), rotation=glm.vec3()):
+        self.position = position * 1.0
+        self.rotation = rotation * 1.0
 
 
 #
@@ -52,9 +60,9 @@ class Transformation:
             position=glm.vec3(),
             scale=glm.vec3(1.0, 1.0, 1.0),
             rotation=glm.vec3()):
-        self.position = position
-        self.scale = scale
-        self.rotation = rotation
+        self.position = position * 1.0
+        self.scale = scale * 1.0
+        self.rotation = rotation * 1.0
 
 
 class TransformationMatrix:
@@ -173,8 +181,8 @@ class ObjectMaterial:
                  diffuse=glm.vec3(0, 0, 0),
                  specular=glm.vec3(0, 0, 0),
                  shininess=5):
-        self.diffuse = diffuse
-        self.specular = specular
+        self.diffuse = diffuse * 1.0
+        self.specular = specular * 1.0
         self.shininess = shininess
 
 

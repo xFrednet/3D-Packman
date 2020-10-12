@@ -9,7 +9,6 @@ Resources are data objects that only get initiated by the world as world variabl
 """
 
 STATE_RUNNING = 1
-STATE_ANIMATION = 2
 STATE_PAUSED = 3
 
 class GameControlState:
