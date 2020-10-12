@@ -123,7 +123,7 @@ class World(esper.World):
         # fallback
         if ghosts < 5:
             ghosts = 5
-        for i in range(ghosts):
+        for i in range(int(ghosts)):
             coord = random.randint(0, len(self.maze.empty_areas_loc) - 1)
             r = random.random()
             g = random.random()

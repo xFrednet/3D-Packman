@@ -25,6 +25,7 @@ def game_loop(world):
             if event.type == pygame.QUIT:
                 return
             elif event.type == pygame.KEYDOWN and event.key == pygame.locals.K_ESCAPE:
+                print('You quit the game!')
                 return
 
         # Update
@@ -46,13 +47,14 @@ def main():
 
 
 def choose_level():
-    print('Please choose a level')
+    print('Please choose a level!')
+    print('Choose:\n\t1 for Beginner (Noob)\n\t2 for Intermediate\n\t3 for Pro\n\n')
     global LEVEL
     while True:
         show = False
         val = 0
         try:
-            val = int(input('Please enter a value: '))
+            val = int(input('Enter your choice: '))
         except ValueError:
             print('You should choose a number between 1, 2 or 3 inclusive!')
             show = False
@@ -70,5 +72,6 @@ def choose_level():
 
 if __name__ == '__main__':
     choose_level()
+    print('Press Escape to quit!')
     main()
     pygame.quit()
