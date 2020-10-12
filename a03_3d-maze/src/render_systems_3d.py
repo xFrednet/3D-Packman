@@ -7,7 +7,7 @@ from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 
 
-def add_3d_render_systems_to_world(world):
+def add_systems_to_world(world):
     world.add_processor(UpdateLightSetup())
     world.add_processor(BuildTransformationMatrixSystem())
     world.add_processor(Start3DDrawSystem())
@@ -43,9 +43,9 @@ class BuildTransformationMatrixSystem(Processor):
             mat = glm.mat4x4(1.0)
             mat = glm.translate(mat, transformation.position)
             # No rotation for you
-            # mat = glm.rotate(mat, rotation.role, glm.vec3(1, 0, 0))
-            # mat = glm.rotate(mat, rotation.pitch, glm.vec3(0, 1, 0))
-            # mat = glm.rotate(mat, rotation.yaw, glm.vec3(0, 0, 1))
+            # mat = glm.rotate(mat, transformation.rotation.z, glm.vec3(1, 0, 0))
+            mat = glm.rotate(mat, transformation.rotation.y, glm.vec3(1, 0, 0))
+            mat = glm.rotate(mat, transformation.rotation.x, glm.vec3(0, 0, 1))
             mat = glm.scale(mat, transformation.scale)
 
             mat_target.value = mat

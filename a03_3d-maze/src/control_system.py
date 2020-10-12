@@ -32,9 +32,9 @@ class GameControlSystem(esper.Processor):
         controls: res.GameControlState = self.world.controls
 
         # Swap camera
-        if keys[controls.key_swap_camera] and not controls.key_swap_camera_state:
-            self._swap_camera()
+        if keys[controls.key_swap_camera] and not controls.key_swap_camera_state and controls.allow_camera_swap:
             # swap camera
+            self.world._swap_camera()
 
         # Reset
         if keys[controls.key_return_to_home] and not controls.key_return_to_home_state:
@@ -50,15 +50,6 @@ class GameControlSystem(esper.Processor):
 
         self._acknowledge_input()
 
-    def _swap_camera(self):
-        controls: res.GameControlState = self.world.controls
-        if controls.control_mode == res.GameControlState.PLAYER_MODE:
-            self.world.camera_id = self.world.free_cam
-            controls.control_mode = res.GameControlState.FREE_CAM_MODE
-        else:
-            self.world.camera_id = self.world.player_cam
-            controls.control_mode = res.GameControlState.PLAYER_MODE
-
     def _acknowledge_input(self):
         controls: res.GameControlState = self.world.controls
 
@@ -68,8 +59,8 @@ class GameControlSystem(esper.Processor):
                 controls.player_speed,
                 False,
                 0.0)
-            self._arrow_key_rotation(self.world.player_object)
-            self._player_jump()
+            self._arrow_key_rotation(self.world.player_object, enable_pitch=False)
+            # self._player_jump()
         else:
             self._wasd_movement(
                 self.world.free_cam,
@@ -77,6 +68,8 @@ class GameControlSystem(esper.Processor):
                 True,
                 controls.free_camera_vertical_speed)
             self._arrow_key_rotation(self.world.free_cam)
+        
+        self._change_light(self.world.win_object)
 
     def _wasd_movement(self, entity_id, speed, vertical_movement, vertical_speed):
         keys = pygame.key.get_pressed()
@@ -89,9 +82,9 @@ class GameControlSystem(esper.Processor):
         if keys[pygame.locals.K_s]:
             direction.y -= 1
         if keys[pygame.locals.K_a]:
-            direction.x -= 1
-        if keys[pygame.locals.K_d]:
             direction.x += 1
+        if keys[pygame.locals.K_d]:
+            direction.x -= 1
 
         if glm.length(direction) > 0.001:
             new_v = glm.normalize(direction) * speed
@@ -107,25 +100,27 @@ class GameControlSystem(esper.Processor):
                 velocity.value.z += vertical_speed
             if keys[pygame.locals.K_LSHIFT]:
                 velocity.value.z -= vertical_speed
-
-    def _arrow_key_rotation(self, entity_id):
+        
+    def _arrow_key_rotation(self, entity_id, enable_pitch=True):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)
 
         keys = pygame.key.get_pressed()
-        pitch_change = 0.0
-        if keys[pygame.locals.K_UP]:
-            pitch_change += 0.1
-        if keys[pygame.locals.K_DOWN]:
-            pitch_change -= 0.1
-        transformation.rotation.y = clamp(
-            transformation.rotation.y + pitch_change,
-            (math.pi - 0.2) / -2,
-            (math.pi - 0.2) / 2)
+        
+        if (enable_pitch):
+            pitch_change = 0.0
+            if keys[pygame.locals.K_UP]:
+                pitch_change += 0.1
+            if keys[pygame.locals.K_DOWN]:
+                pitch_change -= 0.1
+            transformation.rotation.y = clamp(
+                transformation.rotation.y + pitch_change,
+                (math.pi - 0.2) / -2,
+                (math.pi - 0.2) / 2)
 
         if keys[pygame.locals.K_LEFT]:
-            transformation.rotation.x -= 0.1
-        if keys[pygame.locals.K_RIGHT]:
             transformation.rotation.x += 0.1
+        if keys[pygame.locals.K_RIGHT]:
+            transformation.rotation.x -= 0.1
 
     def _player_jump(self):
         collision = self.world.component_for_entity(self.world.player_object, com.CollisionComponent)
@@ -134,6 +129,40 @@ class GameControlSystem(esper.Processor):
             if keys[pygame.locals.K_SPACE]:
                 v = self.world.component_for_entity(self.world.player_object, com.Velocity)
                 v.value.z += self.world.controls.player_jump_height
+    
+    def _change_light(self, entity_id):
+        keys = pygame.key.get_pressed()
+        light: com.Light = self.world.component_for_entity(entity_id, com.Light)
+
+        if keys[pygame.locals.K_t]:
+            light.color.x += 0.01
+        if keys[pygame.locals.K_g]:
+            light.color.x -= 0.01
+        if keys[pygame.locals.K_z]:
+            light.color.y += 0.01
+        if keys[pygame.locals.K_h]:
+            light.color.y -= 0.01
+        if keys[pygame.locals.K_u]:
+            light.color.z += 0.01
+        if keys[pygame.locals.K_h]:
+            light.color.z -= 0.01
+
+        if keys[pygame.locals.K_u]:
+            light.attenuation.x += 0.01
+        if keys[pygame.locals.K_j]:
+            light.attenuation.x -= 0.01
+        if keys[pygame.locals.K_i]:
+            light.attenuation.y += 0.01
+        if keys[pygame.locals.K_k]:
+            light.attenuation.y -= 0.01
+        if keys[pygame.locals.K_o]:
+            light.attenuation.z += 0.01
+        if keys[pygame.locals.K_l]:
+            light.attenuation.z -= 0.01
+
+        if keys[pygame.locals.K_p]:
+            print(f"Light(color: {light.color}, attenuation: {light.attenuation})")
+
 
 
 class ThirdPersonCameraSystem(esper.Processor):
@@ -149,8 +178,8 @@ class ThirdPersonCameraSystem(esper.Processor):
 
             dir_height = math.sin(pitch)
             dir_vec = glm.vec3(
-                math.sin(yaw) * (1.0 - abs(dir_height)),
                 math.cos(yaw) * (1.0 - abs(dir_height)),
+                math.sin(yaw) * (1.0 - abs(dir_height)),
                 dir_height
             )
 
@@ -166,7 +195,7 @@ class FreeCamOrientation(esper.Processor):
                 com.FreeCamera):
             height = math.sin(transformation.rotation.y)
             orientation.look_at = transformation.position + glm.vec3(
-                math.sin(transformation.rotation.x) * (1.0 - abs(height)),
                 math.cos(transformation.rotation.x) * (1.0 - abs(height)),
+                math.sin(transformation.rotation.x) * (1.0 - abs(height)),
                 height
             )

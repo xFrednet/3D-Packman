@@ -7,9 +7,10 @@ import glm
 # Object physics
 #
 class Velocity:
-    def __init__(self, x=0.0, y=0.0, z=0.0, along_world_axis=True):
+    def __init__(self, x=0.0, y=0.0, z=0.0, along_world_axis=True, allow_paused=False):
         self.value = glm.vec3(x, y, z)
         self.along_world_axis = along_world_axis
+        self.allow_paused = allow_paused
 
 
 class Ghost:
