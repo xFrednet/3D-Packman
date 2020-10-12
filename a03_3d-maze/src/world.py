@@ -115,6 +115,7 @@ class World(esper.World):
                 color=glm.vec3(0.5, 0.4, 0.4)))
 
         # ghost
+        ghost_light_count = self.light_setup.MAX_LIGHT_COUNT - 2 - 1
         ghosts = min((len(self.maze.empty_areas_loc) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
         if ghosts < 5:
             ghosts = 5
@@ -135,7 +136,9 @@ class World(esper.World):
                 com.BoundingBox(com.Rectangle3D(2.0, 2.0, 3.0)),
                 com.CollisionComponent(),
                 com.PhysicsObject(),
-                com.Home(position=position)
+                com.Home(position=position),
+                com.Light(attenuation=glm.vec3(0.1, 0.0, 1.0), enabled=(i < ghost_light_count)),
+                com.LightAnimation(base_color=glm.vec3(), add_color=glm.vec3(r, g, b), delta_factor=random.uniform(0.8, 1.4))
             )
 
         self.win_object = self.create_entity(
