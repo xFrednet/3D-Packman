@@ -135,12 +135,9 @@ class World(esper.World):
             )
 
         self.win_object = self.create_entity(
-            com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
-            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 1.0), scale=glm.vec3(0.5, 0.5, 0.5)),
+            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 1.0)),
             com.Win(),
-            com.TransformationMatrix(),
-            com.ObjectMaterial(diffuse=glm.vec3(0.5, 0.5, 0.5)),
-            com.Velocity(along_world_axis=False),
+            com.Velocity(),
             com.BoundingBox(com.Rectangle3D(0.5, 0.5, 0.5)),
             com.CollisionComponent(),
             com.Light(
@@ -159,9 +156,10 @@ class World(esper.World):
             transformation.position = home.position
             velocity.value = glm.vec3()
         if self.life == 0:
-            time.sleep(3)
-            print('Game Over!')
-            self.running = False
+            # time.sleep(3)
+            # print('Game Over!')
+            # self.running = False
+            pass
         elif self.life == 1:
             print(f'You have {self.life} live left!')
         else:
