@@ -125,16 +125,18 @@ class World(esper.World):
             g = random.random()
             b = random.random()
             x, y = self.maze.empty_areas_loc[coord]
+            position = glm.vec3(x + 1, y + 1, 4.0)
             self.ghost = self.create_entity(
                 com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.GHOST)),
                 com.Ghost(),
-                com.Transformation(position=glm.vec3(x + 1, y + 1, 2.0), scale=glm.vec3(2.0, 2.0, 2.0)),
+                com.Transformation(position=position, scale=glm.vec3(2.0, 2.0, 2.0)),
                 com.TransformationMatrix(),
                 com.ObjectMaterial(diffuse=glm.vec3(r, g, b)),
                 com.Velocity(random.uniform(-1, 1), random.uniform(-1, 1), 0, along_world_axis=True),
                 com.BoundingBox(com.Rectangle3D(2, 2, 2)),
                 com.CollisionComponent(),
-                com.PhysicsObject()
+                com.PhysicsObject(),
+                com.Home(position=position)
             )
 
         self.win_object = self.create_entity(

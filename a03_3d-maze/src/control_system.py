@@ -38,12 +38,7 @@ class GameControlSystem(esper.Processor):
 
         # Reset
         if keys[controls.key_return_to_home] and not controls.key_return_to_home_state:
-            for _id, (home, transformation, velocity) in self.world.get_components(
-                    com.Home,
-                    com.Transformation,
-                    com.Velocity):
-                transformation.position = home.position
-                velocity.value = glm.vec3()
+            self.world.home_entities()
 
         controls.key_swap_camera_state = keys[controls.key_swap_camera]
         controls.key_return_to_home_state = keys[controls.key_return_to_home]
