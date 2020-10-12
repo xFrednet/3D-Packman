@@ -35,9 +35,20 @@ class WinSystem(esper.Processor):
 
 class GhostSystem(esper.Processor):
     SPEED = 5.0
+    ANIMATION_DELTA_LIMIT = math.pi
+    LIGHT_CHANGE = 10
+
+    def __init__(self):
+        self.free_light_count = 0
+
     def process(self):
-        for e_id, (ghost_col, ghost, velocity) in self.world.get_components(com.CollisionComponent, com.Ghost,
-                                                                            com.Velocity):
+        for e_id, (ghost_col, velocity, animation, light, ghost) in self.world.get_components(
+                com.CollisionComponent,
+                com.Velocity,
+                com.LightAnimation,
+                com.Light,
+                com.Ghost):
+
             if self.world.player_object in ghost_col.failed:
                 self.world.damage_player()
 
@@ -45,6 +56,19 @@ class GhostSystem(esper.Processor):
                 velocity.value = glm.normalize(
                     glm.vec3(rand.uniform(-1.0, 1.0), rand.uniform(-1.0, 1.0), 0.0)
                 ) * GhostSystem.SPEED
+        
+            if light.enabled:
+                if animation.animation_delta > GhostSystem.ANIMATION_DELTA_LIMIT:
+                    light.enabled = False
+                    animation.enabled = False
+                    self.free_light_count += 1
+            elif self.free_light_count >= 1:
+                if rand.randrange(0, 100) <= GhostSystem.LIGHT_CHANGE:
+                    self.free_light_count -= 1
+                    light.enabled = True
+                    animation.animation_delta = 0.0
+                    animation.delta_factor = rand.uniform(0.8, 1.4)
+                    animation.enabled = True
 
 
 class MovementSystem(esper.Processor):
