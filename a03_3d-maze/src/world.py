@@ -1,5 +1,4 @@
 import random
-import time
 
 import components_3d as com
 import control_system as consys
@@ -21,6 +20,7 @@ class World(esper.World):
         self.resolution = resolution
         self.state = res.STATE_RUNNING
         self.life = 3
+        self.level = 1
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
@@ -28,8 +28,10 @@ class World(esper.World):
         self.model_registry = res.ModelRegistry()
         self.camera_id = 0
         self.view_matrix = glm.mat4(1.0)
-        self.maze = _setup_maze(self, 30, 30, depth=1.5)
-        
+        self.maze_width = 30
+        self.maze_length = 30
+        self.maze = _setup_maze(self, self.maze_width, self.maze_length, depth=1.5)
+
         self._setup_systems()
         self._setup_entities()
         self._setup_level_objects()
@@ -90,7 +92,7 @@ class World(esper.World):
                 color=glm.vec3(0.6, 0.3, 1.2),
                 attenuation=glm.vec3(0.1, 0.0, 1.0))
         )
-        
+
         self.player_cam = self.create_entity(
             com.ThirdPersonCamera(self.player_object, distance=4.0, pitch=-0.5),
             com.CameraOrientation(),
@@ -105,7 +107,7 @@ class World(esper.World):
             com.Home(z=5.0))
 
         self.camera_id = self.player_cam
-    
+
     def _setup_level_objects(self):
         # Central light
         self.create_entity(
@@ -114,9 +116,14 @@ class World(esper.World):
                 color=glm.vec3(0.4, 0.3, 0.3)))
 
         # ghost
-        ghosts = min((len(self.maze[0]) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
+        min_val = min(self.maze_width, self.maze_length)
+        ghosts = self.level * min_val * 0.1
+        print('empty areas:', len(self.maze[0]))
+        print('ghosts nr:', ghosts)
+        # fallback
         if ghosts < 5:
             ghosts = 5
+        print('ghosts nr:', ghosts)
         for i in range(ghosts):
             coord = random.randint(0, len(self.maze[0]) - 1)
             r = random.random()
