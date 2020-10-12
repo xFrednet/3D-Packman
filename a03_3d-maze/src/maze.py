@@ -44,7 +44,6 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
             specular=glm.vec3(0.2, 0.3, 0.6),
             shininess=6)
     )
-    empty_areas_loc = []
     # i + w / 2, j + h / 2
     # Le Walls
     for i in range(len(m[0])):
@@ -83,10 +82,10 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
                 has_shape = False
                 shape_w = 0
             else:
-                empty_areas_loc.append([x, y])
+                maze.empty_areas_loc.append([x, y])
             x += w
         y += h
-    return empty_areas_loc, maze.center
+    return maze
 
 
 class Maze:
@@ -99,6 +98,7 @@ class Maze:
         self.shape = ((self.height // 2) * 2 + 1, (self.width // 2) * 2 + 1)
         self.maze = []
         self.center = glm.vec3()
+        self.empty_areas_loc = []
 
     def generate_maze(self):
         complexity = int(self.complexity * (5 * (self.shape[0] + self.shape[1])))

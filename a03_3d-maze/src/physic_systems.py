@@ -19,8 +19,16 @@ def add_physics_systems_to_world(world):
 
 class WinSystem(esper.Processor):
     def process(self):
-        for e_id, (col, win) in self.world.get_components(com.CollisionComponent, com.Win):
-            if self.world.player_object in col.failed:
+        for e_id, (col, win, light) in self.world.get_components(com.CollisionComponent, com.Win, com.Light):
+            if win.game_over:
+                win.animation_time += self.world.delta
+                if win.animation_time < 5.0:
+                    if win.won:
+                        light.color *= 1.075
+                    else:
+                        light.attenuation.x -= 0.2 * self.world.delta
+            elif self.world.player_object in col.failed:
+                win.won = True
                 self.world.won_game()
 
 

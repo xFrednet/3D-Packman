@@ -60,7 +60,7 @@ class GameControlSystem(esper.Processor):
                 False,
                 0.0)
             self._arrow_key_rotation(self.world.player_object, enable_pitch=False)
-            # self._player_jump()
+            self._player_jump()
         else:
             self._wasd_movement(
                 self.world.free_cam,
@@ -100,6 +100,10 @@ class GameControlSystem(esper.Processor):
                 velocity.value.z += vertical_speed
             if keys[pygame.locals.K_LSHIFT]:
                 velocity.value.z -= vertical_speed
+        
+        if keys[pygame.locals.K_p]:
+            tra = self.world.component_for_entity(entity_id, com.Transformation)
+            print(f"Transformation(Position: {tra.position}, Rotation: {tra.rotation})")
         
     def _arrow_key_rotation(self, entity_id, enable_pitch=True):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)

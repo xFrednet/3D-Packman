@@ -74,15 +74,15 @@ class World(esper.World):
     def _setup_entities(self):
         # Crappy mixed entity, OOP is a thing... well actually an object...
         # WTF. I'm always amazed by the comments I leave in my code. ~xFrednet 2020.09.23
+        position = glm.vec3(2.0, 2.0, 1.0)
+        rotation = glm.vec3(0.0, 0.0, 0.0)
         self.player_object = self.create_entity(
             com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.CUBE)),
-            com.Transformation(
-                position=glm.vec3(2.0, 2.0, 2.0),
-                rotation=glm.vec3(0.0, 0.0, 0.0)),
+            com.Transformation(position=position, rotation=rotation),
             com.TransformationMatrix(),
-            com.ObjectMaterial(diffuse=glm.vec3(0.3 * self.life, 0.0, 0.0)),
+            com.ObjectMaterial(diffuse=glm.vec3(1.0, 0.3, 0.3)),
             com.Velocity(along_world_axis=False),
-            com.Home(x=2.0, y=2.0, z=2.0),
+            com.Home(position, rotation),
             com.BoundingBox(com.Rectangle3D(1, 1, 1)),
             com.CollisionComponent(),
             com.PhysicsObject(),
@@ -97,32 +97,34 @@ class World(esper.World):
             com.Transformation()
         )
 
+        position = glm.vec3(-5.0, -5.0, 20.0)
+        rotation = glm.vec3(0.9, -0.5, 0.0)
         self.free_cam = self.create_entity(
-            com.Transformation(position=glm.vec3(0.0, 10.0, 5.0), rotation=glm.vec3()),
+            com.Transformation(position=position, rotation=rotation),
             com.Velocity(along_world_axis=False, allow_paused=True),
             com.FreeCamera(),
             com.CameraOrientation(),
-            com.Home(z=5.0))
+            com.Home(position, rotation))
 
         self.camera_id = self.player_cam
     
     def _setup_level_objects(self):
         # Central light
         self.create_entity(
-            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 10.0)),
+            com.Transformation(position=glm.vec3(self.maze.center.x, self.maze.center.y, 20.0)),
             com.Light(
-                color=glm.vec3(0.4, 0.3, 0.3)))
+                color=glm.vec3(0.5, 0.4, 0.4)))
 
         # ghost
-        ghosts = min((len(self.maze[0]) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
+        ghosts = min((len(self.maze.empty_areas_loc) // 10), self.light_setup.MAX_LIGHT_COUNT - 2)
         if ghosts < 5:
             ghosts = 5
         for i in range(ghosts):
-            coord = random.randint(0, len(self.maze[0]) - 1)
+            coord = random.randint(0, len(self.maze.empty_areas_loc) - 1)
             r = random.random()
             g = random.random()
             b = random.random()
-            x, y = self.maze[0][coord]
+            x, y = self.maze.empty_areas_loc[coord]
             self.ghost = self.create_entity(
                 com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.GHOST)),
                 com.Ghost(),
@@ -136,7 +138,7 @@ class World(esper.World):
             )
 
         self.win_object = self.create_entity(
-            com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 1.0)),
+            com.Transformation(position=glm.vec3(self.maze.center.x, self.maze.center.y, 1.0)),
             com.Win(),
             com.Velocity(),
             com.BoundingBox(com.Rectangle3D(1.0, 1.0, 1.0)),
@@ -148,28 +150,39 @@ class World(esper.World):
 
     def damage_player(self):
         self.life -= 1
-        self.component_for_entity(self.player_object, com.ObjectMaterial).diffuse = \
-            glm.vec3(0.3 * self.life, 0.0, 0.0)
-        for _id, (home, transformation, velocity) in self.get_components(
-                com.Home,
-                com.Transformation,
-                com.Velocity):
-            transformation.position = home.position
-            velocity.value = glm.vec3()
-        if self.life == 0:
-            self.end_game()
-            print('Game Over!')
+        self.component_for_entity(self.player_object, com.ObjectMaterial).diffuse *= 0.7
+
+        if self.life > 1:
+            print(f'You have {self.life} lives left!')
+            self.home_entities()
         elif self.life == 1:
             print(f'You have {self.life} live left!')
+            self.home_entities()
         else:
-            print(f'You have {self.life} lives left!')
+            print('Game Over!')
+            self.end_game()
 
     def won_game(self):
-        self.end_game()
         print('You winted!')
+        self.end_game()
 
     def end_game(self):
-        pass
+        # Clear collisions
+        for _id, collision in self.get_component(com.CollisionComponent):
+            collision.failed.clear()
+
+        # Setup top-down camera
+        transform = self.component_for_entity(self.free_cam, com.Transformation)
+        transform.position.x = self.maze.center.x
+        transform.position.y = self.maze.center.y
+        transform.position.z = 50.0
+        transform.rotation = glm.vec3(0.0, -1.4, 0.0)
+        self.controls.allow_camera_swap = False
+        if self.controls.control_mode == res.GameControlState.PLAYER_MODE:
+            self._swap_camera()
+        
+        # Animation
+        self.component_for_entity(self.win_object, com.Win).game_over = True
 
     def _swap_camera(self):
         controls: res.GameControlState = self.controls
@@ -181,6 +194,15 @@ class World(esper.World):
             self.camera_id = self.player_cam
             controls.control_mode = res.GameControlState.PLAYER_MODE
             self.state = res.STATE_RUNNING
+
+    def home_entities(self):
+        for _id, (home, transformation, velocity) in self.get_components(
+                com.Home,
+                com.Transformation,
+                com.Velocity):
+            transformation.position = home.position
+            transformation.rotation = home.rotation
+            velocity.value = glm.vec3()
 
     def update_resolution(self, resolution):
         self.resolution = resolution
