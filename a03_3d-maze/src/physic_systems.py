@@ -19,8 +19,16 @@ def add_physics_systems_to_world(world):
 
 class WinSystem(esper.Processor):
     def process(self):
-        for e_id, (col, win) in self.world.get_components(com.CollisionComponent, com.Win):
-            if self.world.player_object in col.failed:
+        for e_id, (col, win, light) in self.world.get_components(com.CollisionComponent, com.Win, com.Light):
+            if win.game_over:
+                win.animation_time += self.world.delta
+                if win.animation_time < 5.0:
+                    if win.won:
+                        light.color *= 1.075
+                    else:
+                        light.attenuation.x -= 0.2 * self.world.delta
+            elif self.world.player_object in col.failed:
+                win.won = True
                 self.world.won_game()
 
 
@@ -32,7 +40,7 @@ class GhostSystem(esper.Processor):
             if self.world.player_object in ghost_col.failed:
                 self.world.damage_player()
 
-            if ghost_col.is_colliding_y or ghost_col.is_colliding_x:
+            if ghost_col.is_colliding_y or ghost_col.is_colliding_x or glm.length(velocity.value) < 1:
                 velocity.value = glm.normalize(
                     glm.vec3(rand.uniform(-1.0, 1.0), rand.uniform(-1.0, 1.0), 0.0)
                 ) * GhostSystem.SPEED
@@ -69,6 +77,8 @@ class CollisionSystem(esper.Processor):
     """
     Welcome to the world of cheats and liars. We are only doing collision
     detection on the x and y direction. 
+    We've now implemented vertical collision detection but I'm still super unhappy with it -.-.
+    It's not as smooth as it should be and has multiple bugs
     """
 
     def process(self):

@@ -38,12 +38,7 @@ class GameControlSystem(esper.Processor):
 
         # Reset
         if keys[controls.key_return_to_home] and not controls.key_return_to_home_state:
-            for _id, (home, transformation, velocity) in self.world.get_components(
-                    com.Home,
-                    com.Transformation,
-                    com.Velocity):
-                transformation.position = home.position
-                velocity.value = glm.vec3()
+            self.world.home_entities()
 
         controls.key_swap_camera_state = keys[controls.key_swap_camera]
         controls.key_return_to_home_state = keys[controls.key_return_to_home]
@@ -69,7 +64,7 @@ class GameControlSystem(esper.Processor):
                 controls.free_camera_vertical_speed)
             self._arrow_key_rotation(self.world.free_cam)
         
-        self._change_light(self.world.win_object)
+        # self._change_light(self.world.win_object)
 
     def _wasd_movement(self, entity_id, speed, vertical_movement, vertical_speed):
         keys = pygame.key.get_pressed()
@@ -100,6 +95,10 @@ class GameControlSystem(esper.Processor):
                 velocity.value.z += vertical_speed
             if keys[pygame.locals.K_LSHIFT]:
                 velocity.value.z -= vertical_speed
+        
+        if keys[pygame.locals.K_p]:
+            tra = self.world.component_for_entity(entity_id, com.Transformation)
+            print(f"Transformation(Position: {tra.position}, Rotation: {tra.rotation})")
         
     def _arrow_key_rotation(self, entity_id, enable_pitch=True):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)
