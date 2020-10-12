@@ -26,10 +26,11 @@ class UpdateLightSetup(Processor):
 
         index = 0
         for _id, (light, transformation) in self.world.get_components(com.Light, com.Transformation):
-            light_setup.light_positions[index] = transformation.position
-            light_setup.lights[index] = light
-            index += 1
-            if index >= res.LightSetup.MAX_LIGHT_COUNT: break
+            if light.enabled:
+                light_setup.light_positions[index] = transformation.position
+                light_setup.lights[index] = light
+                index += 1
+                if index >= res.LightSetup.MAX_LIGHT_COUNT: break
 
         light_setup.light_count = index
         self.world.light_setup = light_setup
@@ -59,10 +60,27 @@ class Start3DDrawSystem(Processor):
         # build view matrix
         position = self.world.component_for_entity(self.world.camera_id, com.Transformation).position
         orientation = self.world.component_for_entity(self.world.camera_id, com.CameraOrientation)
-        self.world.view_matrix = glm.lookAt(
-            position,
-            orientation.look_at,
-            orientation.up)
+        
+        forward = glm.normalize(position - orientation.look_at)
+        right = glm.normalize(glm.cross(orientation.up, forward))
+        up = glm.normalize(glm.cross(forward, right))
+
+        mat = glm.mat4x4(1.0)
+        mat[0][0] = right.x
+        mat[1][0] = right.y
+        mat[2][0] = right.z
+        mat[0][1] = up.x
+        mat[1][1] = up.y
+        mat[2][1] = up.z
+        mat[0][2] = forward.x
+        mat[1][2] = forward.y
+        mat[2][2] = forward.z
+
+        mat[3][0] = -(glm.dot(right, position))
+        mat[3][1] = -(glm.dot(up, position))
+        mat[3][2] = -(glm.dot(forward, position))
+        
+        self.world.view_matrix = mat
 
         # Upload shader data
         self.world.standard_shader.start()
