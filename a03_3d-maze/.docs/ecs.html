@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ecs.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="entity-component-system-ecs">Entity Component System (ECS)</h1>
+<p>This document documents the overall architecture in our game. We decided to use an <em>entity component system(ECS)</em> to structure our game. The documentation is basically some copy pasta from the <a href="https://book.amethyst.rs/stable/intro.html">Amethyst game-engine documentation</a> with some additions from our own experience. A similar architecture is also used by the <a href="https://godotengine.org">Godot engine</a>.</p>
+<p>An ECS does pretty much what it says it is doing. It defines entities as a collection of components. The structure of an ECS and their relations between each other is described in the <em>Parts</em> section. The goal of an ECS is to enable easy reuse of behavior code like movement and collision detection and in theory supporting easy multi threading.</p>
+<p>Note: This documentation was created in the middle of the project. We added some additional systems in the mean time. This only effects the documentation about the systems them self. The multi-threading implementation is still possible in the same way <img class="emoji" alt="smiley" src="data:image/png;base64,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" /></p>
+<h2 id="parts">Parts</h2>
+<p>The entity component system has several parts which wire together into one whole system. These parts are</p>
+<table>
+<thead>
+<tr>
+<th>The what?</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Components</strong></td>
+<td>A component represents one aspect of an object. It is used to store data about this aspect and usually has no real execution code bound to them. An example would be the <code>Velocity</code> or the <code>Material</code> of an entity.</td>
+</tr>
+<tr>
+<td><strong>Entities</strong></td>
+<td>An entity is a collection of components that can be identified via an <code>ID</code>. The <code>create_entity()</code> method created a new collection and returns the ID of it. An example of a simple moving light entity would be the the following collection: { <code>Transformation</code>, <code>Velocity</code>, <code>Light</code>}.</td>
+</tr>
+<tr>
+<td><strong>Systems</strong></td>
+<td>A system is basically a worker that operates on top of the component collections. It can read and write from and to components and even flag entities for deletion. A system operates on a constellation of components. Example: A system might have the following query <code>get_components(Transformation, Velocity)</code>. It could then apply the value of the <code>Velocity</code> component to the position withing the <code>Transformation</code> component. Systems can pass data between them by setting data in components or global resources.</td>
+</tr>
+<tr>
+<td><strong>Resources</strong></td>
+<td>A resource is data that is not specific to a single entity. An example might be the game score or in out case the <code>LightSetup</code> and <code>ShaderProgram</code>. Resources are set as usual values of the world object.</td>
+</tr>
+<tr>
+<td><strong>The World</strong></td>
+<td>The world is the central component in an <em>ECS</em>. It is the global registry for all <em>entities</em> (with <em>components</em>), <em>resources</em> and <em>systems</em>. The world defines the execution order of the systems and enables systems to query entities by their components. It is also use to store global resources that can than be accessed by all systems (<em>It is basically the glue between the other things</em>)</td>
+</tr>
+</tbody>
+</table>
+<p>We are using <a href="https://github.com/benmoran56/esper">Esper</a> as a python library to provide us the basic structure. Esper uses the word <em>Processor</em> instead of <em>System</em> but has the some structure otherwise.</p>
+<p>An overview of all components is great but an example is often way more helpful <img class="emoji" alt="smile" src="data:image/png;base64,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" />. So here is an example of a small ECS that enables entities to move (In python/pseudo code):</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># Components</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Transformation</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, position)</span>:</span>
+        self.position = position
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Velocity</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, velocity)</span>:</span>
+        self.velocity = velocity
+
+<span class="hljs-comment"># System</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MovementSystem</span><span class="hljs-params">(esper.Processor)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">process</span><span class="hljs-params">(self)</span>:</span>
+        <span class="hljs-keyword">for</span> _entity_id, (transformation, velocity) <span class="hljs-keyword">in</span> self.world.get_components(
+                Transformation,
+                Velocity):
+            transformation.position += velocity.velocity * self.world.delta
+
+<span class="hljs-comment"># World</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">World</span><span class="hljs-params">(esper.World)</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        super().__init__()
+
+        <span class="hljs-comment"># resources</span>
+        self.delta = <span class="hljs-number">0.0</span>
+
+        <span class="hljs-comment"># systems</span>
+        self.add_processor(MovementSystem())
+
+        <span class="hljs-comment"># entities</span>
+        self.create_entity(
+            Transformation(position=vec3(<span class="hljs-number">1.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">1.0</span>)),
+            Velocity(velocity=vec3(<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>))
+        )
+        self.create_entity(
+            Transformation(position=vec3(<span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">0.0</span>)),
+            Velocity(velocity=vec3(<span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>, <span class="hljs-number">0.0</span>))
+        )
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">game_loop</span><span class="hljs-params">()</span>:</span>
+    <span class="hljs-keyword">while</span> <span class="hljs-literal">True</span>:
+        world.process()
+</div></code></pre>
+<p>This system makes it easy to reuse code. Every entity with an <code>Transformation</code>, <code>Velocity</code> component will be effected by the <code>MovementSystem</code>. This means that a light can simply be moved by adding a <code>Velocity</code> component to it. A simple addition might be different if we where using a object oriented approach with inheritance.</p>
+<p>A nice example for the use is the <code>Light</code> component. Every entity can glow by simply adding this component to with without any extra setup. Making the player glow was setup by the following three lines:</p>
+<pre class="hljs"><code><div>Light(
+    color=glm.vec3(<span class="hljs-number">0.6</span>, <span class="hljs-number">0.3</span>, <span class="hljs-number">1.2</span>),
+    attenuation=glm.vec3(<span class="hljs-number">0.1</span>, <span class="hljs-number">0.0</span>, <span class="hljs-number">1.0</span>))
+</div></code></pre>
+<h2 id="system-order">System order</h2>
+<p>The system order is determined by the registration on the world instance. Our game has the following execution order:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:right">Order</th>
+<th>System</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">=====</td>
+<td><strong>Game control</strong></td>
+<td>==============</td>
+</tr>
+<tr>
+<td style="text-align:right">1</td>
+<td><code>GameControlSystem</code></td>
+<td>This takes the player input and routes it to the player object or to the current camera.</td>
+</tr>
+<tr>
+<td style="text-align:right">=====</td>
+<td><strong>Physics</strong></td>
+<td>==============</td>
+</tr>
+<tr>
+<td style="text-align:right">2</td>
+<td><code>VelocityToEntityAxis</code></td>
+<td>This translates the xy-velocity from the world axis to the orientation of the object it self.<br> (<code>Transformation</code> &amp;&amp;<code>Velocity(along_world_axis==False)</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">3</td>
+<td><code>GravitySystem</code></td>
+<td>This applies a gravity effect of <em>air_time² * 9.0</em> <br> (<code>Velocity</code> &amp;&amp; <code>PhysicsObject</code> &amp;&amp; <code>CollisionComponent</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">4</td>
+<td><code>CollisionSystem</code></td>
+<td>This checks if an entity with the <code>CollisionComponent</code> collides with a different <code>BoundingBox</code>. This is setup by a different sub query <br> (<code>Transformation</code> &amp;&amp; <code>Velocity</code> &amp;&amp; <code>BoundingBox</code> &amp;&amp; <code>CollisionComponent</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">5</td>
+<td><code>MovementSystem</code></td>
+<td>Applies the <code>Velocity</code> to the position <br>(<code>Transformation</code> &amp;&amp; <code>Velocity</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">=====</td>
+<td><strong>Cameras</strong></td>
+<td>==============</td>
+</tr>
+<tr>
+<td style="text-align:right">6</td>
+<td><code>ThirdPersonCameraSystem</code></td>
+<td>This translates the target position and rotation to the <code>CameraOrientation</code> component of the camera.<br> (<code>Transformation</code> &amp;&amp; <code>CameraOrientation</code> &amp;&amp; <code>ThirdPersonCamera</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">7</td>
+<td><code>FreeCamOrientation</code></td>
+<td>This translates the camera position and orientation into the <code>CameraOrientation</code> component of the camera.<br> (<code>Transformation</code> &amp;&amp; <code>CameraOrientation</code> &amp;&amp; <code>FreeCamera</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">=====</td>
+<td><strong>Rendering</strong></td>
+<td>==============</td>
+</tr>
+<tr>
+<td style="text-align:right">8</td>
+<td><code>PrepareFrameSystem</code></td>
+<td>This clears the screen and depth buffer</td>
+</tr>
+<tr>
+<td style="text-align:right">9</td>
+<td><code>UpdateLightSetup</code></td>
+<td>This loads the current lights into the <code>LightSetup</code> resource instance in the world.<br>(<code>Light</code> &amp;&amp; <code>Transformation</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">10</td>
+<td><code>BuildTransformationMatrixSystem</code></td>
+<td>This builds the transformation matrices for all entities that have a <code>TransformationMatrix</code>. <br>(<code>TransformationMatrix</code> &amp;&amp; <code>Transformation</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">12</td>
+<td><code>Start3DDrawSystem</code></td>
+<td>Creates the <code>ViewMatrix</code>. Starts the 3D shader program and uploads the <code>ViewMatrix</code> and <code>LightSetup</code> as uniforms to the 3D shader.</td>
+</tr>
+<tr>
+<td style="text-align:right">13</td>
+<td><code>StandardRenderSystem</code></td>
+<td>This system renders all entities with a <code>StandardShaderVertexArray</code> component (It rebinds the VBO every time and is therefor not optimized for larger operations). <br>(<code>StandardShaderVertexArray</code> &amp;&amp; <code>TransformationMatrix</code> &amp;&amp; <code>ObjectMaterial</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">14</td>
+<td><code>ModelRenderer</code></td>
+<td>This renders all entities with a <code>Model3D</code> reference. This is optimized to draw multiple entities without rebinding the VertexBufferArray.<br>(<code>Model3D</code> &amp;&amp; <code>TransformationMatrix</code> &amp;&amp; <code>ObjectMaterial</code>)</td>
+</tr>
+<tr>
+<td style="text-align:right">15</td>
+<td><code>Stop3DDrawSystem</code></td>
+<td>This stops the 3D shader program</td>
+</tr>
+<tr>
+<td style="text-align:right">16</td>
+<td><code>FinishFrameSystem</code></td>
+<td>This displays the content of the frame buffer</td>
+</tr>
+</tbody>
+</table>
+<h2 id="theoretical-multi-threading">Theoretical Multi-threading</h2>
+<p>The execution order in ECS is very interesting to say the least. A system operates on one entity at a time and only on a few components of that entity. This basically screams multi threading at least in Rust <img class="emoji" alt="heart" src="data:image/png;base64,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" />.</p>
+<h3 id="multi-threading-within-one-system">Multi threading within one system</h3>
+<p>Systems are usually focussed on just one entity without effecting others. The <code>MovementSystem</code> just applies the velocity to the position of an entity. This could be done in parallel on multiple entities to improve game performance.</p>
+<pre class="hljs"><code><div>   System:
+   #########################
+   #                       #
+   #   +-- entity_1 ---+   #
+####---+-- entity_2 ---+---####
+   #   +-- entity_n ---+   #
+   #                       #
+   #########################
+</div></code></pre>
+<p>A system could be executed for multiple entities at once. The movement of one entity doesn't effect the movement of a different entity (if the collision detection was calculated beforehand). The <code>MovementSystem</code> could therefore execute on all entities at once</p>
+<h3 id="multi-threading-on-different-components">Multi threading on different components</h3>
+<p>Systems are usually focussed on just a small selection on components. This would in theory enable us to operate on different components of the same entity with different systems. This possibility is also one of the main aspects to think about when designing components. We use a fictional example where we split up the <code>Transformation</code> class into the <code>Rotation</code> and <code>Position</code> with corresponding systems to modify them.</p>
+<pre class="hljs"><code><div>   +--- [ MotionSystem ] ---+
+---+                        +---
+   +--- [RotationSystem] ---+
+</div></code></pre>
+<h3 id="threading-potential-in-our-system">Threading potential in our system</h3>
+<p>Esper sadly doesn't support any multi-threading. We still created a simple overview of how our game could be multi-threaded without changing any system or component.
+<img src="res/multi-threading_potential.png" alt="multi-threading potential"></p>
+<h2 id="final-thoughts">Final thoughts</h2>
+<h3 id="xfrednet">xFrednet</h3>
+<p>I enjoyed working with this new architecture and adding some potential of reuse to the system. The potential of multi-threading and the different view of entities was and still is very intriguing for me. Working on this project has also enabled me to understand the architecture and systems that use this architecture better. (Examples are <a href="https://godotengine.org">Godot</a> and <a href="https://amethyst.rs">Amethyst</a> and other data driven systems.)</p>
+<p>However, I noticed that I still spend a lot of time learning how to use this system properly. And that is also my main complaint about the system. Well that and the performance. I have the feeling that Esper is quite performance intensive due to the continues query and no use of multi-threading. The architecture we used seems also a bit overkill for the size of the project.</p>
+<p>All of that being said. Would I use a ECS again? Yes definitely. I'm used to programming games and I always end up at a point where I need some code in several objects with different types. This architecture solves this problem completely. But it also has it mentioned down sides and it's more complicated for other team members as well <img class="emoji" alt="smiley" src="data:image/png;base64,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" /></p>
+
+</body>
+</html>

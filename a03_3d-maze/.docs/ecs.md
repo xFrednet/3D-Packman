@@ -3,7 +3,7 @@ This document documents the overall architecture in our game. We decided to use 
 
 An ECS does pretty much what it says it is doing. It defines entities as a collection of components. The structure of an ECS and their relations between each other is described in the _Parts_ section. The goal of an ECS is to enable easy reuse of behavior code like movement and collision detection and in theory supporting easy multi threading.  
 
-Note: This documentation was created in the middle of the project. We added some additional systems in the mean time. This only effects the documentation about the systems. The multi-threading implementation is still possible in the same way :) 
+Note: This documentation was created in the middle of the project. We added some additional systems in the mean time. This only effects the documentation about the systems them self. The multi-threading implementation is still possible in the same way :) 
 
 ## Parts
 The entity component system has several parts which wire together into one whole system. These parts are 
