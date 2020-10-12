@@ -15,6 +15,7 @@ def add_physics_systems_to_world(world):
     world.add_processor(MovementSystem())
     world.add_processor(GhostSystem())
     world.add_processor(WinSystem())
+    world.add_processor(LightAnimationSystem())
 
 
 class WinSystem(esper.Processor):
@@ -178,3 +179,11 @@ class VelocityToEntityAxis(esper.Processor):
             new_v.z = velocity.value.z
 
             velocity.value = new_v
+
+class LightAnimationSystem(esper.Processor):
+    def process(self):
+        for _id, (light, animation) in self.world.get_components(com.Light, com.LightAnimation):
+            if animation.enabled:
+                animation.animation_delta += self.world.delta * animation.delta_factor
+                factor = math.sin(animation.animation_delta)
+                light.color = animation.base_color + animation.add_color * factor
