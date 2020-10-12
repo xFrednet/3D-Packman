@@ -8,6 +8,9 @@ from vertex_buffer_array import StandardShaderVertexArray
 Resources are data objects that only get initiated by the world as world variables
 """
 
+STATE_RUNNING = 1
+STATE_ANIMATION = 2
+STATE_PAUSED = 3
 
 class GameControlState:
     FREE_CAM_MODE = 1
@@ -15,6 +18,7 @@ class GameControlState:
 
     def __init__(self):
         self.control_mode = GameControlState.PLAYER_MODE
+        self.allow_camera_swap = True
 
         self.key_swap_camera = pygame.locals.K_m
         self.key_swap_camera_state = False
@@ -68,3 +72,7 @@ class ModelRegistry:
 
     def get_model_count(self):
         return self._index
+
+    def cleanup(self):
+        for vbo in self._model_registry:
+            vbo.cleanup()

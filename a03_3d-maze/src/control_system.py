@@ -32,9 +32,9 @@ class GameControlSystem(esper.Processor):
         controls: res.GameControlState = self.world.controls
 
         # Swap camera
-        if keys[controls.key_swap_camera] and not controls.key_swap_camera_state:
-            self._swap_camera()
+        if keys[controls.key_swap_camera] and not controls.key_swap_camera_state and controls.allow_camera_swap:
             # swap camera
+            self.world._swap_camera()
 
         # Reset
         if keys[controls.key_return_to_home] and not controls.key_return_to_home_state:
@@ -49,15 +49,6 @@ class GameControlSystem(esper.Processor):
         controls.key_return_to_home_state = keys[controls.key_return_to_home]
 
         self._acknowledge_input()
-
-    def _swap_camera(self):
-        controls: res.GameControlState = self.world.controls
-        if controls.control_mode == res.GameControlState.PLAYER_MODE:
-            self.world.camera_id = self.world.free_cam
-            controls.control_mode = res.GameControlState.FREE_CAM_MODE
-        else:
-            self.world.camera_id = self.world.player_cam
-            controls.control_mode = res.GameControlState.PLAYER_MODE
 
     def _acknowledge_input(self):
         controls: res.GameControlState = self.world.controls

@@ -7,7 +7,7 @@ from shader_program import StandardShaderProgram
 from vertex_buffer_array import StandardShaderVertexArray
 
 
-def add_3d_render_systems_to_world(world):
+def add_systems_to_world(world):
     world.add_processor(UpdateLightSetup())
     world.add_processor(BuildTransformationMatrixSystem())
     world.add_processor(Start3DDrawSystem())

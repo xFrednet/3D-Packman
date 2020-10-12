@@ -19,7 +19,7 @@ class World(esper.World):
         super().__init__()
 
         self.resolution = resolution
-        self.running = True
+        self.state = res.STATE_RUNNING
         self.life = 3
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
@@ -50,6 +50,7 @@ class World(esper.World):
         for _entity, vbo in self.get_component(StandardShaderVertexArray):
             vbo.cleanup()
 
+        self.model_registry.cleanup()
         self.standard_shader.cleanup()
 
         print("World: Cleanup complete")
@@ -67,7 +68,7 @@ class World(esper.World):
         # Prepare
         consys.add_systems_2_to_world(self)
         self.add_processor(rsys.PrepareFrameSystem())
-        rsys3d.add_3d_render_systems_to_world(self)
+        rsys3d.add_systems_to_world(self)
         self.add_processor(rsys.FinishFrameSystem())
 
     def _setup_entities(self):
@@ -98,7 +99,7 @@ class World(esper.World):
 
         self.free_cam = self.create_entity(
             com.Transformation(position=glm.vec3(0.0, 10.0, 5.0), rotation=glm.vec3()),
-            com.Velocity(along_world_axis=False),
+            com.Velocity(along_world_axis=False, allow_paused=True),
             com.FreeCamera(),
             com.CameraOrientation(),
             com.Home(z=5.0))
@@ -138,7 +139,7 @@ class World(esper.World):
             com.Transformation(position=glm.vec3(self.maze[1].x, self.maze[1].y, 1.0)),
             com.Win(),
             com.Velocity(),
-            com.BoundingBox(com.Rectangle3D(0.5, 0.5, 0.5)),
+            com.BoundingBox(com.Rectangle3D(1.0, 1.0, 1.0)),
             com.CollisionComponent(),
             com.Light(
                 color=glm.vec3(1.0, 0.8, 0.0),
@@ -156,19 +157,30 @@ class World(esper.World):
             transformation.position = home.position
             velocity.value = glm.vec3()
         if self.life == 0:
-            # time.sleep(3)
-            # print('Game Over!')
-            # self.running = False
-            pass
+            self.end_game()
+            print('Game Over!')
         elif self.life == 1:
             print(f'You have {self.life} live left!')
         else:
             print(f'You have {self.life} lives left!')
 
     def won_game(self):
-        print('YOu Won The Game!')
-        time.sleep(3)
-        self.running = False
+        self.end_game()
+        print('You winted!')
+
+    def end_game(self):
+        pass
+
+    def _swap_camera(self):
+        controls: res.GameControlState = self.controls
+        if controls.control_mode == res.GameControlState.PLAYER_MODE:
+            self.camera_id = self.free_cam
+            controls.control_mode = res.GameControlState.FREE_CAM_MODE
+            self.state = res.STATE_PAUSED
+        else:
+            self.camera_id = self.player_cam
+            controls.control_mode = res.GameControlState.PLAYER_MODE
+            self.state = res.STATE_RUNNING
 
     def update_resolution(self, resolution):
         self.resolution = resolution

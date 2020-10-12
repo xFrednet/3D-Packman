@@ -1,9 +1,11 @@
 import math
+import random as rand
 
-import components_3d as com
 import esper
 import glm
-import random as rand
+
+import resources as res
+import components_3d as com
 
 
 def add_physics_systems_to_world(world):
@@ -39,8 +41,10 @@ class GhostSystem(esper.Processor):
 class MovementSystem(esper.Processor):
     def process(self):
         for entity_id, (transformation, velocity) in self.world.get_components(com.Transformation, com.Velocity):
-            planned_velocity = velocity.value * self.world.delta
-            transformation.position = transformation.position + planned_velocity
+            if self.world.state == res.STATE_RUNNING or \
+                    (self.world.state == res.STATE_PAUSED and velocity.allow_paused):
+                planned_velocity = velocity.value * self.world.delta
+                transformation.position = transformation.position + planned_velocity
 
 
 class GravitySystem(esper.Processor):
@@ -49,14 +53,16 @@ class GravitySystem(esper.Processor):
                 com.Velocity,
                 com.PhysicsObject,
                 com.CollisionComponent):
-            if collision.is_colliding_z:
-                phys.air_time = 0.0
-            else:
-                gravity = 9.0
-                old_grav = phys.air_time ** 2 * gravity
-                phys.air_time += self.world.delta
-                new_grav = phys.air_time ** 2 * gravity
-                velocity.value.z -= new_grav - old_grav
+            if self.world.state == res.STATE_RUNNING or \
+                    (self.world.state == res.STATE_PAUSED and velocity.allow_paused):
+                if collision.is_colliding_z:
+                    phys.air_time = 0.0
+                else:
+                    gravity = 9.0
+                    old_grav = phys.air_time ** 2 * gravity
+                    phys.air_time += self.world.delta
+                    new_grav = phys.air_time ** 2 * gravity
+                    velocity.value.z -= new_grav - old_grav
 
 
 class CollisionSystem(esper.Processor):
@@ -66,6 +72,9 @@ class CollisionSystem(esper.Processor):
     """
 
     def process(self):
+        if self.world.state == res.STATE_PAUSED:
+            return
+
         for hero_id, (hero_transformation,
                       hero_velocity,
                       hero_bounding_box,

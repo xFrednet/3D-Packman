@@ -10,7 +10,7 @@ def game_loop(world):
     clock = pygame.time.Clock()
     last_millis = pygame.time.get_ticks()
 
-    while world.running:
+    while True:
         # Delta timing. See https://en.wikipedia.org/wiki/Delta_timing
         # Trust me, this gets important in larger games
         # Pygame implementation stolen from:
@@ -23,8 +23,7 @@ def game_loop(world):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.locals.K_ESCAPE:
+            elif event.type == pygame.KEYDOWN and event.key == pygame.locals.K_ESCAPE:
                     return
 
         # Update
