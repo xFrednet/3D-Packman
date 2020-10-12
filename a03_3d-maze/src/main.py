@@ -28,7 +28,6 @@ def game_loop(world):
             if event.type == pygame.QUIT:
                 return
             elif event.type == pygame.KEYDOWN and event.key == pygame.locals.K_ESCAPE:
-                print('You quit the game!')
                 return
 
         # Update

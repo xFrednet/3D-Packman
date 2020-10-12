@@ -55,6 +55,7 @@ class GameControlSystem(esper.Processor):
                 False,
                 0.0)
             self._arrow_key_rotation(self.world.player_object, enable_pitch=False)
+            self._mouse_control(self.world.player_object, enable_pitch=False)
             # self._player_jump()
         else:
             self._wasd_movement(
@@ -63,7 +64,8 @@ class GameControlSystem(esper.Processor):
                 True,
                 controls.free_camera_vertical_speed)
             self._arrow_key_rotation(self.world.free_cam)
-        
+            self._mouse_control(self.world.free_cam)
+
         # self._change_light(self.world.win_object)
 
     def _wasd_movement(self, entity_id, speed, vertical_movement, vertical_speed):
@@ -95,17 +97,36 @@ class GameControlSystem(esper.Processor):
                 velocity.value.z += vertical_speed
             if keys[pygame.locals.K_LSHIFT]:
                 velocity.value.z -= vertical_speed
-        
+
         if keys[pygame.locals.K_p]:
             tra = self.world.component_for_entity(entity_id, com.Transformation)
             print(f"Transformation(Position: {tra.position}, Rotation: {tra.rotation})")
-        
+
+    def _mouse_control(self, entity_id, enable_pitch=True):
+        transformation = self.world.component_for_entity(entity_id, com.Transformation)
+        (rel_x, rel_y) = pygame.mouse.get_rel()
+        if enable_pitch:
+            pitch_change = 0.0
+            if rel_y > 0:
+                pitch_change += 0.01  # I think it is too fast with change 0.1
+            if rel_y < 0:
+                pitch_change -= 0.01
+            transformation.rotation.y = clamp(
+                transformation.rotation.y + pitch_change,
+                (math.pi - 0.2) / -2,
+                (math.pi - 0.2) / 2)
+
+        if rel_x < 0:
+            transformation.rotation.x += 0.1
+        if rel_x > 0:
+            transformation.rotation.x -= 0.1
+
     def _arrow_key_rotation(self, entity_id, enable_pitch=True):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)
 
         keys = pygame.key.get_pressed()
-        
-        if (enable_pitch):
+
+        if enable_pitch:
             pitch_change = 0.0
             if keys[pygame.locals.K_UP]:
                 pitch_change += 0.1
@@ -128,7 +149,7 @@ class GameControlSystem(esper.Processor):
             if keys[pygame.locals.K_SPACE]:
                 v = self.world.component_for_entity(self.world.player_object, com.Velocity)
                 v.value.z += self.world.controls.player_jump_height
-    
+
     def _change_light(self, entity_id):
         keys = pygame.key.get_pressed()
         light: com.Light = self.world.component_for_entity(entity_id, com.Light)
@@ -161,7 +182,6 @@ class GameControlSystem(esper.Processor):
 
         if keys[pygame.locals.K_p]:
             print(f"Light(color: {light.color}, attenuation: {light.attenuation})")
-
 
 
 class ThirdPersonCameraSystem(esper.Processor):
