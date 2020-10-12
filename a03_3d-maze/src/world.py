@@ -117,6 +117,7 @@ class World(esper.World):
                 color=glm.vec3(0.5, 0.4, 0.4)))
 
         # ghost
+        ghost_light_count = self.light_setup.MAX_LIGHT_COUNT - 2 - 1
         min_val = min(self.maze_width, self.maze_length)
         ghosts = self.level * min_val * 0.2
         # fallback
