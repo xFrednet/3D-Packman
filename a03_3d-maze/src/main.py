@@ -3,6 +3,7 @@ import sys
 
 import glm
 import pygame
+import pygame.display
 from world import World
 
 RESOLUTION = 1024, 720
@@ -40,7 +41,8 @@ def main():
     pygame.init()
     pygame.display.init()
     pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF | pygame.OPENGL)
-    pygame.display.set_caption("Le 3D maze of time")
+    pygame.display.set_caption("Le maze: 3D-Packman - just a bit worse")
+    pygame.mouse.set_visible(False)
     running = True
     world = World(glm.vec2(RESOLUTION), LEVEL)
 

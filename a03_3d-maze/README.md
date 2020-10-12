@@ -10,6 +10,8 @@
 | Return to Home    | `[H]`                      |
 | Debug information | `[P]`                      | 
 
+You can also use the mouse to rotate the view :)
+
 ## Installing and running the game
 This game uses: 
 * PyOpenGL and pygame for rendering

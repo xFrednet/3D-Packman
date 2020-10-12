@@ -24,6 +24,8 @@ class GameControlState:
         self.key_return_to_home = pygame.locals.K_h
         self.key_return_to_home_state = False
 
+        self.mouse_sensitivity = 0.005
+
         self.player_speed = 10.0
         self.player_jump_height = 15.0
         self.free_camera_speed = 10.0
