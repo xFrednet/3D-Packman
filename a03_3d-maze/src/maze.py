@@ -31,7 +31,7 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
 
     # Le floor
     floor_size = glm.vec2(width * (wall_width + path_width) / 2, height * (wall_width + path_width) / 2)
-    maze.center = glm.vec3(floor_size.x / 2, floor_size.y / 2, 0)
+    maze.center = glm.vec3(floor_size.x / 2 + wall_width / 2, floor_size.y / 2 + wall_width / 2, 0)
     world.create_entity(
         com.Model3D(model_id),
         com.Transformation(
@@ -63,9 +63,11 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
                 w = wall_width
             else:
                 w = path_width
+            
             is_set = False
             if j < len(m[0]):
                 is_set = m[i][j]
+
             if is_set:
                 if not has_shape:
                     has_shape = True
@@ -81,8 +83,8 @@ def _setup_maze(world, width, height, depth=2.0, wall_width=1.0, path_width=3.0)
                 unites(shape_x, y, world, shape_w, h, depth, model_id, diffuse)
                 has_shape = False
                 shape_w = 0
-            else:
-                maze.empty_areas_loc.append([x, y])
+            elif (i % 2 == 0 or j % 2 == 0):
+                maze.empty_areas_loc.append([x + path_width / 2, y + path_width / 2])
             x += w
         y += h
     return maze

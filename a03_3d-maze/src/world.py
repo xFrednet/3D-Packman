@@ -125,7 +125,7 @@ class World(esper.World):
             g = random.random()
             b = random.random()
             x, y = self.maze.empty_areas_loc[coord]
-            position = glm.vec3(x + 1, y + 1, 4.0)
+            position = glm.vec3(x, y, 2.0)
             self.ghost = self.create_entity(
                 com.Model3D(self.model_registry.get_model_id(res.ModelRegistry.GHOST)),
                 com.Ghost(),

@@ -40,7 +40,7 @@ class GhostSystem(esper.Processor):
             if self.world.player_object in ghost_col.failed:
                 self.world.damage_player()
 
-            if ghost_col.is_colliding_y or ghost_col.is_colliding_x:
+            if ghost_col.is_colliding_y or ghost_col.is_colliding_x or glm.length(velocity.value) < 1:
                 velocity.value = glm.normalize(
                     glm.vec3(rand.uniform(-1.0, 1.0), rand.uniform(-1.0, 1.0), 0.0)
                 ) * GhostSystem.SPEED
@@ -77,6 +77,8 @@ class CollisionSystem(esper.Processor):
     """
     Welcome to the world of cheats and liars. We are only doing collision
     detection on the x and y direction. 
+    We've now implemented vertical collision detection but I'm still super unhappy with it -.-.
+    It's not as smooth as it should be and has multiple bugs
     """
 
     def process(self):
