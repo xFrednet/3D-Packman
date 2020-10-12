@@ -1,5 +1,5 @@
 import random
-
+from sound_manager import SoundManager
 import components_3d as com
 import control_system as consys
 import esper
@@ -16,7 +16,7 @@ from vertex_buffer_array import StandardShaderVertexArray
 class World(esper.World):
     def __init__(self, resolution, level):
         super().__init__()
-
+        self.sound = SoundManager()
         self.resolution = resolution
         self.state = res.STATE_RUNNING
         self.life = 3
@@ -157,9 +157,11 @@ class World(esper.World):
         )
 
     def damage_player(self):
+        self.sound.pause_music()
+        self.sound.play_sound('damage')
         self.life -= 1
         self.component_for_entity(self.player_object, com.ObjectMaterial).diffuse *= 0.7
-
+        self.sound.unpause_music()
         if self.life > 1:
             print(f'You have {self.life} lives left!')
             self.home_entities()
@@ -168,13 +170,18 @@ class World(esper.World):
             self.home_entities()
         else:
             print('Game Over!')
+            self.sound.stop_music()
             self.end_game()
 
     def won_game(self):
+        self.sound.stop_music()
+        self.sound.play_sound('win')
         print('You winted!')
-        self.end_game()
+        self.end_game(False)
 
-    def end_game(self):
+    def end_game(self, lost=True):
+        if lost:  # to differentiate the sounds  win/lost
+            self.sound.play_sound('game_over')
         # Clear collisions
         for _id, collision in self.get_component(com.CollisionReport):
             collision.failed.clear()

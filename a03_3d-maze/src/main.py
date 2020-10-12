@@ -13,7 +13,8 @@ LEVEL = 1
 def game_loop(world):
     clock = pygame.time.Clock()
     last_millis = pygame.time.get_ticks()
-
+    world.sound.play_sound('start')
+    world.sound.play_music()
     while True:
         # Delta timing. See https://en.wikipedia.org/wiki/Delta_timing
         # Trust me, this gets important in larger games
@@ -28,7 +29,6 @@ def game_loop(world):
             if event.type == pygame.QUIT:
                 return
             elif event.type == pygame.KEYDOWN and event.key == pygame.locals.K_ESCAPE:
-                print('You quit the game!')
                 return
 
         # Update
