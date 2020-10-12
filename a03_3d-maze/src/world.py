@@ -14,13 +14,13 @@ from vertex_buffer_array import StandardShaderVertexArray
 
 
 class World(esper.World):
-    def __init__(self, resolution):
+    def __init__(self, resolution, level):
         super().__init__()
 
         self.resolution = resolution
         self.state = res.STATE_RUNNING
         self.life = 3
-        self.level = 1
+        self.level = level
         self.standard_shader = StandardShaderProgram()
         self.delta = 0.00001
         self.light_setup = res.LightSetup(global_ambient=glm.vec3(0.3, 0.3, 0.3))
@@ -117,14 +117,11 @@ class World(esper.World):
 
         # ghost
         min_val = min(self.maze_width, self.maze_length)
-        ghosts = self.level * min_val * 0.1
-        print('empty areas:', len(self.maze[0]))
-        print('ghosts nr:', ghosts)
+        ghosts = self.level * min_val * 0.2
         # fallback
         if ghosts < 5:
             ghosts = 5
-        print('ghosts nr:', ghosts)
-        for i in range(ghosts):
+        for i in range(int(ghosts)):
             coord = random.randint(0, len(self.maze[0]) - 1)
             r = random.random()
             g = random.random()
