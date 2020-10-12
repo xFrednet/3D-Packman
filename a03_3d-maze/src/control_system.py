@@ -102,25 +102,28 @@ class GameControlSystem(esper.Processor):
             print(f"Transformation(Position: {tra.position}, Rotation: {tra.rotation})")
 
     def _mouse_control(self, entity_id, enable_pitch=True):
+        controls: res.GameControlState = self.world.controls
+        screen_center = self.world.resolution / 2.0
+        
+        # If python breaks on this try updating pygame :D
         (is_pressed, _, _, _, _) = pygame.mouse.get_pressed()
-        transformation = self.world.component_for_entity(entity_id, com.Transformation)
-        (rel_x, rel_y) = pygame.mouse.get_rel()
         if is_pressed:
+            transformation = self.world.component_for_entity(entity_id, com.Transformation)
+            #(rel_x, rel_y) = pygame.mouse.get_rel()
+            (pos_x, pos_y) = pygame.mouse.get_pos()
+            rel_x = screen_center.x - pos_x
+            rel_y = screen_center.y - pos_y
+
             if enable_pitch:
-                pitch_change = 0.0
-                if rel_y > 0:
-                    pitch_change += 0.01  # I think it is too fast with change 0.1
-                if rel_y < 0:
-                    pitch_change -= 0.01
+                pitch_change = rel_y * controls.mouse_sensitivity
                 transformation.rotation.y = clamp(
                     transformation.rotation.y + pitch_change,
                     (math.pi - 0.2) / -2,
                     (math.pi - 0.2) / 2)
 
-            if rel_x < 0:
-                transformation.rotation.x += 0.1
-            if rel_x > 0:
-                transformation.rotation.x -= 0.1
+            transformation.rotation.x += rel_x * controls.mouse_sensitivity
+            
+        pygame.mouse.set_pos([screen_center.x, screen_center.y])
 
     def _arrow_key_rotation(self, entity_id, enable_pitch=True):
         transformation = self.world.component_for_entity(entity_id, com.Transformation)
