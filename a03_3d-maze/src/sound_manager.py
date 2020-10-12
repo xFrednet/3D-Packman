@@ -11,7 +11,7 @@ class SoundManager:
         self.win = pygame.mixer.Sound(self.path + 'win.wav')
 
     def play_music(self):
-        pygame.mixer.music.load(self.path + '/game.wav')
+        pygame.mixer.music.load(self.path + 'game.wav')
         pygame.mixer.music.play(-1)
 
     def play_sound(self, sound):
