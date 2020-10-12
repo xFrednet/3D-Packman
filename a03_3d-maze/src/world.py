@@ -117,7 +117,6 @@ class World(esper.World):
                 color=glm.vec3(0.5, 0.4, 0.4)))
 
         # ghost
-        print('In world', self.level)
         min_val = min(self.maze_width, self.maze_length)
         ghosts = self.level * min_val * 0.2
         # fallback
@@ -140,7 +139,9 @@ class World(esper.World):
                 com.BoundingBox(com.Rectangle3D(2.0, 2.0, 3.0)),
                 com.CollisionComponent(),
                 com.PhysicsObject(),
-                com.Home(position=position)
+                com.Home(position=position),
+                com.Light(attenuation=glm.vec3(0.1, 0.0, 1.0), enabled=(i < ghost_light_count)),
+                com.LightAnimation(base_color=glm.vec3(), add_color=glm.vec3(r, g, b), delta_factor=random.uniform(0.8, 1.4))
             )
 
         self.win_object = self.create_entity(
