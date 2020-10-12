@@ -55,7 +55,7 @@ class GameControlSystem(esper.Processor):
                 False,
                 0.0)
             self._arrow_key_rotation(self.world.player_object, enable_pitch=False)
-            self._player_jump()
+            # self._player_jump()
         else:
             self._wasd_movement(
                 self.world.free_cam,
@@ -64,7 +64,7 @@ class GameControlSystem(esper.Processor):
                 controls.free_camera_vertical_speed)
             self._arrow_key_rotation(self.world.free_cam)
         
-        self._change_light(self.world.win_object)
+        # self._change_light(self.world.win_object)
 
     def _wasd_movement(self, entity_id, speed, vertical_movement, vertical_speed):
         keys = pygame.key.get_pressed()
