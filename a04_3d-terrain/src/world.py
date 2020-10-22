@@ -29,7 +29,7 @@ class World(esper.World):
         print("World was created")
 
     def _setup_systems(self):
-        self.add_processor(TestSystem())
+        self.add_processor(systems.FreeCameraControlSystem())
         self.add_processor(systems.BuildTransformationMatrixSystem())
         self.add_processor(systems.PrepareFrameSystem())
         self.add_processor(systems.TerrainRenderer())
