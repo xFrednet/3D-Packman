@@ -9,6 +9,7 @@ from graphics.shader_program import TerrainShader
 class TerrainRenderer(esper.Processor):
     def process(self, *args, **kwargs):
 
+        gl.glEnable(gl.GL_CULL_FACE)
         shader: TerrainShader = self.world.terrainShader
         shader.start()
         shader.load_view_matrix(self.world.view_matrix)
@@ -17,12 +18,13 @@ class TerrainRenderer(esper.Processor):
         for _id, (vba, transformation) in self.world.get_components(TerrainVba, TransformationMatrix):
             # Bind buffers
             gl.glBindVertexArray(vba.vba_id)
+            vba.index_buffer.bind()
             gl.glEnableVertexAttribArray(TerrainVba.POSITION_ATTR)
             gl.glEnableVertexAttribArray(TerrainVba.NORMAL_ATTR)
 
             # Draw the beautiful
             shader.load_transformation_matrix(transformation.value)
-            gl.glDrawArrays(gl.GL_TRIANGLES, 0, vba.vertex_count)
+            gl.glDrawElements(gl.GL_TRIANGLE_STRIP, vba.vertex_count, gl.GL_UNSIGNED_INT, None)
 
             # Unbind the thingies
             gl.glDisableVertexAttribArray(TerrainVba.POSITION_ATTR)

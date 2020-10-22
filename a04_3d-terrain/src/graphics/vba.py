@@ -1,16 +1,17 @@
 import ctypes
+import numpy 
 
 from OpenGL import GL as gl
-
+from OpenGL.arrays import vbo
 
 class VertexBufferArray:
     def __init__(self, vertex_count):
         self.vba_id = gl.glGenVertexArrays(1)
         self.vertex_count = vertex_count
-        self._vertex_buffer = []
+        self._buffer = []
 
     def cleanup(self):
-        for vb in self._vertex_buffer:
+        for vb in self._buffer:
             gl.glDeleteBuffers(1, [vb])
 
         gl.glDeleteVertexArrays(1, [self.vertex_array_id])
@@ -20,7 +21,7 @@ class VertexBufferArray:
 
         vertex_buffer = gl.glGenBuffers(1)
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, vertex_buffer)
-        self._vertex_buffer.append(vertex_buffer)
+        self._buffer.append(vertex_buffer)
 
         array_type = (gl_array_type * len(data))
         gl.glBufferData(
@@ -29,8 +30,8 @@ class VertexBufferArray:
             array_type(*data),
             gl.GL_STATIC_DRAW)
         gl.glVertexAttribPointer(
-            attr_id,  # attribute 0.
-            items_per_vertex,  # components per vertex attribute
+            attr_id,  
+            items_per_vertex,
             gl_type,  # type
             False,  # to be normalized?
             0,  # stride
@@ -49,7 +50,19 @@ class VertexBufferArray:
             ctypes.sizeof(ctypes.c_float))
 
 
-class TerrainVba(VertexBufferArray):
+class IndexedVertexArrayBuffer(VertexBufferArray):
+    
+    def __init__(self, vertex_count):
+        super().__init__(vertex_count)
+        self.index_buffer2 = None
+        self.index_buffer = None
+    
+    def load_index_buffer(self, data):
+        indices = numpy.array([data], dtype=numpy.int32)
+        self.index_buffer = vbo.VBO(indices, target=gl.GL_ELEMENT_ARRAY_BUFFER)
+
+
+class TerrainVba(IndexedVertexArrayBuffer):
     POSITION_ATTR = 0
     NORMAL_ATTR = 1
 
