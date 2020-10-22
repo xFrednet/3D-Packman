@@ -1,3 +1,4 @@
+import glm
 import esper
 
 from components import Transformation, TransformationMatrix
@@ -23,5 +24,5 @@ class Terrain:
 
         world.create_entity(
             vba,
-            Transformation(),
+            Transformation(position=glm.vec3(1.0, 0.0, 0.0), rotation=glm.vec3(0.0, 1.6, 0.0)),
             TransformationMatrix())

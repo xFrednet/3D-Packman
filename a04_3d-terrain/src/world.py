@@ -5,7 +5,7 @@ import terrain
 
 import systems
 
-from components import Transformation, CameraOrientation
+from components import Transformation, CameraOrientation, FreeCamera
 from graphics import graphics_math, shader_program
 
 class World(esper.World):
@@ -30,6 +30,7 @@ class World(esper.World):
 
     def _setup_systems(self):
         self.add_processor(systems.FreeCameraControlSystem())
+        self.add_processor(systems.FreeCameraOrientationSystem())
         self.add_processor(systems.BuildTransformationMatrixSystem())
         self.add_processor(systems.PrepareFrameSystem())
         self.add_processor(systems.TerrainRenderer())
@@ -37,8 +38,9 @@ class World(esper.World):
 
     def _setup_entities(self):
         self.camera_id = self.create_entity(
-            Transformation(position=glm.vec3(0.0, 0.0, -1.0)),
-            CameraOrientation()
+            Transformation(),
+            CameraOrientation(),
+            FreeCamera()
         )
 
     def cleanup(self):
