@@ -73,4 +73,19 @@ class TerrainShader(ShaderProgram):
         fragment_file.close()
 
         self._compile_shaders(shaders)
+
+        self.vs_transformation_matrix_loc = self._load_uniform_location("u_transformation_matrix")
+        self.vs_view_matrix_loc = self._load_uniform_location("u_view_matrix")
+        self.vs_projection_matrix_loc = self._load_uniform_location("u_projection_matrix")
+
         print("Terrain shader is alive")
+
+    
+    def load_transformation_matrix(self, mat):
+        gl.glUniformMatrix4fv(self.vs_transformation_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
+
+    def load_view_matrix(self, mat):
+        gl.glUniformMatrix4fv(self.vs_view_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
+
+    def load_projection_matrix(self, mat):
+        gl.glUniformMatrix4fv(self.vs_projection_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
