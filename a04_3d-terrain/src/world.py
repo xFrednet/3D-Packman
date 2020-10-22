@@ -3,7 +3,7 @@ import glm
 
 import terrain
 
-from graphics import frame_system
+from graphics import frame_system, shader_program
 
 class World(esper.World):
     def __init__(self, resolution):
@@ -11,6 +11,7 @@ class World(esper.World):
         self.resolution = resolution
         self.delta = 0.00001
         self.terrain = terrain.Terrain()
+        self.terrainShader = shader_program.TerrainShader()
         
         self._setup_systems()
 
@@ -24,4 +25,6 @@ class World(esper.World):
         self.add_processor(frame_system.FinishFrameSystem())
 
     def cleanup(self):
+        self.terrainShader.cleanup()
+
         print("World cleanup complete")

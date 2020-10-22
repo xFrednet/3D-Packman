@@ -1,4 +1,5 @@
 import math
+import os
 import sys
 
 import glm
@@ -18,7 +19,11 @@ class ShaderProgram:
         gl.glDeleteProgram(self.program_id)
 
     def _compile_shaders(self, shaders):
-        for shader_type, shader_src in shaders.items():
+        for name, info in shaders.items():
+            shader_type = info[0]
+            shader_src = info[1]
+            
+            print("Compiling: ", name)
             shader_id = gl.glCreateShader(shader_type)
             gl.glShaderSource(shader_id, shader_src)
 
@@ -53,3 +58,19 @@ class ShaderProgram:
 
     def stop(self):
         gl.glUseProgram(0)
+
+class TerrainShader(ShaderProgram):
+    def __init__(self):
+        super().__init__()
+
+        vertex_file = open(os.getcwd() + "/res/shader/terrain.vert")
+        fragment_file = open(os.getcwd() + "/res/shader/terrain.frag")
+        shaders = {
+            "terrain.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
+            "terrain.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
+        }
+        vertex_file.close()
+        fragment_file.close()
+
+        self._compile_shaders(shaders)
+        print("Terrain shader is alive")

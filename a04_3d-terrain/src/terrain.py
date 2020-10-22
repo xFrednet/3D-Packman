@@ -3,6 +3,7 @@ import esper
 from OpenGL import GL as gl
 
 from graphics.vba import TerrainVba
+from graphics.shader_program import TerrainShader
 
 class Terrain:
     def __init__(self):
@@ -16,9 +17,9 @@ class Terrain:
              0.5,  0.5, 0.0 
         ])
         vba.load_normal_data([
+            1.0, 0.0, 0.0,
             0.0, 1.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 1.0, 0.0
+            0.0, 0.0, 1.0
         ])
 
         world.create_entity(vba)
@@ -26,6 +27,10 @@ class Terrain:
 
 class TerrainRenderer(esper.Processor):
     def process(self, *args, **kwargs):
+
+        shader: TerrainShader = self.world.terrainShader
+        shader.start()
+
         for _id, vba in self.world.get_component(TerrainVba):
             # Bind buffers
             gl.glBindVertexArray(vba.vba_id)
@@ -41,3 +46,5 @@ class TerrainRenderer(esper.Processor):
             gl.glDisableVertexAttribArray(TerrainVba.POSITION_ATTR)
             gl.glDisableVertexAttribArray(TerrainVba.NORMAL_ATTR)
             gl.glBindVertexArray(0)
+        
+        shader.stop()
