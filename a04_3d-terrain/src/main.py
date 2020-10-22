@@ -1,6 +1,3 @@
-import getopt
-import sys
-
 import pygame
 import pygame.display
 import pygame.locals
