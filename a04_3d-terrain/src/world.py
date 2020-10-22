@@ -3,10 +3,10 @@ import glm
 
 import terrain
 
-from graphics import shader_program, graphics_math
-from systems import frame_system, render_preperation_system
+import systems
 
 from components import Transformation, CameraOrientation
+from graphics import graphics_math, shader_program
 
 class World(esper.World):
     def __init__(self, resolution):
@@ -30,10 +30,10 @@ class World(esper.World):
 
     def _setup_systems(self):
         self.add_processor(TestSystem())
-        self.add_processor(render_preperation_system.BuildTransformationMatrixSystem())
-        self.add_processor(frame_system.PrepareFrameSystem())
-        self.add_processor(terrain.TerrainRenderer())
-        self.add_processor(frame_system.FinishFrameSystem())
+        self.add_processor(systems.BuildTransformationMatrixSystem())
+        self.add_processor(systems.PrepareFrameSystem())
+        self.add_processor(systems.TerrainRenderer())
+        self.add_processor(systems.FinishFrameSystem())
 
     def _setup_entities(self):
         self.camera_id = self.create_entity(
