@@ -24,9 +24,9 @@ class Terrain:
         for z in range(depth):
             for x in range(width):
                 y = height_map.get_avg(x, z) * Terrain.Y_MULTIPLIER - Terrain.Y_WATER_LEVEL
-                vertices.append(float(x))
+                vertices.append(float(x * 10))
                 vertices.append(y)
-                vertices.append(float(z))
+                vertices.append(float(z * 10))
 
                 if (z != 0 and x != 0):
                     h = vertices[(x + (z - 1) * width) * 3 + 1] - y
