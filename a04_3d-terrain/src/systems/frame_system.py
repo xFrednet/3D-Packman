@@ -14,8 +14,7 @@ class PrepareFrameSystem(esper.Processor):
             orientation.look_at,
             orientation.up)
 
-        # gl.glEnable(gl.GL_DEPTH_TEST)
-        # 
+        gl.glEnable(gl.GL_DEPTH_TEST)
         gl.glClearColor(0.2, 0.2, 0.2, 0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 

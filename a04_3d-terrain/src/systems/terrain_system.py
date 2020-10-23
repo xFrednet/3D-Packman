@@ -24,7 +24,7 @@ class TerrainRenderer(esper.Processor):
 
             # Draw the beautiful
             shader.load_transformation_matrix(transformation.value)
-            gl.glDrawElements(gl.GL_TRIANGLE_STRIP, vba.vertex_count, gl.GL_UNSIGNED_INT, None)
+            gl.glDrawElements(gl.GL_TRIANGLES, vba.vertex_count, gl.GL_UNSIGNED_INT, None)
 
             # Unbind the thingies
             gl.glDisableVertexAttribArray(TerrainVba.POSITION_ATTR)
