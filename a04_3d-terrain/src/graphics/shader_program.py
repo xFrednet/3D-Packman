@@ -157,4 +157,6 @@ class TerrainShader(Common3DShaderProgram):
 
         self._map_uniforms()
 
+        self.u_tex_map = self._load_uniform_location('u_tex_map')
+
         print("Terrain shader is alive")

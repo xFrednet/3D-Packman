@@ -7,40 +7,29 @@ from graphics import TerrainVba, Sprite
 
 
 class Terrain:
-    Y_MULTIPLIER = 0.25
+    Y_MULTIPLIER = 1.0
     Y_WATER_LEVEL = 128.0 * Y_MULTIPLIER
 
     def __init__(self):
         pass
     
     def create_chunks(self, world):
-        height_map = Sprite('res/terrain/heightmap.png')
+        height_map = Sprite('res/terrain/height_map.png')
         width = height_map.width
         depth = height_map.height
         
         vertices = []
-        normals = []
-        n_vec = glm.vec3()
+        tex_coords = []
+        
         for z in range(depth):
             for x in range(width):
                 y = height_map.get_avg(x, z) * Terrain.Y_MULTIPLIER - Terrain.Y_WATER_LEVEL
-                vertices.append(float(x * 10))
+                vertices.append(float(x * 4))
                 vertices.append(y)
-                vertices.append(float(z * 10))
+                vertices.append(float(z * 4))
 
-                if (z != 0 and x != 0):
-                    h = vertices[(x + (z - 1) * width) * 3 + 1] - y
-                    l = vertices[((x - 1) + z * width) * 3 + 1] - y
-
-                    total = math.sqrt((h ** 2) + (l ** 2) + 1)
-
-                    normals.append(h / total)
-                    normals.append(1.0 / total)
-                    normals.append(l / total)
-                else:
-                    normals.append(0.0)
-                    normals.append(1.0)
-                    normals.append(0.0)
+                tex_coords.append(x / width)
+                tex_coords.append(z / depth)
 
         indices = []
         for col in range(width - 1):
@@ -64,11 +53,13 @@ class Terrain:
 
         vba = TerrainVba(len(indices))
         vba.load_position_data(vertices)
-        vba.load_normal_data(normals)
+        vba.load_tex_coords_data(tex_coords)
         vba.load_index_buffer(indices)
 
+        height_map = Sprite('res/terrain/texture_map.png')
         world.create_entity(
             vba,
             Transformation(position=glm.vec3(1.0, 0.0, 0.0), rotation=glm.vec3(0.0, 0.0, 0.0)),
             TransformationMatrix(),
-            ObjectMaterial(diffuse=glm.vec3(0.25, 0.8, 0.0)))
+            ObjectMaterial(diffuse=glm.vec3(0.25, 0.8, 0.0)),
+            height_map.gen_texture())

@@ -64,7 +64,7 @@ class IndexedVertexArrayBuffer(VertexBufferArray):
 
 class TerrainVba(IndexedVertexArrayBuffer):
     POSITION_ATTR = 0
-    NORMAL_ATTR = 1
+    TEX_COORDS_ATTR = 1
 
     def __init__(self, vertex_count):
         super().__init__(vertex_count)
@@ -72,5 +72,5 @@ class TerrainVba(IndexedVertexArrayBuffer):
     def load_position_data(self, data):
         self._load_vertex_buffer_f(TerrainVba.POSITION_ATTR, data, 3)
 
-    def load_normal_data(self, data):
-        self._load_vertex_buffer_f(TerrainVba.NORMAL_ATTR, data, 3)
+    def load_tex_coords_data(self, data):
+        self._load_vertex_buffer_f(TerrainVba.TEX_COORDS_ATTR, data, 2)

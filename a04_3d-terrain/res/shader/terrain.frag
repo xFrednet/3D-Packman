@@ -5,6 +5,7 @@
 in vec3 f_to_light[MAX_LIGHT_COUNT];
 in vec3 f_to_camera;
 in vec3 f_surface_normal;
+in vec3 f_color;
 
 out vec3 color;
 
@@ -47,4 +48,5 @@ void main() {
     }
 
     color += u_diffuse * u_global_ambient;
+    color = f_color;
 }
