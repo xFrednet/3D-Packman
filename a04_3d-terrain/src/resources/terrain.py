@@ -2,7 +2,7 @@ import glm
 import math
 import esper
 
-from components import Transformation, TransformationMatrix
+from components import Transformation, TransformationMatrix, ObjectMaterial
 from graphics import TerrainVba, Sprite
 
 
@@ -70,4 +70,5 @@ class Terrain:
         world.create_entity(
             vba,
             Transformation(position=glm.vec3(1.0, 0.0, 0.0), rotation=glm.vec3(0.0, 0.0, 0.0)),
-            TransformationMatrix())
+            TransformationMatrix(),
+            ObjectMaterial(diffuse=glm.vec3(0.25, 0.8, 0.0)))

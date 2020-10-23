@@ -1,12 +1,11 @@
 import esper
 import glm
 
-import terrain
-
 import systems
 
-from components import Transformation, CameraOrientation, FreeCamera
+from components import Transformation, CameraOrientation, FreeCamera, Light
 from graphics import graphics_math, shader_program
+from resources import Terrain, LightSetup
 
 class World(esper.World):
     def __init__(self, resolution):
@@ -18,8 +17,9 @@ class World(esper.World):
         
         self.camera_id = 0
         
-        self.terrain = terrain.Terrain()
+        self.terrain = Terrain()
         self.terrainShader = shader_program.TerrainShader()
+        self.light_setup = LightSetup(glm.vec3(0.3, 0.3, 0.3))
         
         self._setup_systems()
         self._setup_entities()
@@ -30,6 +30,7 @@ class World(esper.World):
 
     def _setup_systems(self):
         self.add_processor(systems.FreeCameraControlSystem())
+        self.add_processor(systems.UpdateLightSetupSystem())
         self.add_processor(systems.FreeCameraOrientationSystem())
         self.add_processor(systems.BuildTransformationMatrixSystem())
         self.add_processor(systems.PrepareFrameSystem())
@@ -40,7 +41,14 @@ class World(esper.World):
         self.camera_id = self.create_entity(
             Transformation(position=glm.vec3(0.0, 20.0, 0.0), rotation=glm.vec3(0.0, -1.6, 0.0)),
             CameraOrientation(),
-            FreeCamera()
+            FreeCamera(),
+            Light(color=glm.vec3(0.3, 0.3, 0.3))
+        )
+
+        # The sun
+        self.create_entity(
+            Transformation(position=glm.vec3(100.0, 20.0, 100.0)),
+            Light(color=glm.vec3(0.3, 0.3, 0.3))
         )
 
     def cleanup(self):

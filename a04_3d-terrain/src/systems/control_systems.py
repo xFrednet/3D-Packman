@@ -54,9 +54,9 @@ def _get_wasd_movement():
     if keys[pygame.locals.K_s]:
         movement.z -= 1.0
     if keys[pygame.locals.K_a]:
-        movement.x += 1.0
-    if keys[pygame.locals.K_d]:
         movement.x -= 1.0
+    if keys[pygame.locals.K_d]:
+        movement.x += 1.0
     if keys[pygame.locals.K_SPACE]:
         movement.y += 1.0
     if keys[pygame.locals.K_LSHIFT]:

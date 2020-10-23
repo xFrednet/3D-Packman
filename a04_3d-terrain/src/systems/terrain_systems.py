@@ -2,7 +2,7 @@ import esper
 
 from OpenGL import GL as gl
 
-from components import Transformation, TransformationMatrix
+from components import Transformation, TransformationMatrix, ObjectMaterial
 from graphics.vba import TerrainVba
 from graphics.shader_program import TerrainShader
 
@@ -14,8 +14,9 @@ class TerrainRenderer(esper.Processor):
         shader.start()
         shader.load_view_matrix(self.world.view_matrix)
         shader.load_projection_matrix(self.world.projection_matrix)
+        shader.load_light_setup(self.world.light_setup)
 
-        for _id, (vba, transformation) in self.world.get_components(TerrainVba, TransformationMatrix):
+        for _id, (vba, transformation, material) in self.world.get_components(TerrainVba, TransformationMatrix, ObjectMaterial):
             # Bind buffers
             gl.glBindVertexArray(vba.vba_id)
             vba.index_buffer.bind()
@@ -24,6 +25,7 @@ class TerrainRenderer(esper.Processor):
 
             # Draw the beautiful
             shader.load_transformation_matrix(transformation.value)
+            shader.load_object_material(material)
             gl.glDrawElements(gl.GL_TRIANGLES, vba.vertex_count, gl.GL_UNSIGNED_INT, None)
 
             # Unbind the thingies
