@@ -42,7 +42,13 @@ class World(esper.World):
             Transformation(position=glm.vec3(0.0, 20.0, 0.0), rotation=glm.vec3(0.0, -1.6, 0.0)),
             CameraOrientation(),
             FreeCamera(),
-            Light(color=glm.vec3(0.6, 0.6, 0.6))
+            Light(color=glm.vec3(0.3, 0.3, 0.3))
+        )
+
+        # The sun
+        self.create_entity(
+            Transformation(position=glm.vec3(100.0, 20.0, 100.0)),
+            Light(color=glm.vec3(0.3, 0.3, 0.3))
         )
 
     def cleanup(self):

@@ -68,10 +68,36 @@ class Common3DShaderProgram(ShaderProgram):
         self.vs_view_matrix_loc = None
         self.vs_projection_matrix_loc = None
 
+        self.vs_light_position = None
+        self.vs_light_count = None
+        self.vs_camera_position = None
+
+        self.fs_diffuse = None
+        self.fs_specular = None
+        self.fs_shininess = None
+
+        self.fs_light_color = None
+        self.fs_light_attenuation = None
+        self.fs_light_count = None
+        self.fs_global_ambient = None
+
     def _map_uniforms(self):
         self.vs_transformation_matrix_loc = self._load_uniform_location("u_transformation_matrix")
         self.vs_view_matrix_loc = self._load_uniform_location("u_view_matrix")
         self.vs_projection_matrix_loc = self._load_uniform_location("u_projection_matrix")
+
+        self.vs_light_position = self._load_uniform_location("u_light_position")
+        self.vs_light_count = self._load_uniform_location("u_light_count")
+        self.vs_camera_position = self._load_uniform_location("u_camera_position")
+
+        self.fs_diffuse = self._load_uniform_location("u_diffuse")
+        self.fs_specular = self._load_uniform_location("u_specular")
+        self.fs_shininess = self._load_uniform_location("u_shininess")
+        
+        self.fs_light_color = self._load_uniform_location("u_light_color")
+        self.fs_light_attenuation = self._load_uniform_location("u_light_attenuation")
+        self.fs_light_count = self._load_uniform_location("u_light_count")
+        self.fs_global_ambient = self._load_uniform_location("u_global_ambient")
 
     def load_transformation_matrix(self, mat):
         gl.glUniformMatrix4fv(self.vs_transformation_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
@@ -81,6 +107,34 @@ class Common3DShaderProgram(ShaderProgram):
 
     def load_projection_matrix(self, mat):
         gl.glUniformMatrix4fv(self.vs_projection_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
+    
+    def load_object_material(self, material):
+        gl.glUniform3fv(self.fs_diffuse, 1, glm.value_ptr(material.diffuse))
+        gl.glUniform3fv(self.fs_specular, 1, glm.value_ptr(material.specular))
+        gl.glUniform1ui(self.fs_shininess, material.shininess)
+    
+    def load_light_setup(self, light_setup):
+        # Vertex Shader
+        gl.glUniform1ui(self.vs_light_count, light_setup.light_count)
+        gl.glUniform3fv(self.vs_camera_position, 1, glm.value_ptr(light_setup.camera_position))
+        for index in range(light_setup.light_count):
+            gl.glUniform3fv(
+                self.vs_light_position + index,
+                1,
+                glm.value_ptr(light_setup.light_positions[index]))
+
+        # Fragment shader
+        gl.glUniform1ui(self.fs_light_count, light_setup.light_count)
+        gl.glUniform3fv(self.fs_global_ambient, 1, glm.value_ptr(light_setup.global_ambient))
+        for index in range(light_setup.light_count):
+            gl.glUniform3fv(
+                self.fs_light_color + index,
+                1,
+                glm.value_ptr(light_setup.lights[index].color))
+            gl.glUniform3fv(
+                self.fs_light_attenuation + index,
+                1,
+                glm.value_ptr(light_setup.lights[index].attenuation))
 
 
 class TerrainShader(Common3DShaderProgram):
