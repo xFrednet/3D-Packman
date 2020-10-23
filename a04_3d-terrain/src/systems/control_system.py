@@ -16,14 +16,18 @@ def clamp(value, m_min, m_max):
 
 class FreeCameraControlSystem(esper.Processor):
 
-    MOVEMENT_MULTIPLIER = 0.1
-    ROTATION_MULTIPLIER = 1.0
+    MOVEMENT_MULTIPLIER = 4.0
+    MAGIC_MULTIPLIER = 10.0
+    ROTATION_MULTIPLIER = 3.0
 
     def process(self):
         movement = _get_wasd_movement()
         movement *= FreeCameraControlSystem.MOVEMENT_MULTIPLIER * self.world.delta
         rotation = _get_arrow_key_movement()
         rotation *= FreeCameraControlSystem.ROTATION_MULTIPLIER * self.world.delta
+
+        if pygame.key.get_pressed()[pygame.locals.K_e]:
+            movement *= FreeCameraControlSystem.MAGIC_MULTIPLIER
 
         for _id, (transformation, orientation, _free_cam) in self.world.get_components(
                 Transformation,

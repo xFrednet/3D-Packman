@@ -38,7 +38,7 @@ class World(esper.World):
 
     def _setup_entities(self):
         self.camera_id = self.create_entity(
-            Transformation(),
+            Transformation(position=glm.vec3(0.0, 20.0, 0.0), rotation=glm.vec3(0.0, -1.6, 0.0)),
             CameraOrientation(),
             FreeCamera()
         )
