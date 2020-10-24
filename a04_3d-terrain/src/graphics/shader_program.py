@@ -142,16 +142,21 @@ class TerrainShader(Common3DShaderProgram):
         super().__init__()
 
         vertex_file = open(os.getcwd() + "/res/shader/terrain.vert")
+        geometry_file = open(os.getcwd() + "/res/shader/terrain.geom")
         fragment_file = open(os.getcwd() + "/res/shader/terrain.frag")
         shaders = {
             "terrain.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
+            "terrain.geom": [gl.GL_GEOMETRY_SHADER, geometry_file.read()],
             "terrain.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
         }
         vertex_file.close()
+        geometry_file.close()
         fragment_file.close()
 
         self._compile_shaders(shaders)
 
         self._map_uniforms()
+
+        self.u_tex_map = self._load_uniform_location('u_tex_map')
 
         print("Terrain shader is alive")

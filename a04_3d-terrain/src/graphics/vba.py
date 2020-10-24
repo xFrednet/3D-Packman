@@ -54,7 +54,6 @@ class IndexedVertexArrayBuffer(VertexBufferArray):
     
     def __init__(self, vertex_count):
         super().__init__(vertex_count)
-        self.index_buffer2 = None
         self.index_buffer = None
     
     def load_index_buffer(self, data):
@@ -62,15 +61,12 @@ class IndexedVertexArrayBuffer(VertexBufferArray):
         self.index_buffer = vbo.VBO(indices, target=gl.GL_ELEMENT_ARRAY_BUFFER)
 
 
-class TerrainVba(IndexedVertexArrayBuffer):
-    POSITION_ATTR = 0
-    NORMAL_ATTR = 1
+class TerrainMesh(IndexedVertexArrayBuffer):
+    TEX_COORDS_ATTR = 0
 
-    def __init__(self, vertex_count):
+    def __init__(self, vertex_count, height_map):
         super().__init__(vertex_count)
+        self.height_map = height_map
 
-    def load_position_data(self, data):
-        self._load_vertex_buffer_f(TerrainVba.POSITION_ATTR, data, 3)
-
-    def load_normal_data(self, data):
-        self._load_vertex_buffer_f(TerrainVba.NORMAL_ATTR, data, 3)
+    def load_tex_coords_data(self, data):
+        self._load_vertex_buffer_f(TerrainMesh.TEX_COORDS_ATTR, data, 2)
