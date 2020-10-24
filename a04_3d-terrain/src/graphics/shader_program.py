@@ -169,9 +169,9 @@ class WaterShader(Common3DShaderProgram):
         geometry_file = open(os.getcwd() + "/res/shader/water.geom")
         fragment_file = open(os.getcwd() + "/res/shader/water.frag")
         shaders = {
-            "terrain.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
-            "terrain.geom": [gl.GL_GEOMETRY_SHADER, geometry_file.read()],
-            "terrain.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
+            "water.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
+            "water.geom": [gl.GL_GEOMETRY_SHADER, geometry_file.read()],
+            "water.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
         }
         vertex_file.close()
         geometry_file.close()
