@@ -160,3 +160,34 @@ class TerrainShader(Common3DShaderProgram):
         self.u_tex_map = self._load_uniform_location('u_tex_map')
 
         print("Terrain shader is alive")
+
+class WaterShader(Common3DShaderProgram):
+    def __init__(self):
+        super().__init__()
+
+        vertex_file = open(os.getcwd() + "/res/shader/water.vert")
+        geometry_file = open(os.getcwd() + "/res/shader/water.geom")
+        fragment_file = open(os.getcwd() + "/res/shader/water.frag")
+        shaders = {
+            "terrain.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
+            "terrain.geom": [gl.GL_GEOMETRY_SHADER, geometry_file.read()],
+            "terrain.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
+        }
+        vertex_file.close()
+        geometry_file.close()
+        fragment_file.close()
+
+        self._compile_shaders(shaders)
+
+        self._map_uniforms()
+
+        self.u_tex_map = self._load_uniform_location('u_tex_map')
+        
+        self.world_delta = 0.0
+        self.u_world_delta = self._load_uniform_location('u_world_delta')
+
+        print("Water shader is alive")
+    
+    def add_delta(self, delta):
+        self.world_delta += delta
+        gl.glUniform1f(self.u_world_delta, self.world_delta)

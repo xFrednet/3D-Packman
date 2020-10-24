@@ -5,7 +5,7 @@
 #define Z_MAP_MUTIPLIER              250.0
 
 #define HEIGHT_MAP_MULTIPLIER         50.0
-#define HEIGHT_MAP_OFFSET           -100.0
+#define HEIGHT_MAP_OFFSET            -15.0
 
 #define RGB(r, g, b) vec3(r/255.0, g/255.0, b/255.0)
 
