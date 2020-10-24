@@ -4,15 +4,34 @@
 #define X_MAP_MUTIPLIER              250.0
 #define Z_MAP_MUTIPLIER              250.0
 
-#define HEIGHT_MAP_MULTIPLIER        10.0
+#define HEIGHT_MAP_MULTIPLIER         30.0
 #define HEIGHT_MAP_OFFSET           -100.0
+
+#define RGB(r, g, b) vec3(r/255.0, g/255.0, b/255.0)
+
+struct Material {
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+};
+
+// Water 10%
+const Material TERRAIN_MATERIAL[6] = Material[](
+    Material(RGB(130.0,  11.0,  70.0), vec3(0.0, 0.0, 0.0), 1.0),
+    Material(RGB(240.0, 218.0, 161.0), vec3(0.0, 0.0, 0.0), 1.0),
+    Material(RGB( 86.0, 107.0,  52.0), vec3(0.0, 0.0, 0.0), 1.0),
+    Material(RGB( 20.0,  20.0,  20.0), vec3(0.0, 0.0, 0.0), 1.0),
+    Material(RGB(221.0, 221.0, 221.0), vec3(0.0, 0.0, 0.0), 1.0),
+    Material(RGB(  0.0,   0.0,   0.0), vec3(0.0, 0.0, 0.0), 0.0)
+);
 
 // v for vertex
 layout(location = 0) in vec2 in_tex_coords;
 
 // f for fragment
-out vec3 v_to_light[MAX_LIGHT_COUNT];
-out vec3 v_color;
+out vec3 v_diffuse;
+out vec3 v_specular;
+out float shininess;
 out vec3 v_world_position;
 
 // u for uniform
@@ -20,14 +39,11 @@ uniform mat4 u_transformation_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_projection_matrix;
 
-uniform vec3 u_light_position[MAX_LIGHT_COUNT];
-uniform uint u_light_count;
-
 uniform sampler2D u_height_map;
 
 void main() {
     vec3 tex_value = texture2D(u_height_map, in_tex_coords).xyz;
-    float height = tex_value.x + tex_value.y + tex_value.z;
+    float height = (tex_value.x + tex_value.y + tex_value.z) / 3.0;
     vec4 position = vec4(
         in_tex_coords.x * X_MAP_MUTIPLIER,
         height * HEIGHT_MAP_MULTIPLIER + HEIGHT_MAP_OFFSET,
@@ -35,16 +51,18 @@ void main() {
         1.0
     );
 
+    float material_selection = height * 5;
+    int index = int(material_selection);
+    float lerp = material_selection - floor(material_selection);
+    Material mat_a = TERRAIN_MATERIAL[index];
+    Material mat_b = TERRAIN_MATERIAL[index + 1];
+
+    v_diffuse = mix(mat_a.diffuse, mat_b.diffuse, lerp);
+    v_specular = mix(mat_a.specular, mat_b.specular, lerp);
+    shininess = mix(mat_a.shininess, mat_b.shininess, lerp);
+
     vec4 world_position = u_transformation_matrix * position;
     v_world_position = world_position.xyz;
-
-    for (int index = 0; index < MAX_LIGHT_COUNT; index++) {
-        v_to_light[index] = u_light_position[index] - world_position.xyz;
-    }
-
-    // v_surface_normal = (u_transformation_matrix * vec4(in_normal, 0.0)).xyz;
-    //v_color = vec3(in_tex_coords.x, in_tex_coords.y, 1.0);
-    v_color = texture2D(u_height_map, in_tex_coords).xyz;
 
     gl_Position = u_projection_matrix * (u_view_matrix * world_position);
 }
