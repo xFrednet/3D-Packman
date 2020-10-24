@@ -4,7 +4,7 @@
 #define X_MAP_MUTIPLIER              250.0
 #define Z_MAP_MUTIPLIER              250.0
 
-#define HEIGHT_MAP_MULTIPLIER         30.0
+#define HEIGHT_MAP_MULTIPLIER         50.0
 #define HEIGHT_MAP_OFFSET           -100.0
 
 #define RGB(r, g, b) vec3(r/255.0, g/255.0, b/255.0)
@@ -16,11 +16,12 @@ struct Material {
 };
 
 // Water 10%
-const Material TERRAIN_MATERIAL[6] = Material[](
+#define MATERIAL_COUNT 5
+const Material TERRAIN_MATERIAL[MATERIAL_COUNT + 1] = Material[](
     Material(RGB(130.0,  11.0,  70.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB(240.0, 218.0, 161.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB( 86.0, 107.0,  52.0), vec3(0.0, 0.0, 0.0), 1.0),
-    Material(RGB( 20.0,  20.0,  20.0), vec3(0.0, 0.0, 0.0), 1.0),
+    Material(RGB(100.0,  60.0,  60.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB(221.0, 221.0, 221.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB(  0.0,   0.0,   0.0), vec3(0.0, 0.0, 0.0), 0.0)
 );
@@ -51,8 +52,8 @@ void main() {
         1.0
     );
 
-    float material_selection = height * 5;
-    int index = int(material_selection);
+    float material_selection = height * MATERIAL_COUNT;
+    int index = int(floor(material_selection));
     float lerp = material_selection - floor(material_selection);
     Material mat_a = TERRAIN_MATERIAL[index];
     Material mat_b = TERRAIN_MATERIAL[index + 1];
