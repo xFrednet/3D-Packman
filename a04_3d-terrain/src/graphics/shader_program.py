@@ -140,10 +140,13 @@ class Common3DShaderProgram(ShaderProgram):
 class TerrainShader(Common3DShaderProgram):
     def __init__(self):
         super().__init__()
-
-        vertex_file = open(os.getcwd() + "/res/shader/terrain.vert")
-        geometry_file = open(os.getcwd() + "/res/shader/terrain.geom")
-        fragment_file = open(os.getcwd() + "/res/shader/terrain.frag")
+        cur_dir = os.getcwd()
+        terrain_path = "../res/shader/terrain.vert"
+        fragment_path = "../res/shader/terrain.frag"
+        geometry_path = "../res/shader/terrain.geom"
+        vertex_file = open(os.path.join(cur_dir, terrain_path))
+        fragment_file = open(os.path.join(cur_dir, fragment_path))
+        geometry_file = open(os.path.join(cur_dir, geometry_path))
         shaders = {
             "terrain.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
             "terrain.geom": [gl.GL_GEOMETRY_SHADER, geometry_file.read()],

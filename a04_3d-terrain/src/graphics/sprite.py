@@ -7,7 +7,8 @@ from components import Texture2D
 
 class Sprite:
     def __init__(self, file):
-        self.pygame_surface = pygame.image.load(os.getcwd() + "/" + file)
+        cur_dir = os.getcwd()
+        self.pygame_surface = pygame.image.load(os.path.join(cur_dir, file))
         self.width = self.pygame_surface.get_size()[0]
         self.height = self.pygame_surface.get_size()[1]
         self.str_buffer = pygame.image.tostring(self.pygame_surface, "RGB")
