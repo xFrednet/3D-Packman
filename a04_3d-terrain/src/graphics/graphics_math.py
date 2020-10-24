@@ -34,7 +34,7 @@ def build_view_matrix(position, look_at, up):
 
     return mat
 
-def build_projection_matrix(resolution, fov=(math.pi / 2), n=1.0, f=200.0):
+def build_projection_matrix(resolution, fov=(math.pi / 2), n=1.0, f=500.0):
     aspect = resolution.x / resolution.y
 
     top = n * math.tan(fov / 2)
