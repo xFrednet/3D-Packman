@@ -54,7 +54,7 @@ class Terrain:
                     indices.append(c3)
 
 
-        height_map = Sprite('res/terrain/height_map.png')
+        height_map = Sprite('../res/terrain/height_map.png')
         vba = TerrainMesh(len(indices), height_map.gen_texture())
         vba.load_tex_coords_data(tex_coords)
         vba.load_index_buffer(indices)
