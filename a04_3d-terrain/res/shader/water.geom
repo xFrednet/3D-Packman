@@ -12,6 +12,7 @@ in vec3 v_diffuse[];
 in vec3 v_specular[];
 in float v_shininess[];
 in vec3 v_world_position[];
+in int v_visible[];
 
 out vec4 f_color;
 
@@ -19,9 +20,13 @@ out vec4 f_color;
 uniform vec3 u_light_position[MAX_LIGHT_COUNT];
 uniform vec3 u_light_color[MAX_LIGHT_COUNT];
 uniform vec3 u_light_attenuation[MAX_LIGHT_COUNT];
+
 uniform uint u_light_count;
 uniform vec3 u_camera_position;
 uniform vec3 u_global_ambient;
+
+uniform mat4 u_view_matrix;
+uniform mat4 u_projection_matrix;
 
 // Frasel
 // https://en.wikipedia.org/wiki/Fresnel_equations
@@ -69,6 +74,10 @@ vec3 calculate_light_effect(uint index, vec3 normal, vec3 world_position, vec3 t
 }
 
 void main() {
+    if ((v_visible[0] + v_visible[1] + v_visible[2]) == 0) {
+        return;
+    }
+    
     vec3 world_position = AVG_INPUT(v_world_position);
     vec3 diffuse = AVG_INPUT(v_diffuse);
     vec3 specular = AVG_INPUT(v_specular);
@@ -84,11 +93,11 @@ void main() {
         color += calculate_light_effect(index, normal, world_position, to_camera, diffuse, specular, shininess);
     }
 
-
     float a = 0.6 * calculate_fresnel(normal, to_camera);
     f_color = vec4(color + diffuse * u_global_ambient, a);
     for (int index = 0; index < 3; index++) {
-        gl_Position = gl_in[index].gl_Position;
+        vec4 position = vec4(v_world_position[index], 1.0);
+        gl_Position = u_projection_matrix * u_view_matrix * position;
         EmitVertex();
     }
 

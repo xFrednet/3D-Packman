@@ -18,8 +18,8 @@ class Terrain:
         tex_coords = []
         for z in range(depth):
             for x in range(width):
-                tex_coords.append(x / width)
-                tex_coords.append(z / depth)
+                tex_coords.append((x + 1) / (width + 1))
+                tex_coords.append((z + 1) / (depth + 1))
 
         indices = []
         for col in range(width - 1):
