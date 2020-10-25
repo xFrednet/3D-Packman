@@ -16,8 +16,8 @@ def clamp(value, m_min, m_max):
 
 class FreeCameraControlSystem(esper.Processor):
 
-    MOVEMENT_MULTIPLIER = 4.0
-    MAGIC_MULTIPLIER = 10.0
+    MOVEMENT_MULTIPLIER = 8.0
+    MAGIC_MULTIPLIER = 20.0
     ROTATION_MULTIPLIER = 3.0
 
     def process(self):

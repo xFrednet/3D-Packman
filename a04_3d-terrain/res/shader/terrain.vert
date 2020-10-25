@@ -1,11 +1,11 @@
 #version 430 core
 #define MAX_LIGHT_COUNT 4
 
-#define X_MAP_MUTIPLIER              250.0
-#define Z_MAP_MUTIPLIER              250.0
+#define X_MAP_MUTIPLIER              500.0
+#define Z_MAP_MUTIPLIER              500.0
 
-#define HEIGHT_MAP_MULTIPLIER         50.0
-#define HEIGHT_MAP_OFFSET            -15.0
+#define HEIGHT_MAP_MULTIPLIER        100.0
+#define HEIGHT_MAP_OFFSET            -30.0
 
 #define RGB(r, g, b) vec3(r/255.0, g/255.0, b/255.0)
 
@@ -46,9 +46,9 @@ void main() {
     vec3 tex_value = texture2D(u_height_map, in_tex_coords).xyz;
     float height = (tex_value.x + tex_value.y + tex_value.z) / 3.0;
     vec4 position = vec4(
-        in_tex_coords.x * X_MAP_MUTIPLIER,
+        (in_tex_coords.x - 0.5) * X_MAP_MUTIPLIER,
         height * HEIGHT_MAP_MULTIPLIER + HEIGHT_MAP_OFFSET,
-        in_tex_coords.y * Z_MAP_MUTIPLIER,
+        (in_tex_coords.y - 0.5) * Z_MAP_MUTIPLIER,
         1.0
     );
 
