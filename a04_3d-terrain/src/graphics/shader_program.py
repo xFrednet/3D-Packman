@@ -90,10 +90,6 @@ class Common3DShaderProgram(ShaderProgram):
         self.vs_light_count = self._load_uniform_location("u_light_count")
         self.vs_camera_position = self._load_uniform_location("u_camera_position")
 
-        self.fs_diffuse = self._load_uniform_location("u_diffuse")
-        self.fs_specular = self._load_uniform_location("u_specular")
-        self.fs_shininess = self._load_uniform_location("u_shininess")
-        
         self.fs_light_color = self._load_uniform_location("u_light_color")
         self.fs_light_attenuation = self._load_uniform_location("u_light_attenuation")
         self.fs_light_count = self._load_uniform_location("u_light_count")
@@ -107,11 +103,6 @@ class Common3DShaderProgram(ShaderProgram):
 
     def load_projection_matrix(self, mat):
         gl.glUniformMatrix4fv(self.vs_projection_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
-    
-    def load_object_material(self, material):
-        gl.glUniform3fv(self.fs_diffuse, 1, glm.value_ptr(material.diffuse))
-        gl.glUniform3fv(self.fs_specular, 1, glm.value_ptr(material.specular))
-        gl.glUniform1ui(self.fs_shininess, material.shininess)
     
     def load_light_setup(self, light_setup):
         # Vertex Shader

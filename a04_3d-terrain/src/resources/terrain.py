@@ -62,5 +62,4 @@ class Terrain:
         world.create_entity(
             vba,
             Transformation(position=glm.vec3(1.0, 0.0, 0.0), rotation=glm.vec3(0.0, 0.0, 0.0)),
-            TransformationMatrix(),
-            ObjectMaterial(diffuse=glm.vec3(0.25, 0.8, 0.0)))
+            TransformationMatrix())

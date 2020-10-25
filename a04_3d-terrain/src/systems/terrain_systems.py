@@ -16,7 +16,7 @@ class TerrainRenderer(esper.Processor):
         shader.load_projection_matrix(self.world.projection_matrix)
         shader.load_light_setup(self.world.light_setup)
 
-        for _id, (mesh, transformation, material) in self.world.get_components(TerrainMesh, TransformationMatrix, ObjectMaterial):
+        for _id, (mesh, transformation) in self.world.get_components(TerrainMesh, TransformationMatrix, ObjectMaterial):
             # Bind buffers
             gl.glBindVertexArray(mesh.vba_id)
             mesh.index_buffer.bind()
@@ -28,7 +28,6 @@ class TerrainRenderer(esper.Processor):
 
             # Draw the beautiful
             shader.load_transformation_matrix(transformation.value)
-            shader.load_object_material(material)
             gl.glDrawElements(gl.GL_TRIANGLES, mesh.vertex_count, gl.GL_UNSIGNED_INT, None)
 
             # Unbind the thingies
