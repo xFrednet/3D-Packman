@@ -90,10 +90,6 @@ class Common3DShaderProgram(ShaderProgram):
         self.vs_light_count = self._load_uniform_location("u_light_count")
         self.vs_camera_position = self._load_uniform_location("u_camera_position")
 
-        self.fs_diffuse = self._load_uniform_location("u_diffuse")
-        self.fs_specular = self._load_uniform_location("u_specular")
-        self.fs_shininess = self._load_uniform_location("u_shininess")
-        
         self.fs_light_color = self._load_uniform_location("u_light_color")
         self.fs_light_attenuation = self._load_uniform_location("u_light_attenuation")
         self.fs_light_count = self._load_uniform_location("u_light_count")
@@ -107,11 +103,6 @@ class Common3DShaderProgram(ShaderProgram):
 
     def load_projection_matrix(self, mat):
         gl.glUniformMatrix4fv(self.vs_projection_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
-    
-    def load_object_material(self, material):
-        gl.glUniform3fv(self.fs_diffuse, 1, glm.value_ptr(material.diffuse))
-        gl.glUniform3fv(self.fs_specular, 1, glm.value_ptr(material.specular))
-        gl.glUniform1ui(self.fs_shininess, material.shininess)
     
     def load_light_setup(self, light_setup):
         # Vertex Shader
@@ -140,6 +131,7 @@ class Common3DShaderProgram(ShaderProgram):
 class TerrainShader(Common3DShaderProgram):
     def __init__(self):
         super().__init__()
+
         cur_dir = os.getcwd()
         terrain_path = "../res/shader/terrain.vert"
         fragment_path = "../res/shader/terrain.frag"
@@ -163,3 +155,38 @@ class TerrainShader(Common3DShaderProgram):
         self.u_tex_map = self._load_uniform_location('u_tex_map')
 
         print("Terrain shader is alive")
+
+class WaterShader(Common3DShaderProgram):
+    def __init__(self):
+        super().__init__()
+
+        cur_dir = os.getcwd()
+        terrain_path = "../res/shader/water.vert"
+        fragment_path = "../res/shader/water.frag"
+        geometry_path = "../res/shader/water.geom"
+        vertex_file = open(os.path.join(cur_dir, terrain_path))
+        fragment_file = open(os.path.join(cur_dir, fragment_path))
+        geometry_file = open(os.path.join(cur_dir, geometry_path))
+        shaders = {
+            "water.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
+            "water.geom": [gl.GL_GEOMETRY_SHADER, geometry_file.read()],
+            "water.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
+        }
+        vertex_file.close()
+        geometry_file.close()
+        fragment_file.close()
+
+        self._compile_shaders(shaders)
+
+        self._map_uniforms()
+
+        self.u_tex_map = self._load_uniform_location('u_tex_map')
+        
+        self.world_delta = 0.0
+        self.u_world_delta = self._load_uniform_location('u_world_delta')
+
+        print("Water shader is alive")
+    
+    def add_delta(self, delta):
+        self.world_delta += delta
+        gl.glUniform1f(self.u_world_delta, self.world_delta)

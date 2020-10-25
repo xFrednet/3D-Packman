@@ -18,7 +18,8 @@ class World(esper.World):
         self.camera_id = 0
         
         self.terrain = Terrain()
-        self.terrainShader = shader_program.TerrainShader()
+        self.terrain_shader = shader_program.TerrainShader()
+        self.water_shader = shader_program.WaterShader()
         self.light_setup = LightSetup(glm.vec3(0.3, 0.3, 0.3))
         
         self._setup_systems()
@@ -35,6 +36,7 @@ class World(esper.World):
         self.add_processor(systems.BuildTransformationMatrixSystem())
         self.add_processor(systems.PrepareFrameSystem())
         self.add_processor(systems.TerrainRenderer())
+        self.add_processor(systems.WaterRendererSystem())
         self.add_processor(systems.FinishFrameSystem())
 
     def _setup_entities(self):
@@ -52,7 +54,8 @@ class World(esper.World):
         )
 
     def cleanup(self):
-        self.terrainShader.cleanup()
+        self.terrain_shader.cleanup()
+        self.water_shader.cleanup()
 
         print("World cleanup complete")
 

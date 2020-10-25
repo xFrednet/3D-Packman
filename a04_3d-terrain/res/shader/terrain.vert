@@ -5,7 +5,7 @@
 #define Z_MAP_MUTIPLIER              250.0
 
 #define HEIGHT_MAP_MULTIPLIER         50.0
-#define HEIGHT_MAP_OFFSET           -100.0
+#define HEIGHT_MAP_OFFSET            -15.0
 
 #define RGB(r, g, b) vec3(r/255.0, g/255.0, b/255.0)
 
@@ -32,7 +32,7 @@ layout(location = 0) in vec2 in_tex_coords;
 // f for fragment
 out vec3 v_diffuse;
 out vec3 v_specular;
-out float shininess;
+out float v_shininess;
 out vec3 v_world_position;
 
 // u for uniform
@@ -60,7 +60,7 @@ void main() {
 
     v_diffuse = mix(mat_a.diffuse, mat_b.diffuse, lerp);
     v_specular = mix(mat_a.specular, mat_b.specular, lerp);
-    shininess = mix(mat_a.shininess, mat_b.shininess, lerp);
+    v_shininess = mix(mat_a.shininess, mat_b.shininess, lerp);
 
     vec4 world_position = u_transformation_matrix * position;
     v_world_position = world_position.xyz;
