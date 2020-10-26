@@ -64,9 +64,9 @@ class IndexedVertexArrayBuffer(VertexBufferArray):
 class TerrainMesh(IndexedVertexArrayBuffer):
     TEX_COORDS_ATTR = 0
 
-    def __init__(self, vertex_count, height_map):
+    def __init__(self, vertex_count, height_maps):
         super().__init__(vertex_count)
-        self.height_map = height_map
+        self.height_maps = height_maps
 
     def load_tex_coords_data(self, data):
         self._load_vertex_buffer_f(TerrainMesh.TEX_COORDS_ATTR, data, 2)

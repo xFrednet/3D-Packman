@@ -23,7 +23,7 @@ class TerrainRenderer(esper.Processor):
             gl.glEnableVertexAttribArray(TerrainMesh.TEX_COORDS_ATTR)
 
             gl.glActiveTexture(gl.GL_TEXTURE0)
-            gl.glBindTexture(gl.GL_TEXTURE_2D, mesh.height_map.texture)
+            gl.glBindTexture(gl.GL_TEXTURE_2D, mesh.height_maps[self.world.height_map_index].texture)
             gl.glUniform1i(shader.u_tex_map, 0)
 
             # Draw the beautiful
@@ -58,7 +58,7 @@ class WaterRendererSystem(esper.Processor):
             gl.glEnableVertexAttribArray(TerrainMesh.TEX_COORDS_ATTR)
 
             gl.glActiveTexture(gl.GL_TEXTURE0)
-            gl.glBindTexture(gl.GL_TEXTURE_2D, mesh.height_map.texture)
+            gl.glBindTexture(gl.GL_TEXTURE_2D, mesh.height_maps[self.world.height_map_index].texture)
             gl.glUniform1i(shader.u_tex_map, 0)
 
             # Draw the beautiful

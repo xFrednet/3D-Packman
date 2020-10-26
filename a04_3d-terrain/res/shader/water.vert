@@ -1,9 +1,9 @@
 #version 430 core
-#define PI                   3.1415926535897932384626433832795
-#define WAVE_LENGTH            4.0
-#define X_AMPLITUDE            0.2
-#define Y_AMPLITUDE            0.2
-#define Z_AMPLITUDE            0.2
+#define PI                             3.14159265358979
+#define WAVE_LENGTH                    4.0
+#define X_AMPLITUDE                    0.2
+#define Y_AMPLITUDE                    0.2
+#define Z_AMPLITUDE                    0.2
 
 #define X_MAP_MUTIPLIER              500.0
 #define Z_MAP_MUTIPLIER              500.0

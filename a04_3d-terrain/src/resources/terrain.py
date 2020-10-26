@@ -54,8 +54,7 @@ class Terrain:
                     indices.append(c3)
 
 
-        height_map = Sprite('../res/terrain/height_map.png')
-        vba = TerrainMesh(len(indices), height_map.gen_texture())
+        vba = TerrainMesh(len(indices), self._load_height_maps())
         vba.load_tex_coords_data(tex_coords)
         vba.load_index_buffer(indices)
 
@@ -63,3 +62,17 @@ class Terrain:
             vba,
             Transformation(position=glm.vec3(1.0, 0.0, 0.0), rotation=glm.vec3(0.0, 0.0, 0.0)),
             TransformationMatrix())
+
+    def _load_height_maps(self):
+        height_maps = [] 
+        height_maps.append(Sprite('../res/terrain/height_map_0.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_1.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_2.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_3.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_4.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_5.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_6.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_7.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_8.png').gen_texture())
+        height_maps.append(Sprite('../res/terrain/height_map_9.png').gen_texture())
+        return height_maps
