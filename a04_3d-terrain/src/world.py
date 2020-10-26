@@ -18,6 +18,7 @@ class World(esper.World):
         self.camera_id = 0
         
         self.terrain = Terrain()
+        self.height_map_index = 1
         self.terrain_shader = shader_program.TerrainShader()
         self.water_shader = shader_program.WaterShader()
         self.light_setup = LightSetup(glm.vec3(0.3, 0.3, 0.3))

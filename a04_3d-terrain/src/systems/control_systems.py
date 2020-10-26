@@ -43,6 +43,8 @@ class FreeCameraControlSystem(esper.Processor):
 
             # Movement
             transformation.position += _xz_motion_to_object_axis(movement, transformation.rotation)
+        
+        self.world.height_map_index = _get_number_input(self.world.height_map_index)
 
 def _get_wasd_movement():
     keys = pygame.key.get_pressed()
@@ -91,6 +93,32 @@ def _xz_motion_to_object_axis(motion, rotation):
     new_v.y = motion.y
 
     return new_v
+
+def _get_number_input(default_value):
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.locals.K_0]:
+        return 0;
+    if keys[pygame.locals.K_1]:
+        return 1;
+    if keys[pygame.locals.K_2]:
+        return 2;
+    if keys[pygame.locals.K_3]:
+        return 3;
+    if keys[pygame.locals.K_4]:
+        return 4;
+    if keys[pygame.locals.K_5]:
+        return 5;
+    if keys[pygame.locals.K_6]:
+        return 6;
+    if keys[pygame.locals.K_7]:
+        return 7;
+    if keys[pygame.locals.K_8]:
+        return 8;
+    if keys[pygame.locals.K_9]:
+        return 9;
+    
+    return default_value;
 
 class FreeCameraOrientationSystem(esper.Processor):
     def process(self):
