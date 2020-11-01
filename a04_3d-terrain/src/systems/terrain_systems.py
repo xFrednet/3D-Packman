@@ -7,8 +7,8 @@ from graphics.vba import TerrainMesh
 from graphics.shader_program import TerrainShader, WaterShader
 
 class TerrainRenderer(esper.Processor):
-    def process(self, *args, **kwargs):
 
+    def process(self):
         gl.glEnable(gl.GL_CULL_FACE)
         shader: TerrainShader = self.world.terrain_shader
         shader.start()
@@ -38,8 +38,8 @@ class TerrainRenderer(esper.Processor):
 
 
 class WaterRendererSystem(esper.Processor):
-    def process(self, *args, **kwargs):
 
+    def process(self):
         gl.glEnable(gl.GL_CULL_FACE)
         gl.glEnable(gl.GL_BLEND)
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)

@@ -31,9 +31,26 @@ Most of these goals are self explanatory. However, I want to add some notes to 2
 
 Okay, that is enough introduction for now. Let's get into some fun and technical stuff
 
-## 2 Geometry
+## 2 Geometry Shader
+This section will try to give a really really rough overview of the geometry shader. Further information should be taken from the documentation it self. The implementation section will go into more detail about how what feature was used inside the project.
+
+## 2.1 Formal information
+Our course has covered the vertex and fragment shader. In this project I wanted to specificity take look at the geometry shader. This shader sits between the vertex shader and the _Tessellation_ stage. It can operates _primitives_ like points, triangles and lines.
+
+This shader receives the primitive vertices with their data and can emits a set amount of vertices with vertex data it self. The number of possible vertices it determined by the size of the vertex data and the hardware. OpenGL 4.3 which I'm using for these shaders defines a minimum size of 1024 components with one float having a component size of one.
+
+## 2.2 My view
+The definition was an over simplified definition of a super power powerful yet uncomplicated tool in OpenGL. In this section I want to give a even rougher view on the shader that worked well during my development.
+
+The geometry shader is basically a powerful vertex shader that has access to all vertices of the triangle (or other primitive) that gets drawn. It is also the only shader that can create more data it self. This and the fact that it operates on multiple vertices at once distinguishes it from the other shaders and makes it so powerful in comparison.
+
+I'm sure that my implementations hasn't even scratched the surface of what is all possible with this shader.
 
 ## 3 Implementation
+This section will go into detail about the challenges I've encountered during the development and how the systems work them self. It will only go into detail about interesting and new stuff. This means that I will not explain every line but more the concepts that where being used.
+
+### 3.1 General
+* AVG macro
 
 ### 3.1 Terrain 
 
@@ -42,3 +59,6 @@ Okay, that is enough introduction for now. Let's get into some fun and technical
 ### 3.3 Particles 
 
 ## 4. Final thoughts
+
+## 5. Sources
+* OpenGL: Geometry Shader. https://www.khronos.org/opengl/wiki/Geometry_Shader (2020.11.01)
