@@ -99,9 +99,9 @@ void main() {
         vec4 position = vec4(v_world_position[index], 1.0);
         gl_Position = u_projection_matrix * u_view_matrix * position;
         
-        if (gl_Position.z < -1.0) {
-            f_color = vec4(1.0, 1.0, 1.0, 1.0);
-        }
+        // if (gl_Position.z < -1.0) {
+        //     f_color = vec4(1.0, 1.0, 1.0, 1.0);
+        // }
         EmitVertex();
     }
 
