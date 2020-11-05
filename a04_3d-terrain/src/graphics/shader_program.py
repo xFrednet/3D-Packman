@@ -1,10 +1,11 @@
 import math
 import os
 import sys
-
 import glm
+
 from OpenGL import GL as gl
 
+from components import ParticleEmitter
 
 class ShaderProgram:
     def __init__(self):
@@ -236,6 +237,13 @@ class ParticleShader(Common3DShaderProgram):
         self._compile_shaders(shaders)
 
         self._map_uniforms()
+
+        self.u_world_time = self._load_uniform_location("u_world_time")
+
+        self.u_emit_times = self._load_uniform_location("u_emit_times")
+        self.u_emit_positions = self._load_uniform_location("u_emit_positions")
+        self.u_sprite_incices = self._load_uniform_location("u_sprite_incices")
+
         self.u_camera_position = self._load_uniform_location("u_camera_position")
         self.u_camera_up = self._load_uniform_location("u_camera_up")
 
@@ -246,3 +254,20 @@ class ParticleShader(Common3DShaderProgram):
 
     def load_camera_up(self, up):
         gl.glUniform3fv(self.u_camera_up, 1, glm.value_ptr(up))
+    
+    def load_world_time(self, time):
+        gl.glUniform1f(self.u_world_time, time)
+
+    def load_emitter(self, emitter: ParticleEmitter):
+        for index in range(emitter.particle_count):
+            gl.glUniform1f(
+                self.u_emit_times + index,
+                emitter.data_emit_time[index])
+            gl.glUniform3fv(
+                self.u_emit_positions + index,
+                1,
+                glm.value_ptr(emitter.data_emit_position[index]))
+            gl.glUniform1ui(
+                self.u_sprite_incices + index,
+                1,
+                emitter.data_sprite_incices[index])

@@ -12,6 +12,7 @@ class World(esper.World):
         super().__init__()
         self.resolution = glm.vec2(resolution[0], resolution[1])
         self.delta = 0.00001
+        self.time = self.delta
         self.view_matrix = glm.mat4()
         self.projection_matrix = graphics_math.build_projection_matrix(self.resolution)
         
