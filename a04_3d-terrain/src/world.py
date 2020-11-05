@@ -3,8 +3,8 @@ import glm
 
 import systems
 
-from components import Transformation, CameraOrientation, FreeCamera, Light, ParticleEmitter
-from graphics import graphics_math, shader_program
+from components import Transformation, CameraOrientation, FreeCamera, Light, ParticleEmitter, SpriteSheet
+from graphics import graphics_math, shader_program, Sprite
 from resources import Terrain, LightSetup
 
 class World(esper.World):
@@ -54,7 +54,7 @@ class World(esper.World):
 
         self.create_entity(
             Transformation(position=glm.vec3(0.0, 45.0, 0.0)),
-            ParticleEmitter(None)
+            ParticleEmitter(SpriteSheet(Sprite('../res/particles/idc_particle_pack.png').gen_texture(), 2, 2))
         )
 
         # The sun

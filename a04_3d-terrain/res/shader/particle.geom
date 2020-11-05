@@ -15,7 +15,7 @@ uniform vec3 u_camera_position;
 uniform vec3 u_camera_up;
 
 void main() {
-    f_color = vec3(1.0, 1.0, 1.0) * (v_sprite_index[0] + 1);
+    f_color = vec3(0.25, 0.25, 0.25) * v_sprite_index[0];
     float size = 1.0;
 
     vec3 forward = normalize(u_camera_position - gl_in[0].gl_Position.xyz);

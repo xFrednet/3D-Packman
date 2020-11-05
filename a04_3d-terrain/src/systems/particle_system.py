@@ -1,6 +1,7 @@
 import esper
 import glm
 import sys
+import random
 
 from OpenGL import GL as gl
 
@@ -33,7 +34,7 @@ class ParticleEmitterSystem(esper.Processor):
                         # Emit new
                         emitter.data_emit_time.append(self.world.time)
                         emitter.data_emit_position.append(transformation.position * 1.0)
-                        emitter.data_sprite_incices.append(0)
+                        emitter.data_sprite_incices.append(random.choice(emitter.sprite_choices))
 
                         emitter.emit_timer = emitter.emit_interval
                         emitter.particle_count += 1
