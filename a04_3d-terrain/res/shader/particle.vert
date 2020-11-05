@@ -4,7 +4,7 @@
 // v for vertex
 layout(location = 0) in float in_id;
 
-out vec3 v_color;
+out int v_sprite_index;
 
 uniform float u_world_time;
 
@@ -13,9 +13,11 @@ uniform vec3 u_emit_positions[MAX_PARTICLE_COUNT];
 uniform int u_sprite_incices[MAX_PARTICLE_COUNT];
 
 void main() {
-    int i_id = int(in_id);
-    float f_id = float(i_id);
-    v_color = vec3(f_id / 256.0, f_id / 256.0, f_id / 256.0);
+    int particle_id = int(in_id);
+    float life_time = u_world_time - u_emit_times[particle_id];
 
-    gl_Position = vec4(f_id, f_id, f_id, 1.0);
+    v_sprite_index = u_sprite_incices[particle_id];
+
+    gl_Position = vec4(u_emit_positions[particle_id], 1.0);
+    gl_Position.y += life_time;
 }

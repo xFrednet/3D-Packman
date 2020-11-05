@@ -3,7 +3,7 @@
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 
-in vec3 v_color[];
+in int v_sprite_index[];
 
 out vec3 f_color;
 
@@ -15,7 +15,7 @@ uniform vec3 u_camera_position;
 uniform vec3 u_camera_up;
 
 void main() {
-    f_color = v_color[0];
+    f_color = vec3(1.0, 1.0, 1.0) * (v_sprite_index[0] + 1);
     float size = 1.0;
 
     vec3 forward = normalize(u_camera_position - gl_in[0].gl_Position.xyz);

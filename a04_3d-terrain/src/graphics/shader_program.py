@@ -267,7 +267,6 @@ class ParticleShader(Common3DShaderProgram):
                 self.u_emit_positions + index,
                 1,
                 glm.value_ptr(emitter.data_emit_position[index]))
-            gl.glUniform1ui(
+            gl.glUniform1i(
                 self.u_sprite_incices + index,
-                1,
                 emitter.data_sprite_incices[index])

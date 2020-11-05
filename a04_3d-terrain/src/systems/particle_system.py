@@ -72,6 +72,7 @@ class ParticleRenderSystem(esper.Processor):
         shader.load_projection_matrix(self.world.projection_matrix)
         shader.load_camera_position(self.world.light_setup.camera_position)
         shader.load_camera_up(self.world.component_for_entity(self.world.camera_id, CameraOrientation).up)
+        shader.load_world_time(self.world.time)
 
         # VBO
         gl.glBindVertexArray(self._pixel_vbo.vba_id)
