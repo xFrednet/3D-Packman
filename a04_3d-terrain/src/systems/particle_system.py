@@ -1,5 +1,6 @@
 import esper
 import glm
+import sys
 
 from OpenGL import GL as gl
 
@@ -8,6 +9,8 @@ from components import CameraOrientation
 
 class ParticleRenderSystem(esper.Processor):
     DEFAULT_MAX_VERTEX_COUNT = 256
+    PARTICLE_STAGES = 10
+    MAX_BYTES_PER_PARTICLE = 12
 
     def __init__(self):
         super().__init__()
@@ -18,6 +21,16 @@ class ParticleRenderSystem(esper.Processor):
             data.append(float(i))
 
         self._pixel_vbo.load_indices(data)
+
+        min_requirement = (
+                ParticleRenderSystem.PARTICLE_STAGES *
+                ParticleRenderSystem.MAX_BYTES_PER_PARTICLE *
+                ParticleRenderSystem.DEFAULT_MAX_VERTEX_COUNT)
+        if (gl.glGetIntegerv(gl.GL_MAX_UNIFORM_BLOCK_SIZE) < min_requirement):
+            # This was a joke at first but this actually filles out halve of my available block size
+            print("ParticleRenderSystem: Error the system as a minimum uniform block size of: ", min_requirement)
+            sys.exit(-15)
+        
         print("ParticleRenderSystem was created: Am I a particle yet?")
     
     def process(self):
