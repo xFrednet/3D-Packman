@@ -1,6 +1,23 @@
 # Report: 3D Terrain - rendering smooth was yesterday
 
-
+## Table of Contents
+* [1 Introduction](#1-Introduction)
+  * [1.1 Inspiration and backstory](#11-Inspiration-and-backstory)
+  * [1.2 Goal](#12-Goal)
+* [2 Geometry shader](#2-Geometry-shader)
+  * [2.1 Formal information](#21-Formal-information)
+  * [2.2 My view](#22-My-view)
+* [3 Implementation](#3-Implementation)
+  * [3.1 Art style](#31-Art-style)
+  * [3.2 General](#32-General)
+  * [3.3 Terrain](#33-Terrain)
+    * [3.3.1 Vertex shader](#331-Vertex-shader)
+    * [3.3.2 Geometry shader thingy](#332-Geometry-shader-thingy)
+    * [3.3.3 The long fragment shader](#333-The-long-fragment-shader)
+  * [3.4 Water](#34-Water)
+  * [3.5 Particles](#35-Particles)
+* [4 Final thoughts](#4-Final-thoughts)
+* [5 Sources](#5-Sources)
 
 ## 1 Introduction
 This report is part of the assignment 5. It covers the 3D terrain rendering and especially the interesting parts of this project as well as a description how this was developed.
