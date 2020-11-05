@@ -19,6 +19,10 @@
     * [3.4.2 Geometry shader](#342-Geometry-shader)
     * [3.4.3 Fragment shader](#343-Fragment-shader)
   * [3.5 Particles](#35-Particles)
+    * [3.5.1 System setup](#351-System-setup)
+    * [3.5.2 The vertex shader](#352-The-vertex-shader)
+    * [3.5.3 The geometry shader](#353-The-geometry-shader)
+    * [3.5.4 The fragment shader](#354-The-fragment-shader)
 * [4 Final thoughts](#4-Final-thoughts)
 * [5 Sources](#5-Sources)
 
@@ -132,7 +136,6 @@ An optimized game would usually calculate which water vertices can actually be s
 
 The idea behind clipping water is basically just to remove all vertices where the terrain is above the sea level in our case >= 0.0. However, we want to make sure that all vertices are below the terrain before we clip the face completely. The vertex shader therefor only calculates if this vertex is below the terrain and passes this information to the geometry shader to deal with. Note that this calculation uses the y value with applied waves. This would even allow us to simulate a tsunami with the correct clipping calculations. 
 
-
 #### 3.4.2 Geometry shader
 
 #### Clipping
@@ -224,11 +227,11 @@ The fragment shader only receives a texture coordinate that should be mapped usi
 Blending between the texture and the already drawn stuff is done by OpenGL. The `ParticleEmitter` component allows the user to set custom blending options if desired. The default is set to `[gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA]` correlating no normal alpha blending.
 
 ## 4. Final thoughts
-I really like the visual result of the simulation. It is really impressive to see how simple such a visual representation can be at the end. That being said it took quite some time to get fully used to the geometry shader. This is of course logical but I still would have liked to get a bit more done as usual. :)
+I really like the visual result of the simulation. It is really impressive to see, how simple such a visual representation can be at the end. That being said it took quite some time to get fully used to the geometry shader. This is of course logical but I still would have liked to get a bit more done, as usual. The particle system was quite a system to figure out but damn it was worth it. I'm super happy with how it turned out. There is still a bug with the drawing order and I would probably need to to the clipping manual it's still a system I'm proud of.
 
-I'm still very happy with the result and even the structure and architecture of the entire project. I believe that it has really improved since the last project.
+The structure and architecture of the entire project has also really improved since the last project. This also makes me very happy and increase the ability to implement new features.
 
-I hope you had fun reading this report and looking at the simulation it self!
+And that's it! I hope you had fun reading this report and looking at the simulation it self!
 
 ## 5. Sources
 * OpenGL: Geometry Shader. https://www.khronos.org/opengl/wiki/Geometry_Shader (2020.11.01)
