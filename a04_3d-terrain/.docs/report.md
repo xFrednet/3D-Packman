@@ -1,9 +1,6 @@
 # Report: 3D Terrain - rendering smooth was yesterday
 
-## Table of Contents
-* 1 [Introduction](#1-introduction)
-    * 1.1 [Inspiration and backstory](#11-Inspiration-and-backstory)
-    * 1.2 [Goal](#12-Goal)
+
 
 ## 1 Introduction
 This report is part of the assignment 5. It covers the 3D terrain rendering and especially the interesting parts of this project as well as a description how this was developed.
@@ -31,15 +28,15 @@ Most of these goals are self explanatory. However, I want to add some notes to 2
 
 Okay, that is enough introduction for now. Let's get into some fun and technical stuff
 
-## 2 Geometry Shader
+## 2 Geometry shader
 This section will try to give a really really rough overview of the geometry shader. Further information should be taken from the documentation it self. The implementation section will go into more detail about how what feature was used inside the project.
 
-## 2.1 Formal information
+### 2.1 Formal information
 Our course has covered the vertex and fragment shader. In this project I wanted to specificity take look at the geometry shader. This shader sits between the vertex shader and the _Tessellation_ stage. It can operates _primitives_ like points, triangles and lines.
 
 This shader receives the primitive vertices with their data and can emits a set amount of vertices with vertex data it self. The number of possible vertices it determined by the size of the vertex data and the hardware. OpenGL 4.3 which I'm using for these shaders defines a minimum size of 1024 components with one float having a component size of one.
 
-## 2.2 My view
+### 2.2 My view
 The definition was an over simplified definition of a super power powerful yet uncomplicated tool in OpenGL. In this section I want to give a even rougher view on the shader that worked well during my development.
 
 The geometry shader is basically a powerful vertex shader that has access to all vertices of the triangle (or other primitive) that gets drawn. It is also the only shader that can create more data it self. This and the fact that it operates on multiple vertices at once distinguishes it from the other shaders and makes it so powerful in comparison.
@@ -49,14 +46,49 @@ I'm sure that my implementations hasn't even scratched the surface of what is al
 ## 3 Implementation
 This section will go into detail about the challenges I've encountered during the development and how the systems work them self. It will only go into detail about interesting and new stuff. This means that I will not explain every line but more the concepts that where being used.
 
-### 3.1 General
-* AVG macro
+### 3.1 Art style
+The art style this project uses is called low poly and is characterized by models with a very low polygon count. This leads to clearly visible edges. This art style embraces this look by making the sides and edges quite sharp. Here is an example image from the game itself:
 
-### 3.1 Terrain 
+![](res/low_poly_example.png)
 
-### 3.2 Water
+The interesting part about this art style is the way this effect is archived. Light plays a major role when it comes to 3D-rendering in general. Surfaces use normal vectors to calculate the effect light should have. Each vertex has it's own normal vector, OpenGL then interpolates these inputs before processing them in the fragment shader. This archives a smooth surface effect.
 
-### 3.3 Particles 
+Low poly does the complete opposite by using the same normal vector for an entire face. This makes edges look hard and causes a almost constant light effect. This usually goes hand in hand with single colored faces. It is actually quite simple for how different it looks.
+
+### 3.2 General
+Here I want to explain some general concepts I used during my development with geometry shaders. Mainly the the `AVG_INPUT(x)` macro I use in both shaders. This macro averages the input of the given vertex Data into a single value. It does this by adding them together and just dividing them by three. It's actually quite simple.
+
+### 3.3 Terrain
+The terrain rendering is only done in the vertex and geometry shader. 
+
+#### 3.3.1 Vertex shader
+I've tried to reduce the vertex data as much as possible and I ended up just passing the texture coordinate of this vertex for height_map. The vertex shader than samples the color of the height_map at the given coordinate and divides the sum of the RGB values by three. This returns a value between 0.0 for pitch black and 1.0 for snow white.
+
+The texture coordinates are used for the x and z value of the position and the y is set via the height_map. This vertex position is than scaled by some defined constants in the vertex shader. This gives us a Terrain that is varying in height. The shader also apples the transformation matrix to the position.
+
+I, le Fred, also wanted to have a color effect depending on the height of the terrain. I first defined several materials I want to have to the different height. I than needed to select two materials to interpolate between. This is done by using the previous height value and scaling it my the amount of defined materials. In our case 5. This gives us a value in the range from 0.0 and 5.0. This value is than simply converted into an integer and used as an index for the material list. The fraction is directly used in the interpolation as an added bonus.
+
+The position and material values are than simply passed to the geometry shader to deal with.
+
+#### 3.3.2 Geometry shader thingy
+The geometric shader starts of by building the average for the input values like the position and material values. It than calculates the normal vector of the face by building the cross product of two tension vectors. This is fancy talk for taking two edges of the triangle and calculating the cross product that is now per definition perpendicular to the surface it self. (I'm actually quite proud of myself for this one. I know that others have done it before, but I came up with it when I was designing the shader)
+
+The shader than proceeds to do the normal lighting calculation for the center point of the triangle. This process was documented in a previous report. I than apply the calculated color to the entire triangle.
+
+The last step is just to apply the projection and view matrix to the position and pass the vertices and triangle onto the next stage.
+
+#### 3.3.3 The long fragment shader
+The fragment shader just passes the input color as an output to the next stage.
+
+Yep and that is that. It's actually surprisingly simple for such a cool effect in my opinion.
+
+### 3.4 Water
+
+* Positioning
+* Clipping
+* Visibility
+
+### 3.5 Particles
 
 ## 4. Final thoughts
 
