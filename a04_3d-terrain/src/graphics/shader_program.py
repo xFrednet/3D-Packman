@@ -260,7 +260,6 @@ class ParticleShader(Common3DShaderProgram):
         gl.glEnable(gl.GL_CULL_FACE)
         gl.glEnable(gl.GL_BLEND)
         gl.glDisable(gl.GL_DEPTH_TEST)
-        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
     
     def stop(self):
         super().stop()
@@ -286,6 +285,7 @@ class ParticleShader(Common3DShaderProgram):
             self.u_sprite_sheet_columns,
             emitter.sprite_sheet.columns)
 
+        gl.glBlendFunc(emitter.opengl_blending[0], emitter.opengl_blending[1])
         gl.glBindTexture(gl.GL_TEXTURE_2D, emitter.sprite_sheet.texture.texture)
         gl.glUniform1i(self.u_sprite_sheet, 0)
 

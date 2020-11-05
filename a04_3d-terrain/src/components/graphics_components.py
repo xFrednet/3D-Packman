@@ -1,12 +1,22 @@
 import numpy as np
 
+from OpenGL import GL as gl
+
+
 class Texture2D:
     def __init__(self, texture):
         self.texture = texture
 
 
 class ParticleEmitter:
-    def __init__(self, sprite_sheet, life_time=10.0, emitting=True, emit_interval=1.0, max_particles=10, sprite_choices=None):
+    def __init__(self,
+            sprite_sheet,
+            life_time=10.0,
+            emitting=True,
+            emit_interval=1.0,
+            max_particles=10,
+            sprite_choices=None,
+            opengl_blending=[gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA]):
         self.sprite_sheet = sprite_sheet
         self.max_particles = max_particles
         self.particle_count = 0
@@ -14,6 +24,7 @@ class ParticleEmitter:
         self.emitting = emitting
         self.emit_interval = emit_interval
         self.emit_timer = 0.0
+        self.opengl_blending = opengl_blending
 
         if (sprite_choices is not None):
             self.sprite_choices = sprite_choices
