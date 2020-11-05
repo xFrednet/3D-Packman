@@ -3,8 +3,8 @@ import glm
 
 import systems
 
-from components import Transformation, CameraOrientation, FreeCamera, Light
-from graphics import graphics_math, shader_program
+from components import Transformation, CameraOrientation, FreeCamera, Light, ParticleEmitter, SpriteSheet
+from graphics import graphics_math, shader_program, Sprite
 from resources import Terrain, LightSetup
 
 class World(esper.World):
@@ -12,6 +12,7 @@ class World(esper.World):
         super().__init__()
         self.resolution = glm.vec2(resolution[0], resolution[1])
         self.delta = 0.00001
+        self.time = self.delta
         self.view_matrix = glm.mat4()
         self.projection_matrix = graphics_math.build_projection_matrix(self.resolution)
         
@@ -21,6 +22,7 @@ class World(esper.World):
         self.height_map_index = 1
         self.terrain_shader = shader_program.TerrainShader()
         self.water_shader = shader_program.WaterShader()
+        self.particle_shader = shader_program.ParticleShader()
         self.light_setup = LightSetup(glm.vec3(0.3, 0.3, 0.3))
         
         self._setup_systems()
@@ -32,20 +34,27 @@ class World(esper.World):
 
     def _setup_systems(self):
         self.add_processor(systems.FreeCameraControlSystem())
+        self.add_processor(systems.ParticleEmitterSystem())
         self.add_processor(systems.UpdateLightSetupSystem())
         self.add_processor(systems.FreeCameraOrientationSystem())
         self.add_processor(systems.BuildTransformationMatrixSystem())
         self.add_processor(systems.PrepareFrameSystem())
         self.add_processor(systems.TerrainRenderer())
         self.add_processor(systems.WaterRendererSystem())
+        self.add_processor(systems.ParticleRenderSystem())
         self.add_processor(systems.FinishFrameSystem())
 
     def _setup_entities(self):
         self.camera_id = self.create_entity(
-            Transformation(position=glm.vec3(0.0, 20.0, 0.0), rotation=glm.vec3(0.0, -1.6, 0.0)),
+            Transformation(position=glm.vec3(0.0, 50.0, 0.0), rotation=glm.vec3(0.0, -0.6, 0.0)),
             CameraOrientation(),
             FreeCamera(),
             Light(color=glm.vec3(0.3, 0.3, 0.3))
+        )
+
+        self.create_entity(
+            Transformation(position=glm.vec3(0.0, 45.0, 0.0)),
+            ParticleEmitter(SpriteSheet(Sprite('../res/particles/idc_particle_pack.png').gen_texture(), 2, 2))
         )
 
         # The sun

@@ -18,6 +18,7 @@ def game_loop(world):
         # https://stackoverflow.com/questions/24039804/pygame-current-time-millis-and-delta-time
         millis = pygame.time.get_ticks()
         world.delta = min(max((millis - last_millis) / 1000.0, 0.00000001), 0.1)
+        world.time += world.delta
         last_millis = millis
 
         # Get events
