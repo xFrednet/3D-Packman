@@ -4,6 +4,7 @@ import glm
 from OpenGL import GL as gl
 
 from graphics import PixelVBA, ParticleShader
+from components import CameraOrientation
 
 class ParticleRenderSystem(esper.Processor):
     DEFAULT_MAX_VERTEX_COUNT = 256
@@ -24,6 +25,8 @@ class ParticleRenderSystem(esper.Processor):
         shader.start()
         shader.load_view_matrix(self.world.view_matrix)
         shader.load_projection_matrix(self.world.projection_matrix)
+        shader.load_camera_position(self.world.light_setup.camera_position)
+        shader.load_camera_up(self.world.component_for_entity(self.world.camera_id, CameraOrientation).up)
 
         # VBO
         gl.glBindVertexArray(self._pixel_vbo.vba_id)

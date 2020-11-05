@@ -153,10 +153,10 @@ class TerrainShader(Common3DLightShaderProgram):
         super().__init__()
 
         cur_dir = os.getcwd()
-        terrain_path = "../res/shader/terrain.vert"
+        vertex_path = "../res/shader/terrain.vert"
         fragment_path = "../res/shader/terrain.frag"
         geometry_path = "../res/shader/terrain.geom"
-        vertex_file = open(os.path.join(cur_dir, terrain_path))
+        vertex_file = open(os.path.join(cur_dir, vertex_path))
         fragment_file = open(os.path.join(cur_dir, fragment_path))
         geometry_file = open(os.path.join(cur_dir, geometry_path))
         shaders = {
@@ -218,19 +218,31 @@ class ParticleShader(Common3DShaderProgram):
         super().__init__()
 
         cur_dir = os.getcwd()
-        terrain_path = "../res/shader/particle.vert"
+        vertex_path = "../res/shader/particle.vert"
+        geometry_path = "../res/shader/particle.geom"
         fragment_path = "../res/shader/particle.frag"
-        vertex_file = open(os.path.join(cur_dir, terrain_path))
+        vertex_file = open(os.path.join(cur_dir, vertex_path))
+        geometry_file = open(os.path.join(cur_dir, geometry_path))
         fragment_file = open(os.path.join(cur_dir, fragment_path))
         shaders = {
-            "particle.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
+            "particle.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()],
+            "particle.geom": [gl.GL_GEOMETRY_SHADER, geometry_file.read()],
             "particle.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
         }
         vertex_file.close()
+        geometry_file.close();
         fragment_file.close()
 
         self._compile_shaders(shaders)
 
         self._map_uniforms()
+        self.u_camera_position = self._load_uniform_location("u_camera_position")
+        self.u_camera_up = self._load_uniform_location("u_camera_up")
 
         print("Particle shader is alive: * x . *")
+
+    def load_camera_position(self, position):
+        gl.glUniform3fv(self.u_camera_position, 1, glm.value_ptr(position))
+
+    def load_camera_up(self, up):
+        gl.glUniform3fv(self.u_camera_up, 1, glm.value_ptr(up))
