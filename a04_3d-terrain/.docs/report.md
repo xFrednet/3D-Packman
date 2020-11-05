@@ -136,17 +136,22 @@ The idea behind clipping water is basically just to remove all vertices where th
 #### 3.4.2 Geometry shader
 
 #### Clipping
-The geometry shader starts where the vertex shader has left of by checking if all vertices are below the terrain. It aborts drawing this triangle if all of them are invisible. This saves us from doing the lighting and alpha calculations
+The geometry shader starts where the vertex shader has left of by checking if all vertices are below the terrain. It aborts drawing this triangle if all of them are invisible. This saves us from doing the lighting and alpha calculations.
 
 #### Water alpha value
-* Clipping
-* Visibility
+The water opacity is calculated using a formula Fresnel that describes how light gets diverted when it hits a different optical media. I sadly have to say that I didn't quite understand the formula it self. I decided to simply copy the equation and move on to a more interesting aspect.
 
 #### 3.4.3 Fragment shader
+The fragment shader simply takes the given color and alpha value and applies it to the pixel it gets drawn on. The actual blending it self is done by OpenGL it self. I used the normal alpha blending with `gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)`. The water alpha was setup to simply draw over the color it self.
 
 ### 3.5 Particles
 
 ## 4. Final thoughts
+I really like the visual result of the simulation. It is really impressive to see how simple such a visual representation can be at the end. That being said it took quite some time to get fully used to the geometry shader. This is of course logical but I still would have liked to get a bit more done as usual. :)
+
+I'm still very happy with the result and even the structure and architecture of the entire project. I believe that it has really improved since the last project.
+
+I hope you had fun reading this report and looking at the simulation it self!
 
 ## 5. Sources
 * OpenGL: Geometry Shader. https://www.khronos.org/opengl/wiki/Geometry_Shader (2020.11.01)
