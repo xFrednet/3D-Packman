@@ -73,7 +73,7 @@ This section will go into detail about the challenges I've encountered during th
 ### 3.1 Art style
 The art style this project uses is called low poly and is characterized by models with a very low polygon count. This leads to clearly visible edges. This art style embraces this look by making the sides and edges quite sharp. Here is an example image from the game itself:
 
-![](res/low_poly_example.png)
+![](res/report/low_poly_example.png)
 
 The interesting part about this art style is the way this effect is archived. Light plays a major role when it comes to 3D-rendering in general. Surfaces use normal vectors to calculate the effect light should have. Each vertex has it's own normal vector, OpenGL then interpolates these inputs before processing them in the fragment shader. This archives a smooth surface effect.
 

@@ -1,5 +1,5 @@
 # Gallery 
-Visual programming is fairly enjoyable due to some intermediate results and maybe some funny glitches. These usually don't make it into the final game. I've taken screenshots of my favorite or most confusing things I've seen during this development. This gallery should give you a small insight into the development. Please enjoy!
+Visual programming is fairly enjoyable due to some intermediate results and maybe some funny glitches. These usually don't make it into the final game. I've taken screenshots of my favorite or most confusing things I've seen during development. This gallery should give you a small insight into the development. Please enjoy!
 
 ## The first terrain
 This is the first terrain that was completely rendered using shaders. I used the height map as a texture. This results in an interesting depth effect. There is no other lighting in this scene
@@ -51,3 +51,13 @@ I was testing some stuff to create an underwater filter. I tried to apply a spec
 ![](res/gallery/08-testing-water-clipping.png)
 
 (Extra points if you can guess how this effect was archived.)
+
+## Adding a plane at y=0
+This was the result of a test where I added a plane at y=0. This actually enables us to see a patter in the waves them self:
+
+![](res/gallery/09-adding-a-plane.png)
+
+## The first particles
+These where the first particle _rectangles_ that where created using the geometric shader. It isn't perfect but it worked out at the end :).
+
+![](res/gallery/10-first-particles.png)
