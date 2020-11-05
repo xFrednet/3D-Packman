@@ -247,6 +247,9 @@ class ParticleShader(Common3DShaderProgram):
         self.u_camera_position = self._load_uniform_location("u_camera_position")
         self.u_camera_up = self._load_uniform_location("u_camera_up")
 
+        self.u_sprite_sheet_rows = self._load_uniform_location("u_sprite_sheet_rows")
+        self.u_sprite_sheet_columns = self._load_uniform_location("u_sprite_sheet_columns")
+
         print("Particle shader is alive: * x . *")
 
     def load_camera_position(self, position):
@@ -259,6 +262,15 @@ class ParticleShader(Common3DShaderProgram):
         gl.glUniform1f(self.u_world_time, time)
 
     def load_emitter(self, emitter: ParticleEmitter):
+        # General shader destruction... Information* Information... How do I fix this now?
+        gl.glUniform1i(
+            self.u_sprite_sheet_rows,
+            emitter.sprite_sheet.rows)
+        gl.glUniform1i(
+            self.u_sprite_sheet_columns,
+            emitter.sprite_sheet.columns)
+
+        # Particle specific information
         for index in range(emitter.particle_count):
             gl.glUniform1f(
                 self.u_emit_times + index,
@@ -270,3 +282,4 @@ class ParticleShader(Common3DShaderProgram):
             gl.glUniform1i(
                 self.u_sprite_incices + index,
                 emitter.data_sprite_incices[index])
+        
