@@ -70,3 +70,17 @@ class TerrainMesh(IndexedVertexArrayBuffer):
 
     def load_tex_coords_data(self, data):
         self._load_vertex_buffer_f(TerrainMesh.TEX_COORDS_ATTR, data, 2)
+
+class PixelVBA(VertexBufferArray):
+    INDEX_ARRAY_ATTR = 0 
+
+    def __init__(self, vertex_count):
+        super().__init__(vertex_count)
+    
+    def load_indices(self, data):
+        """
+        My int loader is sadly not working for some reason but time is of the essence and it's to late to ask so
+        I'll simply use a float which is working. The shader will than cast it to an int.
+        This is nice and the way it was intended right? ~xFrednet 2020.11.05
+        """
+        self._load_vertex_buffer_f(PixelVBA.INDEX_ARRAY_ATTR, data, 1)

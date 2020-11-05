@@ -21,6 +21,7 @@ class World(esper.World):
         self.height_map_index = 1
         self.terrain_shader = shader_program.TerrainShader()
         self.water_shader = shader_program.WaterShader()
+        self.particle_shader = shader_program.ParticleShader()
         self.light_setup = LightSetup(glm.vec3(0.3, 0.3, 0.3))
         
         self._setup_systems()
@@ -38,6 +39,7 @@ class World(esper.World):
         self.add_processor(systems.PrepareFrameSystem())
         self.add_processor(systems.TerrainRenderer())
         self.add_processor(systems.WaterRendererSystem())
+        self.add_processor(systems.ParticleRenderSystem())
         self.add_processor(systems.FinishFrameSystem())
 
     def _setup_entities(self):

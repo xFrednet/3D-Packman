@@ -35,6 +35,7 @@ class TerrainRenderer(esper.Processor):
             gl.glBindVertexArray(0)
         
         shader.stop()
+        gl.glDisable(gl.GL_CULL_FACE)
 
 
 class WaterRendererSystem(esper.Processor):
@@ -71,3 +72,4 @@ class WaterRendererSystem(esper.Processor):
         
         shader.stop()
         gl.glDisable(gl.GL_BLEND)
+        gl.glDisable(gl.GL_CULL_FACE)

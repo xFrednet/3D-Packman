@@ -23,7 +23,7 @@ class ShaderProgram:
             shader_type = info[0]
             shader_src = info[1]
             
-            print("Compiling: ", name)
+            print("    > Compiling: ", name)
             shader_id = gl.glCreateShader(shader_type)
             gl.glShaderSource(shader_id, shader_src)
 
@@ -68,6 +68,35 @@ class Common3DShaderProgram(ShaderProgram):
         self.vs_view_matrix_loc = None
         self.vs_projection_matrix_loc = None
 
+    def _map_uniforms(self):
+        self.vs_transformation_matrix_loc = self._load_uniform_location("u_transformation_matrix")
+        self.vs_view_matrix_loc = self._load_uniform_location("u_view_matrix")
+        self.vs_projection_matrix_loc = self._load_uniform_location("u_projection_matrix")
+    
+    def load_transformation_matrix(self, mat):
+        gl.glUniformMatrix4fv(self.vs_transformation_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
+
+    def load_view_matrix(self, mat):
+        gl.glUniformMatrix4fv(self.vs_view_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
+
+    def load_projection_matrix(self, mat):
+        gl.glUniformMatrix4fv(self.vs_projection_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
+
+
+class Common3DLightShaderProgram(Common3DShaderProgram):
+    """
+    Looking at this inheritance cancer makes me realize that I should have
+    build these in a modular fashion as well. Good to know for the rework but this
+    is also good enough for now ^^.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+        self.vs_transformation_matrix_loc = None
+        self.vs_view_matrix_loc = None
+        self.vs_projection_matrix_loc = None
+
         self.vs_light_position = None
         self.vs_light_count = None
         self.vs_camera_position = None
@@ -94,15 +123,6 @@ class Common3DShaderProgram(ShaderProgram):
         self.fs_light_attenuation = self._load_uniform_location("u_light_attenuation")
         self.fs_light_count = self._load_uniform_location("u_light_count")
         self.fs_global_ambient = self._load_uniform_location("u_global_ambient")
-
-    def load_transformation_matrix(self, mat):
-        gl.glUniformMatrix4fv(self.vs_transformation_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
-
-    def load_view_matrix(self, mat):
-        gl.glUniformMatrix4fv(self.vs_view_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
-
-    def load_projection_matrix(self, mat):
-        gl.glUniformMatrix4fv(self.vs_projection_matrix_loc, 1, gl.GL_FALSE, glm.value_ptr(mat))
     
     def load_light_setup(self, light_setup):
         # Vertex Shader
@@ -128,7 +148,7 @@ class Common3DShaderProgram(ShaderProgram):
                 glm.value_ptr(light_setup.lights[index].attenuation))
 
 
-class TerrainShader(Common3DShaderProgram):
+class TerrainShader(Common3DLightShaderProgram):
     def __init__(self):
         super().__init__()
 
@@ -154,9 +174,10 @@ class TerrainShader(Common3DShaderProgram):
 
         self.u_tex_map = self._load_uniform_location('u_tex_map')
 
-        print("Terrain shader is alive")
+        print("Terrain shader is alive: _/\\_/\\_")
 
-class WaterShader(Common3DShaderProgram):
+
+class WaterShader(Common3DLightShaderProgram):
     def __init__(self):
         super().__init__()
 
@@ -185,8 +206,31 @@ class WaterShader(Common3DShaderProgram):
         self.world_delta = 0.0
         self.u_world_delta = self._load_uniform_location('u_world_delta')
 
-        print("Water shader is alive")
+        print("Water shader is alive: ~~~~~")
     
     def add_delta(self, delta):
         self.world_delta += delta
         gl.glUniform1f(self.u_world_delta, self.world_delta)
+
+
+class ParticleShader(Common3DShaderProgram):
+    def __init__(self):
+        super().__init__()
+
+        cur_dir = os.getcwd()
+        terrain_path = "../res/shader/particle.vert"
+        fragment_path = "../res/shader/particle.frag"
+        vertex_file = open(os.path.join(cur_dir, terrain_path))
+        fragment_file = open(os.path.join(cur_dir, fragment_path))
+        shaders = {
+            "particle.vert": [gl.GL_VERTEX_SHADER, vertex_file.read()], 
+            "particle.frag": [gl.GL_FRAGMENT_SHADER, fragment_file.read()]
+        }
+        vertex_file.close()
+        fragment_file.close()
+
+        self._compile_shaders(shaders)
+
+        self._map_uniforms()
+
+        print("Particle shader is alive: * x . *")
