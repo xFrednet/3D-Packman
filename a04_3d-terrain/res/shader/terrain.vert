@@ -17,13 +17,14 @@ struct Material {
 
 // Water 10%
 #define MATERIAL_COUNT 5
-const Material TERRAIN_MATERIAL[MATERIAL_COUNT + 1] = Material[](
+const Material TERRAIN_MATERIAL[MATERIAL_COUNT + 2] = Material[](
     Material(RGB(130.0,  11.0,  70.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB(240.0, 218.0, 161.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB( 86.0, 107.0,  52.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB(100.0,  60.0,  60.0), vec3(0.0, 0.0, 0.0), 1.0),
     Material(RGB(221.0, 221.0, 221.0), vec3(0.0, 0.0, 0.0), 1.0),
-    Material(RGB(  0.0,   0.0,   0.0), vec3(0.0, 0.0, 0.0), 0.0)
+    Material(RGB(221.0, 221.0, 221.0), vec3(0.0, 0.0, 0.0), 1.0),
+    Material(RGB(221.0, 221.0, 221.0), vec3(0.0, 0.0, 0.0), 1.0)
 );
 
 // v for vertex

@@ -32,11 +32,15 @@ uniform mat4 u_transformation_matrix;
 uniform float u_world_delta;
 uniform sampler2D u_height_map;
 
-float get_offset(float a, float b, float factor_1, float factor_2) {
-    float a_in = (u_world_delta * 0.1) + (b + a * factor_1) * 117.0;
-    float b_in = (u_world_delta * 0.1) + (a + b * factor_2) * 117.0;
+float get_offset(float a, float b, float factor_1, float factor_2, float factor_3) {
+    float a_in = (u_world_delta * 0.1003 * factor_3) + (b + a * factor_1) * 117.0;
+    float b_in = (u_world_delta * 0.1007 * factor_3) + (a + b * factor_2) * 117.0;
     return sin(a_in * 2.0 * PI) + cos(b_in * 2.0 * PI);
 }
+
+// Function(sin(((x * 0.1 * 0.97) + ((b * 2.3) + (a * 2.1) * 0.1) * 117.0) * 2.0 * pi) + cos(((x * 0.1 * 0.97) + ((a * 2.1) + (b * 2.3) * 0.2) * 117.0) * 2.0 * pi), 0, 100)
+// Function(sin(((x * 0.1 * 0.99) + ((b * 2.5) + (a * 2.3) * 0.3) * 117.0) * 2.0 * pi) + cos(((x * 0.1 * 0.99) + ((a * 2.3) + (b * 2.5) * 0.4) * 117.0) * 2.0 * pi), 0, 100)
+// Function(sin(((x * 0.1 * 1.04) + ((b * 2.2) + (a * 2.7) * 0.2) * 117.0) * 2.0 * pi) + cos(((x * 0.1 * 1.04) + ((a * 2.7) + (b * 2.2) * 0.5) * 117.0) * 2.0 * pi), 0, 100)
 
 void main() {
     vec3 tex_value = texture2D(u_height_map, in_tex_coords).xyz;
@@ -48,9 +52,9 @@ void main() {
         1.0
     );
 
-    position.x += get_offset(in_tex_coords.x * 2.1, in_tex_coords.y * 2.3, 0.1, 0.2) * X_AMPLITUDE;
-    position.y += get_offset(in_tex_coords.x * 2.3, in_tex_coords.y * 2.5, 0.3, 0.4) * Y_AMPLITUDE;
-    position.z += get_offset(in_tex_coords.x * 2.7, in_tex_coords.y * 2.2, 0.2, 0.5) * Z_AMPLITUDE;
+    position.x += get_offset(in_tex_coords.x * 2.1, in_tex_coords.y * 2.3, 0.1, 0.2, 0.97) * X_AMPLITUDE;
+    position.y += get_offset(in_tex_coords.x * 2.3, in_tex_coords.y * 2.5, 0.3, 0.4, 0.99) * Y_AMPLITUDE;
+    position.z += get_offset(in_tex_coords.x * 2.7, in_tex_coords.y * 2.2, 0.2, 0.5, 1.04) * Z_AMPLITUDE;
 
     v_diffuse = RGB(10.0, 10.0, 155.0);
     v_specular = RGB(12.0, 12.0, 12.0);
