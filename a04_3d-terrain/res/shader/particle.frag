@@ -4,6 +4,8 @@ in vec2 f_tex_coordinate;
 
 out vec4 color;
 
+uniform sampler2D u_sprite_sheet;
+
 void main() {
-    color = vec4(f_tex_coordinate.x, 0.0, f_tex_coordinate.y, 1.0);
+    color = texture2D(u_sprite_sheet, f_tex_coordinate);
 }

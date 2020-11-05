@@ -249,8 +249,24 @@ class ParticleShader(Common3DShaderProgram):
 
         self.u_sprite_sheet_rows = self._load_uniform_location("u_sprite_sheet_rows")
         self.u_sprite_sheet_columns = self._load_uniform_location("u_sprite_sheet_columns")
+        self.u_sprite_sheet = self._load_uniform_location("u_sprite_sheet")
+        # I again regret not setting this up in a more modular way. Anyways :) ~xFrednet 2020.11.05
 
         print("Particle shader is alive: * x . *")
+
+    def start(self):
+        super().start()
+        gl.glActiveTexture(gl.GL_TEXTURE0)
+        gl.glEnable(gl.GL_CULL_FACE)
+        gl.glEnable(gl.GL_BLEND)
+        gl.glDisable(gl.GL_DEPTH_TEST)
+        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+    
+    def stop(self):
+        super().stop()
+        gl.glEnable(gl.GL_DEPTH_TEST)
+        gl.glDisable(gl.GL_BLEND)
+        gl.glDisable(gl.GL_CULL_FACE)
 
     def load_camera_position(self, position):
         gl.glUniform3fv(self.u_camera_position, 1, glm.value_ptr(position))
@@ -269,6 +285,9 @@ class ParticleShader(Common3DShaderProgram):
         gl.glUniform1i(
             self.u_sprite_sheet_columns,
             emitter.sprite_sheet.columns)
+
+        gl.glBindTexture(gl.GL_TEXTURE_2D, emitter.sprite_sheet.texture.texture)
+        gl.glUniform1i(self.u_sprite_sheet, 0)
 
         # Particle specific information
         for index in range(emitter.particle_count):
