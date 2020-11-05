@@ -111,23 +111,23 @@ The vertex input is again the texture coordinates of the height_map, like in the
 ##### The wave effect
 The basic idea to archive this wave effect is to apply a time and position based offset. The shader throws a combination of the time and the texture coordinates scaled by some value into a sinus and cosinus function to receives values -1.0 and 1.0. These values are than added together. The texture coordinates and are scaled differently for the x y and z offset. The exact code can be found in the shader it self. I want to add some visual explanations to the formula. I therefore visualized the offset calculations for three different world positions. The colors red, green and blue correlate with the x y and z offset.
 
-![](res/report/waves_x03_y02.png)
-
 The wave offset for x=`0.3` and y=`0.2`
 
-![](res/report/waves_x05_y04.png)
+![](res/report/waves_x03_y02.png)
 
 The wave offset for x=`0.5` and y=`0.4`
 
-![](res/report/waves_x06_y06.png)
+![](res/report/waves_x05_y04.png)
 
 The wave offset for x=`0.6` and y=`0.6`
+
+![](res/report/waves_x06_y06.png)
 
 This pattern is by far not ideal but that's not the goal. All we want to archive is a human unpredictable pattern and a continues smooth motion and this definitely does the job quite well. Finding the right values for the offset and even the combination of the time and factors took quite some time, it was basically a lot of try and error with a lot of different constellations.
 
 The position with the applied offset is than further passed to the geometry shader.
 
-#### Clipping
+##### Clipping
 An optimized game would usually calculate which water vertices can actually be seen by the player and wouldn't even generate the other ones. However, this simulation calculates the height of the terrain in the vertex shader and limits us therefor to clip the unseen water vertices beforehand. I still wanted to clip at least some of the water to gain a bit of performance. 
 
 The idea behind clipping water is basically just to remove all vertices where the terrain is above the sea level in our case >= 0.0. However, we want to make sure that all vertices are below the terrain before we clip the face completely. The vertex shader therefor only calculates if this vertex is below the terrain and passes this information to the geometry shader to deal with. Note that this calculation uses the y value with applied waves. This would even allow us to simulate a tsunami with the correct clipping calculations. 
