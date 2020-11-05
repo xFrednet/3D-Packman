@@ -15,6 +15,9 @@
     * [3.3.2 Geometry shader thingy](#332-Geometry-shader-thingy)
     * [3.3.3 The long fragment shader](#333-The-long-fragment-shader)
   * [3.4 Water](#34-Water)
+    * [3.4.1 Vertex shader](#341-Vertex-shader)
+    * [3.4.2 Geometry shader](#342-Geometry-shader)
+    * [3.4.3 Fragment shader](#343-Fragment-shader)
   * [3.5 Particles](#35-Particles)
 * [4 Final thoughts](#4-Final-thoughts)
 * [5 Sources](#5-Sources)
@@ -81,7 +84,7 @@ The terrain rendering is only done in the vertex and geometry shader.
 #### 3.3.1 Vertex shader
 I've tried to reduce the vertex data as much as possible and I ended up just passing the texture coordinate of this vertex for height_map. The vertex shader than samples the color of the height_map at the given coordinate and divides the sum of the RGB values by three. This returns a value between 0.0 for pitch black and 1.0 for snow white.
 
-The texture coordinates are used for the x and z value of the position and the y is set via the height_map. This vertex position is than scaled by some defined constants in the vertex shader. This gives us a Terrain that is varying in height. The shader also apples the transformation matrix to the position.
+The texture coordinates are used for the x and z value of the position and the y is set via the height_map.  This vertex position is than scaled by some defined constants in the vertex shader. This gives us a Terrain that is varying in height. Note that an offset is added to the y value to have the water level be at 0.0. The actual terrain height can range from -30.0 to 70.0. The shader also apples the transformation matrix to the position.
 
 I, le Fred, also wanted to have a color effect depending on the height of the terrain. I first defined several materials I want to have to the different height. I than needed to select two materials to interpolate between. This is done by using the previous height value and scaling it my the amount of defined materials. In our case 5. This gives us a value in the range from 0.0 and 5.0. This value is than simply converted into an integer and used as an index for the material list. The fraction is directly used in the interpolation as an added bonus.
 
@@ -100,10 +103,46 @@ The fragment shader just passes the input color as an output to the next stage.
 Yep and that is that. It's actually surprisingly simple for such a cool effect in my opinion.
 
 ### 3.4 Water
+This section will explain the water implementation in the project. The water is rendered using it's own shaders. However, we use the same vertex array like the terrain. This also enables us to implement vertex clipping below the terrain. Let's get into it.
 
-* Positioning
+#### 3.4.1 Vertex shader
+The vertex input is again the texture coordinates of the height_map, like in the terrain shader. These are also again multiplied by defined constants to expand the water mesh to the size of the terrain. They Y value is set to 0.0 for now. This leaves us with a flat mesh at y value 0.0.
+
+##### The wave effect
+The basic idea to archive this wave effect is to apply a time and position based offset. The shader throws a combination of the time and the texture coordinates scaled by some value into a sinus and cosinus function to receives values -1.0 and 1.0. These values are than added together. The texture coordinates and are scaled differently for the x y and z offset. The exact code can be found in the shader it self. I want to add some visual explanations to the formula. I therefore visualized the offset calculations for three different world positions. The colors red, green and blue correlate with the x y and z offset.
+
+![](res/report/waves_x03_y02.png)
+
+The wave offset for x=`0.3` and y=`0.2`
+
+![](res/report/waves_x05_y04.png)
+
+The wave offset for x=`0.5` and y=`0.4`
+
+![](res/report/waves_x06_y06.png)
+
+The wave offset for x=`0.6` and y=`0.6`
+
+This pattern is by far not ideal but that's not the goal. All we want to archive is a human unpredictable pattern and a continues smooth motion and this definitely does the job quite well. Finding the right values for the offset and even the combination of the time and factors took quite some time, it was basically a lot of try and error with a lot of different constellations.
+
+The position with the applied offset is than further passed to the geometry shader.
+
+#### Clipping
+An optimized game would usually calculate which water vertices can actually be seen by the player and wouldn't even generate the other ones. However, this simulation calculates the height of the terrain in the vertex shader and limits us therefor to clip the unseen water vertices beforehand. I still wanted to clip at least some of the water to gain a bit of performance. 
+
+The idea behind clipping water is basically just to remove all vertices where the terrain is above the sea level in our case >= 0.0. However, we want to make sure that all vertices are below the terrain before we clip the face completely. The vertex shader therefor only calculates if this vertex is below the terrain and passes this information to the geometry shader to deal with. Note that this calculation uses the y value with applied waves. This would even allow us to simulate a tsunami with the correct clipping calculations. 
+
+
+#### 3.4.2 Geometry shader
+
+#### Clipping
+The geometry shader starts where the vertex shader has left of by checking if all vertices are below the terrain. It aborts drawing this triangle if all of them are invisible. This saves us from doing the lighting and alpha calculations
+
+#### Water alpha value
 * Clipping
 * Visibility
+
+#### 3.4.3 Fragment shader
 
 ### 3.5 Particles
 
