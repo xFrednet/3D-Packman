@@ -1,5 +1,0 @@
-pygame==2.0.0.dev12
-PyGLM
-PyOpenGL
-esper
-numpy

@@ -5,17 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "3D Maze",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "2D Game",
-            "type": "python",
-            "request": "launch",
-            "program": "a02_2d-game/main.py",
+            "program": "src/main.py",
             "console": "integratedTerminal"
         }
     ]
